@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping(value = BaseController.BASE_URI) public class RepositorySearchController extends BaseController {
 
 	@Autowired
-	private SearchRepository tvSearch;
+	private SearchRepository searchRepository;
 
 	/*
 	 * 全文搜索
@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 		if (!domainType.isAnnotationPresent(Indexed.class)) {
 			throw new ResourceNotFoundException();
 		}
-		Page page = tvSearch.search(domainType, keyword, pageable, sort, highLight, null);
+		Page page = searchRepository.search(domainType, keyword, pageable, sort, highLight, null);
 		Link selfRel = ControllerLinkBuilder
 				.linkTo(RepositorySearchController.class, RepositorySearchController.class.getMethod("search", RootResourceInformation.class, String.class, Pageable.class, Sort.class, boolean.class),
 						resourceInformation.getPathName())

@@ -1,5 +1,8 @@
 package cn.bestwu.framework.data.model;
 
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -9,6 +12,7 @@ import javax.persistence.Id;
  *
  * @author Peter Wu
  */
+@Indexed
 @Entity
 public class TestUser {
 
@@ -16,9 +20,11 @@ public class TestUser {
 	@GeneratedValue
 	private Long id;
 
+	@Field
 	//	@NotBlank
 	private String firstName;
 	//	@NotBlank
+	@Field
 	private String lastName;
 
 	public Long getId() {

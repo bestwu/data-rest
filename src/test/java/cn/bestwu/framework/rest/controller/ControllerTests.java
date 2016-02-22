@@ -9,6 +9,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -60,17 +62,22 @@ public class ControllerTests {
 		Assert.assertEquals("Peter_modify", testUser1UpdateResult.get("firstName"));
 
 		MultiValueMap<String, Object> testUser2ForUpdate = new LinkedMultiValueMap<>();
-		testUser2ForUpdate.put("lastName", Collections.singletonList("Wu2_modify"));
+		testUser2ForUpdate.put("lastName", Collections.singletonList("wu2_modify"));
 		Map testUser2UpdateResult = restTemplate.putForObject(getBaseUrl() + "/testUsers/" + testUser2Result.get("id"), testUser2ForUpdate, HashMap.class);
-		Assert.assertEquals("Wu2_modify", testUser2UpdateResult.get("lastName"));
+		Assert.assertEquals("wu2_modify", testUser2UpdateResult.get("lastName"));
 
 		//get
 		Map getResult = restTemplate.getForObject(getBaseUrl() + "/testUsers/" + testUser2Result.get("id"), HashMap.class);
-		Assert.assertEquals("Wu2_modify", getResult.get("lastName"));
+		Assert.assertEquals("wu2_modify", getResult.get("lastName"));
 
 		//index
 		Map page = restTemplate.getForObject(getBaseUrl() + "/testUsers", HashMap.class);
 		Assert.assertEquals(2, page.get("totalElements"));
+
+		//search
+		ResponseEntity<HashMap> entity = restTemplate.getForEntity(getBaseUrl() + "/testUsers/search?keyword=wu2_modify", HashMap.class);
+		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
+		Assert.assertEquals(1, entity.getBody().get("totalElements"));
 
 		//delete
 		restTemplate.delete(getBaseUrl() + "/testUsers/" + testUser1Result.get("id"));
