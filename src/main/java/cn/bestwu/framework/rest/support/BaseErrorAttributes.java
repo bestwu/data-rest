@@ -9,7 +9,6 @@ import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
@@ -150,10 +149,6 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 			} else if (e instanceof HttpMediaTypeNotAcceptableException) {
 				httpStatusCode = HttpStatus.NOT_ACCEPTABLE.value();
 				message = "MediaType not Acceptable!Must ACCEPT:" + ((HttpMediaTypeNotAcceptableException) e).getSupportedMediaTypes();
-			} else if (e instanceof JpaSystemException) {
-				httpStatusCode = getStatus(requestAttributes).value();
-				message = ((JpaSystemException) e).getRootCause().getMessage();
-				logger.error(message, e);
 			} else if (e instanceof IllegalStateException) {
 				httpStatusCode = HttpStatus.BAD_REQUEST.value();
 			} else if (e instanceof org.springframework.data.mapping.PropertyReferenceException) {

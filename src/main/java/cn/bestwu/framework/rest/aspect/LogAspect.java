@@ -1,8 +1,8 @@
 package cn.bestwu.framework.rest.aspect;
 
 import cn.bestwu.framework.rest.controller.BaseController;
-import cn.bestwu.framework.rest.support.Resource;
 import cn.bestwu.framework.rest.support.PrincipalNamePutEvent;
+import cn.bestwu.framework.rest.support.Resource;
 import cn.bestwu.framework.util.StringUtil;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -10,14 +10,11 @@ import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 
 import javax.servlet.RequestDispatcher;
 import java.util.Map;
 
 @Aspect
-@Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class LogAspect extends BaseController {
 	private final Logger logger = LoggerFactory.getLogger(LogAspect.class);
 	private final String PUT_PARAMETER_MAP = "PUT_PARAMETER_MAP";

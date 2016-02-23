@@ -1,6 +1,7 @@
 package cn.bestwu.framework.rest.config;
 
 import cn.bestwu.framework.rest.aspect.LogAspect;
+import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.converter.DefaultElementMixIn;
 import cn.bestwu.framework.rest.converter.PageMixIn;
 import cn.bestwu.framework.rest.converter.StringToEnumConverterFactory;
@@ -26,13 +27,12 @@ import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.autoconfigure.web.WebMvcProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.context.web.OrderedRequestContextFilter;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.*;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.core.io.Resource;
@@ -54,7 +54,6 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.util.ClassUtils;
 import org.springframework.validation.DefaultMessageCodesResolver;
 import org.springframework.validation.MessageCodesResolver;
 import org.springframework.validation.Validator;
@@ -88,12 +87,20 @@ import java.util.*;
  */
 @Configuration
 @ConditionalOnWebApplication
+@Import({ MessageSourceConfiguration.class })
 public class RestMvcConfiguration {
+
+	@Configuration
+	@ConditionalOnWebApplication
+	@ComponentScan(basePackageClasses = BaseController.class)
+	protected static class ControllerConfiguration {
+	}
 
 	@Autowired
 	private ApplicationEventPublisher publisher;
 
 	@Bean
+	@Order(Ordered.HIGHEST_PRECEDENCE + 10)
 	public LogAspect logAspect() {
 		return new LogAspect(publisher);
 	}
@@ -137,7 +144,7 @@ public class RestMvcConfiguration {
 	@Configuration
 	@ConditionalOnBean({ JavaMailSenderImpl.class, MailProperties.class })
 	@ConditionalOnMissingBean(MailClient.class)
-	public static class MailSenderAutoConfiguration {
+	protected static class MailSenderAutoConfiguration {
 
 		@Autowired
 		private MailProperties properties;
@@ -154,7 +161,7 @@ public class RestMvcConfiguration {
 	@ConditionalOnWebApplication
 	@Import(EnableWebMvcConfiguration.class)
 	@EnableConfigurationProperties({ WebMvcProperties.class, ResourceProperties.class })
-	public static class WebMvcAutoConfigurationAdapter extends WebMvcConfigurerAdapter {
+	protected static class WebMvcAutoConfigurationAdapter extends WebMvcConfigurerAdapter {
 
 		private static final Log logger = LogFactory.getLog(WebMvcConfigurerAdapter.class);
 
@@ -329,18 +336,24 @@ public class RestMvcConfiguration {
 
 	@Configuration
 	@ConditionalOnWebApplication
-	public static class EnableWebMvcConfiguration extends DelegatingWebMvcConfiguration {
+	protected static class EnableWebMvcConfiguration extends DelegatingWebMvcConfiguration {
 
 		@Autowired(required = false)
 		private WebMvcProperties mvcProperties;
 		@Autowired
 		private MessageSource messageSource;
 		@Autowired
-		private Repositories repositories;
-		@Autowired
 		private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter;
 		@Autowired
 		private StringHttpMessageConverter stringHttpMessageConverter;
+
+		@Autowired
+		private ApplicationContext applicationContext;
+
+		@Bean
+		public Repositories repositories() {
+			return new Repositories(applicationContext);
+		}
 
 		@Bean
 		@Override public FormattingConversionService mvcConversionService() {
@@ -352,7 +365,7 @@ public class RestMvcConfiguration {
 		@Bean
 		public RepositoryInvokerFactory repositoryInvokerFactory() {
 			return new UnwrappingRepositoryInvokerFactory(
-					new DefaultRepositoryInvokerFactory(repositories, mvcConversionService()));
+					new DefaultRepositoryInvokerFactory(repositories(), mvcConversionService()));
 		}
 
 		@Lazy
@@ -379,7 +392,7 @@ public class RestMvcConfiguration {
 		public RootResourceInformationHandlerMethodArgumentResolver repoRequestArgumentResolver() {
 
 			if (QueryDslUtils.QUERY_DSL_PRESENT) {
-				return new QuerydslAwareRootResourceInformationHandlerMethodArgumentResolver(repositories,
+				return new QuerydslAwareRootResourceInformationHandlerMethodArgumentResolver(repositories(),
 						repositoryInvokerFactory(), repositoryResourceMetadataHandlerMethodArgumentResolver(), querydslPredicateBuilder(), querydslBindingsFactory(), publisher);
 			}
 
@@ -398,8 +411,6 @@ public class RestMvcConfiguration {
 				argumentResolvers.add(0, new QuerydslPredicateArgumentResolver(querydslBindingsFactory(), querydslPredicateBuilder(), publisher));
 			argumentResolvers.add(new ETagArgumentResolver());
 			argumentResolvers.add(new MultipartFileHolderMethodArgumentResolver());
-			if (ClassUtils.isPresent("org.apache.lucene.search.Sort", RestMvcConfiguration.class.getClassLoader()))
-				argumentResolvers.add(new SearchSortHandlerMethodArgumentResolver());
 		}
 
 		/*
@@ -441,7 +452,7 @@ public class RestMvcConfiguration {
 
 		@Bean
 		public RepositoryResourceMappings repositoryResourceMappings() {
-			return new RepositoryResourceMappings(repositories);
+			return new RepositoryResourceMappings(repositories());
 		}
 
 		@Autowired(required = false)

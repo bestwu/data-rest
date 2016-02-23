@@ -1,20 +1,24 @@
 package cn.bestwu.framework;
 
+import cn.bestwu.framework.data.JpaSearchRepository;
+import cn.bestwu.framework.data.MongodbSearchRepository;
 import cn.bestwu.framework.data.SearchRepository;
 import cn.bestwu.framework.event.AnnotatedEventHandlerInvoker;
+import cn.bestwu.framework.rest.config.RestMvcConfiguration;
 import org.hibernate.search.jpa.Search;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.auditing.AuditableBeanWrapperFactory;
 import org.springframework.data.auditing.MappingAuditableBeanWrapperFactory;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mapping.context.PersistentEntities;
-import org.springframework.data.repository.support.Repositories;
+import org.springframework.data.mongodb.core.query.TextCriteria;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,16 +29,11 @@ import java.util.List;
  * @author Peter Wu
  */
 @Configuration
-@ComponentScan(basePackageClasses = EnableDataRest.class)
+@Import({ RestMvcConfiguration.class })
 public class DataRestConfiguration {
 
 	@Autowired
 	private ApplicationContext applicationContext;
-
-	@Bean
-	public Repositories repositories() {
-		return new Repositories(applicationContext);
-	}
 
 	@Bean
 	public PersistentEntities persistentEntities() {
@@ -61,10 +60,22 @@ public class DataRestConfiguration {
 
 	@Configuration
 	@ConditionalOnClass(Search.class)
-	public static class SearchConfiguration {
+	protected static class JpaSearchRepositoryConfiguration {
+
 		@Bean
 		public SearchRepository searchRepository() {
-			return new SearchRepository();
+			return new JpaSearchRepository();
+		}
+	}
+
+	@Configuration
+	@ConditionalOnMissingBean(SearchRepository.class)
+	@ConditionalOnClass(TextCriteria.class)
+	protected static class MongodbSearchRepositoryConfiguration {
+
+		@Bean
+		public SearchRepository searchRepository() {
+			return new MongodbSearchRepository();
 		}
 	}
 }

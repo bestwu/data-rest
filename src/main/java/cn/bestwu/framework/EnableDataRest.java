@@ -1,7 +1,6 @@
 package cn.bestwu.framework;
 
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 import java.lang.annotation.*;
 
@@ -13,7 +12,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-@EnableJpaAuditing
 @Import(DataRestConfiguration.class)
 public @interface EnableDataRest {
 }

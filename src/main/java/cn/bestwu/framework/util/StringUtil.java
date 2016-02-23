@@ -1,11 +1,10 @@
 package cn.bestwu.framework.util;
 
+import cn.bestwu.framework.rest.converter.DefaultElementMixIn;
 import cn.bestwu.framework.rest.converter.PageMixIn;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import cn.bestwu.framework.rest.converter.DefaultElementMixIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageImpl;
@@ -95,7 +94,7 @@ public class StringUtil {
 		} else {
 			try {
 				return objectMapper.writeValueAsString(object);
-			} catch (JsonProcessingException e) {
+			} catch (Exception e) {
 				logger.error(e.getMessage(), e);
 			}
 		}

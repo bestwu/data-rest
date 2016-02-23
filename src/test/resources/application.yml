@@ -1,0 +1,12 @@
+spring.data.mongodb.uri: mongodb://root:root@localhost/test
+
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        search:
+          analyzer: org.apache.lucene.analysis.cjk.CJKAnalyzer
+          default:
+            directory_provider: filesystem
+            indexBase: D:/home/tv/indexes/

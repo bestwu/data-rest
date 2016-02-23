@@ -46,9 +46,9 @@ dependencyManagement {
         mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
     }
     dependencies {
-        dependency 'com.mysema.querydsl:querydsl-apt:3.6.7'
-
-        dependency 'com.mysema.querydsl:querydsl-jpa:3.6.7'
+        dependency 'com.mysema.querydsl:querydsl-apt:3.7.1'
+        dependency 'com.mysema.querydsl:querydsl-jpa:3.7.1'
+        dependency 'com.mysema.querydsl:querydsl-mongodb:3.7.1'
         dependency 'org.hibernate:hibernate-search-orm:5.3.0.Final'
         dependency 'org.apache.lucene:lucene-highlighter:4.10.4'
 
@@ -60,7 +60,7 @@ dependencyManagement {
 
 dependencies {
     //data
-    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.springframework.boot:spring-boot-starter-aop'
     //web
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.hateoas:spring-hateoas'
@@ -70,37 +70,48 @@ dependencies {
     compile 'commons-io:commons-io'
 
     //optional
-    optional 'org.springframework.boot:spring-boot-starter-mail'
-    optional 'com.belerweb:pinyin4j'
+    optional 'org.springframework.boot:spring-boot-starter-data-jpa'
     optional 'com.mysema.querydsl:querydsl-jpa'
+    optional 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    optional 'com.mysema.querydsl:querydsl-mongodb'
     optional 'org.hibernate:hibernate-search-orm'
     optional 'org.apache.lucene:lucene-highlighter'
+    optional 'org.springframework.boot:spring-boot-starter-mail'
+    optional 'com.belerweb:pinyin4j'
     //test
-    testCompile 'com.mysema.querydsl:querydsl-apt'
     testCompile "com.h2database:h2"
+    testCompile 'com.mysema.querydsl:querydsl-apt'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
 
 def taskGroup = 'app'
 
 //Querydsl
-def querydslSourcesDir = file('src/querydsl/java')
-task generateQueryDSL(type: JavaCompile, group: taskGroup) {
-    source = sourceSets.main.java
+//def querydslSourcesDir = file('src/querydsl/java')
+//task generateQueryDSL(type: JavaCompile, group: taskGroup) {
+//    source = sourceSets.main.java
+//    classpath = configurations.compile + configurations.testCompile + configurations.runtime
+//    options.compilerArgs = ['-proc:only', '-processor', 'com.mysema.query.apt.jpa.JPAAnnotationProcessor']
+//    options.encoding = 'UTF-8'
+//    destinationDir = querydslSourcesDir
+//}
+//project.compileJava {
+//    source querydslSourcesDir
+//}
+//compileJava.dependsOn generateQueryDSL
+
+def testquerydslSourcesDir = file('src/testquerydsl/java')
+task generateTestJPAQueryDSL(type: JavaCompile, group: taskGroup) {
+    source = 'src/test/java/cn/bestwu/framework/jpa/model'
     classpath = configurations.compile + configurations.testCompile + configurations.runtime
     options.compilerArgs = ['-proc:only', '-processor', 'com.mysema.query.apt.jpa.JPAAnnotationProcessor']
     options.encoding = 'UTF-8'
-    destinationDir = querydslSourcesDir
+    destinationDir = testquerydslSourcesDir
 }
-project.compileJava {
-    source querydslSourcesDir
-}
-
-def testquerydslSourcesDir = file('src/testquerydsl/java')
-task generateTestQueryDSL(type: JavaCompile, group: taskGroup) {
-    source = 'src/test/java/com/saygoer/framework/data/model'
+task generateTestMongodbQueryDSL(type: JavaCompile, group: taskGroup) {
+    source = 'src/test/java/cn/bestwu/framework/mongodb/model'
     classpath = configurations.compile + configurations.testCompile + configurations.runtime
-    options.compilerArgs = ['-proc:only', '-processor', 'com.mysema.query.apt.jpa.JPAAnnotationProcessor']
+    options.compilerArgs = ['-proc:only', '-processor', 'org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor']
     options.encoding = 'UTF-8'
     destinationDir = testquerydslSourcesDir
 }
@@ -108,8 +119,7 @@ project.compileTestJava {
     source testquerydslSourcesDir
 }
 
-compileJava.dependsOn generateQueryDSL
-compileTestJava.dependsOn generateTestQueryDSL
+compileTestJava.dependsOn generateTestJPAQueryDSL, generateTestMongodbQueryDSL
 
 //
 
@@ -123,7 +133,7 @@ idea {
 
         inheritOutputDirs = false
 
-        sourceDirs += querydslSourcesDir
+//        sourceDirs += querydslSourcesDir
         testSourceDirs += testquerydslSourcesDir
 
         downloadJavadoc = false

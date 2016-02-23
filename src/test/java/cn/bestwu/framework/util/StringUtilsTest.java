@@ -1,6 +1,6 @@
 package cn.bestwu.framework.util;
 
-import cn.bestwu.framework.data.model.TestUser;
+import cn.bestwu.framework.jpa.model.TestUser;
 import org.junit.Assert;
 import org.junit.Test;
 
