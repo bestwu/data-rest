@@ -81,8 +81,8 @@ public class LogAspect extends BaseController {
 					StringUtil.subString(String.valueOf(result), 100));
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("parameters:{}", String.valueOf(parameterMap));
-				logger.debug("result:{}", String.valueOf(result));
+				logger.debug("parameters:{}", StringUtil.valueOf(parameterMap));
+				logger.debug("result:{}", StringUtil.valueOf(result));
 			}
 		}
 	}
