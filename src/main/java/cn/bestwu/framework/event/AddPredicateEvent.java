@@ -12,7 +12,7 @@ public class AddPredicateEvent extends RepositoryEvent {
 
 	private static final long serialVersionUID = 1224057810877643594L;
 
-	public AddPredicateEvent(Resource<Predicate> predicateResource, Class<?> domainType) {
-		super(predicateResource, domainType);
+	public AddPredicateEvent(Resource<Predicate> predicateResource, Class<?> modelType) {
+		super(predicateResource, modelType);
 	}
 }

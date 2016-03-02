@@ -68,15 +68,15 @@ public class QuerydslPredicateArgumentResolver implements HandlerMethodArgumentR
 		Class<? extends QuerydslBinderCustomizer> customizer = annotation == null ? null : annotation.bindings();
 		QuerydslBindings bindings = bindingsFactory.createBindingsFor(customizer, typeInformation);
 
-		Class<?> domainType = typeInformation.getType();
+		Class<?> modelType = typeInformation.getType();
 		{//设置默认条件
 			ParameterUtil.setPredicateDefaultActiveParameter(parameters);
-			publisher.publishEvent(new DefaultPredicateEvent(parameters, domainType));
+			publisher.publishEvent(new DefaultPredicateEvent(parameters, modelType));
 		}
 		Predicate predicate = predicateBuilder.getPredicate(typeInformation, parameters, bindings);
 		{//添加条件
 			Resource<Predicate> predicateResource = new Resource<>(predicate);
-			publisher.publishEvent(new AddPredicateEvent(predicateResource, domainType));
+			publisher.publishEvent(new AddPredicateEvent(predicateResource, modelType));
 			predicate = predicateResource.getContent();
 		}
 		return predicate;
@@ -90,10 +90,10 @@ public class QuerydslPredicateArgumentResolver implements HandlerMethodArgumentR
 			return ClassTypeInformation.from(annotation.root());
 		}
 
-		return detectDomainType(ClassTypeInformation.fromReturnTypeOf(parameter.getMethod()));
+		return detectModelType(ClassTypeInformation.fromReturnTypeOf(parameter.getMethod()));
 	}
 
-	private static TypeInformation<?> detectDomainType(TypeInformation<?> source) {
+	private static TypeInformation<?> detectModelType(TypeInformation<?> source) {
 
 		if (source.getTypeArguments().isEmpty()) {
 			return source;
@@ -102,13 +102,13 @@ public class QuerydslPredicateArgumentResolver implements HandlerMethodArgumentR
 		TypeInformation<?> actualType = source.getActualType();
 
 		if (source != actualType) {
-			return detectDomainType(actualType);
+			return detectModelType(actualType);
 		}
 
 		if (source instanceof Iterable) {
 			return source;
 		}
 
-		return detectDomainType(source.getComponentType());
+		return detectModelType(source.getComponentType());
 	}
 }

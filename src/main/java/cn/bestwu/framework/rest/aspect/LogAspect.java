@@ -2,6 +2,7 @@ package cn.bestwu.framework.rest.aspect;
 
 import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.support.PrincipalNamePutEvent;
+import cn.bestwu.framework.rest.support.RequestJsonViewResponseBodyAdvice;
 import cn.bestwu.framework.rest.support.Resource;
 import cn.bestwu.framework.util.StringUtil;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -9,7 +10,9 @@ import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.converter.json.MappingJacksonValue;
 
 import javax.servlet.RequestDispatcher;
 import java.util.Map;
@@ -38,6 +41,9 @@ public class LogAspect extends BaseController {
 		if ("PUT".equals(request.getMethod()))
 			request.setAttribute(PUT_PARAMETER_MAP, request.getParameterMap());
 	}
+
+	@Autowired(required = false)
+	private RequestJsonViewResponseBodyAdvice requestJsonViewResponseBodyAdvice;
 
 	@AfterReturning(value = "@annotation(org.springframework.web.bind.annotation.RequestMapping)", returning = "result")
 	public void log(Object result) {
@@ -81,8 +87,14 @@ public class LogAspect extends BaseController {
 					StringUtil.subString(String.valueOf(result), 100));
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("parameters:{}", StringUtil.valueOf(parameterMap));
-				logger.debug("result:{}", StringUtil.valueOf(result));
+				logger.debug("parameters:\n{}", StringUtil.valueOf(parameterMap, true));
+				if (requestJsonViewResponseBodyAdvice == null)
+					logger.debug("result:\n{}", StringUtil.valueOf(result, true));
+				else {
+					MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
+					requestJsonViewResponseBodyAdvice.beforeBodyWrite(mappingJacksonValue, request);
+					logger.debug("result:\n{}", StringUtil.valueOf(mappingJacksonValue, true));
+				}
 			}
 		}
 	}

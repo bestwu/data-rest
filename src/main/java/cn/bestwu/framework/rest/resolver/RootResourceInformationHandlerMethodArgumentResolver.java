@@ -59,14 +59,14 @@ public class RootResourceInformationHandlerMethodArgumentResolver implements Han
 		RepositoryResourceMetadata resourceMetadata = resourceMetadataResolver.resolveArgument(parameter, mavContainer, webRequest,
 				binderFactory);
 
-		Class<?> domainType = resourceMetadata.getDomainType();
-		RepositoryInvoker repositoryInvoker = invokerFactory.getInvokerFor(domainType);
+		Class<?> modelType = resourceMetadata.getModelType();
+		RepositoryInvoker repositoryInvoker = invokerFactory.getInvokerFor(modelType);
 
 		return new RootResourceInformation(resourceMetadata,
-				postProcess(repositoryInvoker, domainType, webRequest));
+				postProcess(repositoryInvoker, modelType, webRequest));
 	}
 
-	protected RepositoryInvoker postProcess(RepositoryInvoker invoker, Class<?> domainType,
+	protected RepositoryInvoker postProcess(RepositoryInvoker invoker, Class<?> modelType,
 			NativeWebRequest webRequest) {
 		return invoker;
 	}

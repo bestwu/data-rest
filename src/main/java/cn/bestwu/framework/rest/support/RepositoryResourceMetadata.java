@@ -141,7 +141,7 @@ public class RepositoryResourceMetadata {
 	}
 
 	//--------------------------------------------
-	public Class<?> getDomainType() {
+	public Class<?> getModelType() {
 		return entity.getType();
 	}
 

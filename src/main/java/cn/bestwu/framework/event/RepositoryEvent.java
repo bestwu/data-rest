@@ -9,14 +9,14 @@ public abstract class RepositoryEvent extends ApplicationEvent {
 
 	private static final long serialVersionUID = 4280564526952763162L;
 
-	private final Class<?> domainType;
+	private final Class<?> modelType;
 
-	protected RepositoryEvent(Object source, Class<?> domainType) {
+	protected RepositoryEvent(Object source, Class<?> modelType) {
 		super(source);
-		this.domainType = domainType;
+		this.modelType = modelType;
 	}
 
-	public Class<?> getDomainType() {
-		return domainType;
+	public Class<?> getModelType() {
+		return modelType;
 	}
 }

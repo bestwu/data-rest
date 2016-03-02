@@ -51,8 +51,8 @@ public class RootResourceInformation {
 		return resourceMetadata.getEntity();
 	}
 
-	public Class<?> getDomainType() {
-		return resourceMetadata.getDomainType();
+	public Class<?> getModelType() {
+		return resourceMetadata.getModelType();
 	}
 
 	public String getPathName() {

@@ -64,25 +64,25 @@ public class JpaSearchRepository implements SearchRepository {
 	/**
 	 * 可选高亮的全文搜索方法
 	 *
-	 * @param domainType 要搜索的类
-	 * @param keyword    关键字
-	 * @param pageable   分页
-	 * @param highLight  是否高亮
-	 * @param <T>        t
+	 * @param modelType 要搜索的类
+	 * @param keyword   关键字
+	 * @param pageable  分页
+	 * @param highLight 是否高亮
+	 * @param <T>       t
 	 * @return 搜索结果
 	 */
 	@Override
-	public <T> Page search(Class<T> domainType, String keyword, Pageable pageable, boolean highLight) {
-		String[] fieldArray = getSearchFields(domainType);
+	public <T> Page search(Class<T> modelType, String keyword, Pageable pageable, boolean highLight) {
+		String[] fieldArray = getSearchFields(modelType);
 
-		return search(domainType, keyword, pageable, fieldArray, (searchFactory, query, result) -> {
+		return search(modelType, keyword, pageable, fieldArray, (searchFactory, query, result) -> {
 			//highLight
 			if (highLight) {
-				String[] highLightFieldArray = getHighLightFields(domainType);
+				String[] highLightFieldArray = getHighLightFields(modelType);
 				if (highLightFieldArray == null) {
 					highLightFieldArray = fieldArray;
 				}
-				highLight(query, searchFactory.getAnalyzer(domainType), result, domainType, highLightFieldArray);
+				highLight(query, searchFactory.getAnalyzer(modelType), result, modelType, highLightFieldArray);
 			} else {
 				result.forEach(t -> publisher.publishEvent(new SearchResultEvent(t)));
 			}
@@ -92,7 +92,7 @@ public class JpaSearchRepository implements SearchRepository {
 	/**
 	 * 不处理结果的全文搜索
 	 *
-	 * @param domainType 要搜索的类
+	 * @param modelType  要搜索的类
 	 * @param keyword    关键字
 	 * @param pageable   分页
 	 * @param fieldArray fieldArray
@@ -100,32 +100,32 @@ public class JpaSearchRepository implements SearchRepository {
 	 * @return 搜索结果
 	 */
 	@Override
-	public <T> Page<T> search(Class<T> domainType, String keyword, Pageable pageable, String[] fieldArray) {
-		return search(domainType, keyword, pageable, fieldArray, null);
+	public <T> Page<T> search(Class<T> modelType, String keyword, Pageable pageable, String[] fieldArray) {
+		return search(modelType, keyword, pageable, fieldArray, null);
 	}
 
 	/**
 	 * 可选是否处理结果的全文搜索
 	 *
-	 * @param domainType 要搜索的类
-	 * @param keyword    关键字
-	 * @param pageable   分页
-	 * @param <T>        t
+	 * @param modelType 要搜索的类
+	 * @param keyword   关键字
+	 * @param pageable  分页
+	 * @param <T>       t
 	 * @return 搜索结果
 	 */
-	private <T> Page<T> search(Class<T> domainType, String keyword, Pageable pageable, String[] fieldArray, ResultHandler<T> handleResult) {
+	private <T> Page<T> search(Class<T> modelType, String keyword, Pageable pageable, String[] fieldArray, ResultHandler<T> handleResult) {
 
 		FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
 		SearchFactory searchFactory = fullTextEntityManager.getSearchFactory();
-		QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity(domainType).get();
+		QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity(modelType).get();
 
 		TermMatchingContext termMatchingContext = queryBuilder.keyword().onFields(fieldArray);
 
 		Query luceneQuery = termMatchingContext.matching(keyword).createQuery();
-		org.hibernate.search.jpa.FullTextQuery jpaQuery = fullTextEntityManager.createFullTextQuery(luceneQuery, domainType);
+		org.hibernate.search.jpa.FullTextQuery jpaQuery = fullTextEntityManager.createFullTextQuery(luceneQuery, modelType);
 
-		Criteria criteria = EntityManagerUtil.getSession(entityManager).createCriteria(domainType);
-		publisher.publishEvent(new BeforeSearchEvent(criteria, domainType));
+		Criteria criteria = EntityManagerUtil.getSession(entityManager).createCriteria(modelType);
+		publisher.publishEvent(new BeforeSearchEvent(criteria, modelType));
 		boolean noCriterionEntries = criteria.toString().contains("[][]");
 		if (!noCriterionEntries) {
 			jpaQuery.setCriteriaQuery(criteria);
@@ -173,20 +173,20 @@ public class JpaSearchRepository implements SearchRepository {
 	/*
 	 * 高亮字段
 	 */
-	private <T> String[] getHighLightFields(Class<T> domainType) {
+	private <T> String[] getHighLightFields(Class<T> modelType) {
 		String[] highLightFieldArray = null;
-		if (highLightFieldsCache.containsKey(domainType)) {
-			highLightFieldArray = highLightFieldsCache.get(domainType);
+		if (highLightFieldsCache.containsKey(modelType)) {
+			highLightFieldArray = highLightFieldsCache.get(modelType);
 		} else {
 			Set<String> fields = new HashSet<>();
-			Arrays.stream(domainType.getDeclaredFields()).forEach(field -> {
+			Arrays.stream(modelType.getDeclaredFields()).forEach(field -> {
 				if (field.isAnnotationPresent(HighLight.class)) {
 					fields.add(field.getName());
 				}
 			});
 			if (!fields.isEmpty()) {
 				highLightFieldArray = fields.toArray(new String[fields.size()]);
-				highLightFieldsCache.put(domainType, highLightFieldArray);
+				highLightFieldsCache.put(modelType, highLightFieldArray);
 			}
 		}
 		return highLightFieldArray;
@@ -195,19 +195,19 @@ public class JpaSearchRepository implements SearchRepository {
 	/*
 	 * 默认搜索字段
 	 */
-	private <T> String[] getSearchFields(Class<T> domainType) {
+	private <T> String[] getSearchFields(Class<T> modelType) {
 		String[] fieldArray;
-		if (fieldsCache.containsKey(domainType)) {
-			fieldArray = fieldsCache.get(domainType);
+		if (fieldsCache.containsKey(modelType)) {
+			fieldArray = fieldsCache.get(modelType);
 		} else {
 			Set<String> fields = new HashSet<>();
-			Arrays.stream(domainType.getDeclaredFields()).forEach(field -> {
+			Arrays.stream(modelType.getDeclaredFields()).forEach(field -> {
 				if (field.isAnnotationPresent(Field.class)) {
 					fields.add(field.getName());
 				}
 			});
 			fieldArray = fields.toArray(new String[fields.size()]);
-			fieldsCache.put(domainType, fieldArray);
+			fieldsCache.put(modelType, fieldArray);
 		}
 		return fieldArray;
 	}
@@ -215,23 +215,23 @@ public class JpaSearchRepository implements SearchRepository {
 	/**
 	 * 高亮显示文章
 	 *
-	 * @param query      {@link Query}
-	 * @param analyzer   analyzer
-	 * @param data       要高亮的数据
-	 * @param domainType domainType
-	 * @param fields     需要高亮的字段   @return 高亮数据
+	 * @param query     {@link Query}
+	 * @param analyzer  analyzer
+	 * @param data      要高亮的数据
+	 * @param modelType modelType
+	 * @param fields    需要高亮的字段   @return 高亮数据
 	 */
-	private <T> void highLight(Query query, Analyzer analyzer, List<T> data, Class<T> domainType, String... fields) {
+	private <T> void highLight(Query query, Analyzer analyzer, List<T> data, Class<T> modelType, String... fields) {
 		QueryScorer queryScorer = new QueryScorer(query);
 		Highlighter highlighter = new Highlighter(defaultFormatter, queryScorer);
 		for (T t : data) {
 			publisher.publishEvent(new SearchResultEvent(t));
 			for (String fieldName : fields) {
 				try {
-					Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(domainType, fieldName).getReadMethod(), t);
+					Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getReadMethod(), t);
 					String highLightFieldValue = highlighter.getBestFragment(analyzer, fieldName, String.valueOf(fieldValue));
 					if (highLightFieldValue != null) {
-						ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(domainType, fieldName).getWriteMethod(), t, highLightFieldValue);
+						ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getWriteMethod(), t, highLightFieldValue);
 					}
 				} catch (Exception e) {
 					//不处理，只记录日志

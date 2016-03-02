@@ -37,11 +37,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 		}
 		Assert.hasText(keyword, getText("param.notnull", "keyword"));
 
-		Class<?> domainType = resourceInformation.getDomainType();
-		if (JpaSearchRepository.class.equals(AopProxyUtils.ultimateTargetClass(searchRepository)) && !domainType.isAnnotationPresent(Indexed.class)) {
+		Class<?> modelType = resourceInformation.getModelType();
+		if (JpaSearchRepository.class.equals(AopProxyUtils.ultimateTargetClass(searchRepository)) && !modelType.isAnnotationPresent(Indexed.class)) {
 			throw new ResourceNotFoundException();
 		}
-		Page page = searchRepository.search(domainType, keyword, pageable, highLight);
+		Page page = searchRepository.search(modelType, keyword, pageable, highLight);
 		Link selfRel = ControllerLinkBuilder
 				.linkTo(RepositorySearchController.class, RepositorySearchController.class.getMethod("search", RootResourceInformation.class, String.class, Pageable.class, boolean.class),
 						resourceInformation.getPathName())

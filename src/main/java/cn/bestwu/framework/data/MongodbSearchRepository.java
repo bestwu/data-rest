@@ -22,12 +22,12 @@ public class MongodbSearchRepository implements SearchRepository {
 	private Repositories repositories;
 	private Logger logger = LoggerFactory.getLogger(MongodbSearchRepository.class);
 
-	@Override public <T> Page search(Class<T> domainType, String keyword, Pageable pageable, boolean highLight) {
-		Class<?> repositoryInterface = repositories.getRepositoryInformationFor(domainType).getRepositoryInterface();
+	@Override public <T> Page search(Class<T> modelType, String keyword, Pageable pageable, boolean highLight) {
+		Class<?> repositoryInterface = repositories.getRepositoryInformationFor(modelType).getRepositoryInterface();
 		try {
 			Method method = repositoryInterface.getMethod("findAllBy", TextCriteria.class, Pageable.class);
 			TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingPhrase(keyword);
-			return (Page) method.invoke(repositories.getRepositoryFor(domainType), criteria, pageable);
+			return (Page) method.invoke(repositories.getRepositoryFor(modelType), criteria, pageable);
 		} catch (NoSuchMethodException e) {
 			throw new ResourceNotFoundException();
 		} catch (InvocationTargetException | IllegalAccessException e) {
@@ -36,7 +36,7 @@ public class MongodbSearchRepository implements SearchRepository {
 		}
 	}
 
-	@Override public <T> Page<T> search(Class<T> domainType, String keyword, Pageable pageable, String[] fieldArray) {
+	@Override public <T> Page<T> search(Class<T> modelType, String keyword, Pageable pageable, String[] fieldArray) {
 		return null;
 	}
 }

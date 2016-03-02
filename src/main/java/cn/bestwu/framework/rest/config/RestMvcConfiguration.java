@@ -51,8 +51,10 @@ import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.validation.DefaultMessageCodesResolver;
 import org.springframework.validation.MessageCodesResolver;
@@ -71,9 +73,6 @@ import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.i18n.FixedLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.springframework.web.servlet.resource.AppCacheManifestTransformer;
-import org.springframework.web.servlet.resource.ResourceResolver;
-import org.springframework.web.servlet.resource.VersionResourceResolver;
 import org.springframework.web.servlet.view.BeanNameViewResolver;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
@@ -290,39 +289,39 @@ public class RestMvcConfiguration {
 		//			}
 		//		}
 
-		private void registerResourceChain(ResourceHandlerRegistration registration) {
-			ResourceProperties.Chain properties = this.resourceProperties.getChain();
-			if (properties.getEnabled()) {
-				configureResourceChain(properties,
-						registration.resourceChain(properties.isCache()));
-			}
-		}
+		//		private void registerResourceChain(ResourceHandlerRegistration registration) {
+		//			ResourceProperties.Chain properties = this.resourceProperties.getChain();
+		//			if (properties.getEnabled()) {
+		//				configureResourceChain(properties,
+		//						registration.resourceChain(properties.isCache()));
+		//			}
+		//		}
 
-		private void configureResourceChain(ResourceProperties.Chain properties,
-				ResourceChainRegistration chain) {
-			ResourceProperties.Strategy strategy = properties.getStrategy();
-			if (strategy.getFixed().isEnabled() || strategy.getContent().isEnabled()) {
-				chain.addResolver(getVersionResourceResolver(strategy));
-			}
-			if (properties.isHtmlApplicationCache()) {
-				chain.addTransformer(new AppCacheManifestTransformer());
-			}
-		}
+		//		private void configureResourceChain(ResourceProperties.Chain properties,
+		//				ResourceChainRegistration chain) {
+		//			ResourceProperties.Strategy strategy = properties.getStrategy();
+		//			if (strategy.getFixed().isEnabled() || strategy.getContent().isEnabled()) {
+		//				chain.addResolver(getVersionResourceResolver(strategy));
+		//			}
+		//			if (properties.isHtmlApplicationCache()) {
+		//				chain.addTransformer(new AppCacheManifestTransformer());
+		//			}
+		//		}
 
-		private ResourceResolver getVersionResourceResolver(
-				ResourceProperties.Strategy properties) {
-			VersionResourceResolver resolver = new VersionResourceResolver();
-			if (properties.getFixed().isEnabled()) {
-				String version = properties.getFixed().getVersion();
-				String[] paths = properties.getFixed().getPaths();
-				resolver.addFixedVersionStrategy(version, paths);
-			}
-			if (properties.getContent().isEnabled()) {
-				String[] paths = properties.getContent().getPaths();
-				resolver.addContentVersionStrategy(paths);
-			}
-			return resolver;
-		}
+		//		private ResourceResolver getVersionResourceResolver(
+		//				ResourceProperties.Strategy properties) {
+		//			VersionResourceResolver resolver = new VersionResourceResolver();
+		//			if (properties.getFixed().isEnabled()) {
+		//				String version = properties.getFixed().getVersion();
+		//				String[] paths = properties.getFixed().getPaths();
+		//				resolver.addFixedVersionStrategy(version, paths);
+		//			}
+		//			if (properties.getContent().isEnabled()) {
+		//				String[] paths = properties.getContent().getPaths();
+		//				resolver.addContentVersionStrategy(paths);
+		//			}
+		//			return resolver;
+		//		}
 
 		@Override
 		public void addViewControllers(ViewControllerRegistry registry) {
@@ -400,13 +399,23 @@ public class RestMvcConfiguration {
 					repositoryResourceMetadataHandlerMethodArgumentResolver());
 		}
 
+		@Autowired
+		private MappingJackson2XmlHttpMessageConverter mappingJackson2XmlHttpMessageConverter;
+
+		private List<AbstractJackson2HttpMessageConverter> messageConverters() {
+			List<AbstractJackson2HttpMessageConverter> messageConverters = new ArrayList<>(2);
+			messageConverters.add(mappingJackson2HttpMessageConverter);
+			messageConverters.add(mappingJackson2XmlHttpMessageConverter);
+			return messageConverters;
+		}
+
 		@Override protected void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
 			super.addArgumentResolvers(argumentResolvers);
 
 			argumentResolvers.add(repoRequestArgumentResolver());
-			argumentResolvers.add(new DomainMethodArgumentResolver(repositoryInvokerFactory(), mappingJackson2HttpMessageConverter));
+			argumentResolvers.add(new ModelMethodArgumentResolver(repositoryInvokerFactory(), messageConverters()));
 			argumentResolvers
-					.add(new ResourceMethodArgumentResolver(repositoryResourceMetadataHandlerMethodArgumentResolver(), repositoryInvokerFactory(), mappingJackson2HttpMessageConverter));
+					.add(new ResourceMethodArgumentResolver(repositoryResourceMetadataHandlerMethodArgumentResolver(), repositoryInvokerFactory(), messageConverters()));
 			if (QueryDslUtils.QUERY_DSL_PRESENT)
 				argumentResolvers.add(0, new QuerydslPredicateArgumentResolver(querydslBindingsFactory(), querydslPredicateBuilder(), publisher));
 			argumentResolvers.add(new ETagArgumentResolver());
@@ -441,8 +450,14 @@ public class RestMvcConfiguration {
 			adapter.setIgnoreDefaultModelOnRedirect(this.mvcProperties == null || this.mvcProperties.isIgnoreDefaultModelOnRedirect());
 
 			if (serializationViewMappings != null)
-				adapter.setResponseBodyAdvice(Collections.singletonList(new RequestJsonViewResponseBodyAdvice(serializationViewMappings)));
+				adapter.setResponseBodyAdvice(Collections.singletonList(requestJsonViewResponseBodyAdvice()));
 			return adapter;
+		}
+
+		@Bean
+		@ConditionalOnBean(SerializationViewMappings.class)
+		public RequestJsonViewResponseBodyAdvice requestJsonViewResponseBodyAdvice() {
+			return new RequestJsonViewResponseBodyAdvice(serializationViewMappings);
 		}
 
 		@Override protected void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {

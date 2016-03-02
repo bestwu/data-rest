@@ -69,7 +69,7 @@ public class QuerydslAwareRootResourceInformationHandlerMethodArgumentResolver
 
 	@Override
 	@SuppressWarnings({ "unchecked" })
-	protected RepositoryInvoker postProcess(RepositoryInvoker invoker, Class<?> domainType,
+	protected RepositoryInvoker postProcess(RepositoryInvoker invoker, Class<?> modelType,
 			NativeWebRequest webRequest) {
 
 		HttpServletRequest nativeRequest = webRequest.getNativeRequest(HttpServletRequest.class);
@@ -77,24 +77,24 @@ public class QuerydslAwareRootResourceInformationHandlerMethodArgumentResolver
 			return invoker;
 		}
 
-		Object repository = repositories.getRepositoryFor(domainType);
+		Object repository = repositories.getRepositoryFor(modelType);
 
 		if (!QueryDslPredicateExecutor.class.isInstance(repository)) {
 			return invoker;
 		}
 
-		ClassTypeInformation<?> type = ClassTypeInformation.from(domainType);
+		ClassTypeInformation<?> type = ClassTypeInformation.from(modelType);
 
 		QuerydslBindings bindings = factory.createBindingsFor(null, type);
 		MultiValueMap<String, String> parameters = toMultiValueMap(webRequest.getParameterMap());
 		{//设置默认条件
 			ParameterUtil.setPredicateDefaultActiveParameter(parameters);
-			publisher.publishEvent(new DefaultPredicateEvent(parameters, domainType));
+			publisher.publishEvent(new DefaultPredicateEvent(parameters, modelType));
 		}
 		Predicate predicate = predicateBuilder.getPredicate(type, parameters, bindings);
 		{//添加条件
 			Resource<Predicate> predicateResource = new Resource<>(predicate);
-			publisher.publishEvent(new AddPredicateEvent(predicateResource, domainType));
+			publisher.publishEvent(new AddPredicateEvent(predicateResource, modelType));
 			predicate = predicateResource.getContent();
 		}
 

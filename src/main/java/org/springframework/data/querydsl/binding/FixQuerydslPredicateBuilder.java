@@ -21,7 +21,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 /**
- * 修复entity有 get // set方法无field时空指针异常bug
+ * 修复entity有 get // set方法,无field时空指针异常bug
  *
  * @author Peter Wu
  */

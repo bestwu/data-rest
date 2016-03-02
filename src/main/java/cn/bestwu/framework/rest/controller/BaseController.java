@@ -95,13 +95,13 @@ public abstract class BaseController extends Response {
 		return pageable;
 	}
 
-	protected Pageable getDefaultPageable(Pageable pageable, Class<?> domainType) {
+	protected Pageable getDefaultPageable(Pageable pageable, Class<?> modelType) {
 		if (pageable == null) {
 			return null;
 		}
 		if (pageable.getSort() == null) {
 			List<Sort.Order> orders = new ArrayList<>();
-			publisher.publishEvent(new DefaultSortEvent(orders, domainType));
+			publisher.publishEvent(new DefaultSortEvent(orders, modelType));
 			if (orders.isEmpty()) {
 				orders.add(new Sort.Order(Sort.Direction.DESC, "id"));
 			}

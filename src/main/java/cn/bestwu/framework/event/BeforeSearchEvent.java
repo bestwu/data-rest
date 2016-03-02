@@ -11,7 +11,7 @@ public class BeforeSearchEvent extends RepositoryEvent {
 
 	private static final long serialVersionUID = -4178548774162112340L;
 
-	public BeforeSearchEvent(Criteria criteria, Class<?> domainType) {
-		super(criteria, domainType);
+	public BeforeSearchEvent(Criteria criteria, Class<?> modelType) {
+		super(criteria, modelType);
 	}
 }

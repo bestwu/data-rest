@@ -13,6 +13,8 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.servlet.mvc.method.annotation.AbstractMappingJacksonResponseBodyAdvice;
 
+import javax.servlet.http.HttpServletRequest;
+
 public class RequestJsonViewResponseBodyAdvice extends AbstractMappingJacksonResponseBodyAdvice {
 
 	private final Logger logger = LoggerFactory.getLogger(RequestJsonViewResponseBodyAdvice.class);
@@ -30,7 +32,11 @@ public class RequestJsonViewResponseBodyAdvice extends AbstractMappingJacksonRes
 	@Override
 	protected void beforeBodyWriteInternal(MappingJacksonValue bodyContainer, MediaType contentType,
 			MethodParameter returnType, ServerHttpRequest request, ServerHttpResponse response) {
-		Class<?> serializationView = serializationViewMappings.getSerializationView(((ServletServerHttpRequest) request).getServletRequest());
+		beforeBodyWrite(bodyContainer, ((ServletServerHttpRequest) request).getServletRequest());
+	}
+
+	public void beforeBodyWrite(MappingJacksonValue bodyContainer, HttpServletRequest request) {
+		Class<?> serializationView = serializationViewMappings.getSerializationView(request);
 		if (logger.isDebugEnabled()) {
 			logger.debug("serializationView:{}", serializationView == null ? null : serializationView.getSimpleName());
 		}

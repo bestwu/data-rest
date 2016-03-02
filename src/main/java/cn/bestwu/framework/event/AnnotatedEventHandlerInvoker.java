@@ -26,8 +26,8 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 
 	@Override
 	public void onApplicationEvent(RepositoryEvent event) {
-		Class<?> domainType = event.getDomainType();
-		if (!handlerMethods.containsKey(domainType)) {
+		Class<?> modelType = event.getModelType();
+		if (!handlerMethods.containsKey(modelType)) {
 			return;
 		}
 
@@ -41,7 +41,7 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 
 		Class<? extends RepositoryEvent> eventType = event.getClass();
 
-		for (EventHandlerMethod handlerMethod : handlerMethods.get(domainType)) {
+		for (EventHandlerMethod handlerMethod : handlerMethods.get(modelType)) {
 
 			if (!handlerMethod.eventType.equals(eventType)) {
 				continue;
@@ -105,21 +105,21 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 		if (parameterTypes.length == 0) {
 			throw new IllegalStateException(String.format(PARAMETER_MISSING, method));
 		}
-		Class<?> domainType;
+		Class<?> modelType;
 		if (annotationType.equals(HandleDefaultSort.class)) {
-			domainType = ((HandleDefaultSort) annotation).value();
+			modelType = ((HandleDefaultSort) annotation).value();
 		} else if (annotationType.equals(HandleDefaultPredicate.class)) {
-			domainType = ((HandleDefaultPredicate) annotation).value();
+			modelType = ((HandleDefaultPredicate) annotation).value();
 		} else if (annotationType.equals(HandleAddPredicate.class)) {
-			domainType = ((HandleAddPredicate) annotation).value();
+			modelType = ((HandleAddPredicate) annotation).value();
 		} else if (annotationType.equals(HandleBeforeSearch.class)) {
-			domainType = ((HandleBeforeSearch) annotation).value();
+			modelType = ((HandleBeforeSearch) annotation).value();
 		} else {
-			domainType = parameterTypes[0];
+			modelType = parameterTypes[0];
 		}
 
 		EventHandlerMethod handlerMethod = new EventHandlerMethod(eventType, handler, method);
-		handlerMethods.add(domainType, handlerMethod);
+		handlerMethods.add(modelType, handlerMethod);
 	}
 
 	static class EventHandlerMethod {

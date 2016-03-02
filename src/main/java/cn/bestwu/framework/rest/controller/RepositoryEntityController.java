@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.validation.Valid;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
@@ -85,7 +86,7 @@ import java.util.Map;
 
 		RepositoryInvoker invoker = resourceInformation.getInvoker();
 
-		pageable = getDefaultPageable(pageable, resourceInformation.getDomainType());
+		pageable = getDefaultPageable(pageable, resourceInformation.getModelType());
 		Iterable<?> results;
 		if (all && resourceInformation.getResourceMetadata().enableAllDataInOnePage()) {
 			results = invoker.invokeFindAll(pageable.getSort());
@@ -118,7 +119,7 @@ import java.util.Map;
 	 * 创建资源
 	 */
 	@RequestMapping(method = RequestMethod.POST)
-	public Object create(RootResourceInformation resourceInformation, PersistentEntityResource resource) {
+	public Object create(RootResourceInformation resourceInformation, @Valid PersistentEntityResource resource) {
 		RepositoryInvoker invoker = resourceInformation.getInvoker();
 
 		Object content = resource.getContent();
@@ -136,12 +137,12 @@ import java.util.Map;
 	 * 修改资源
 	 */
 	@RequestMapping(value = ID_URI, method = RequestMethod.PUT)
-	public Object update(RootResourceInformation resourceInformation, PersistentEntityResource resource, @PathVariable String id, ETag eTag) {
+	public Object update(RootResourceInformation resourceInformation, @Valid PersistentEntityResource resource, @PathVariable String id, ETag eTag) {
 		RepositoryInvoker invoker = resourceInformation.getInvoker();
 
 		Object content = resource.getContent();
 
-		eTag.verify(resourceInformation.getEntity(), resourceInformation.getDomainType());
+		eTag.verify(resourceInformation.getEntity(), resourceInformation.getModelType());
 
 		publisher.publishEvent(new BeforeSaveEvent(content));
 		invoker.invokeSave(content);

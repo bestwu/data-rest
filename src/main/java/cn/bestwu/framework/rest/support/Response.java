@@ -38,8 +38,8 @@ public class Response {
 	@Autowired
 	protected ApplicationEventPublisher publisher;
 
-	protected PersistentEntity<?, ?> getPersistentEntity(Class<?> domainClass) {
-		return repositories.getPersistentEntity(domainClass);
+	protected PersistentEntity<?, ?> getPersistentEntity(Class<?> modelType) {
+		return repositories.getPersistentEntity(modelType);
 	}
 
 	/**
