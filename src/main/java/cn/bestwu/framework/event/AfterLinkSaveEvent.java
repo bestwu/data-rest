@@ -4,7 +4,7 @@ public class AfterLinkSaveEvent extends LinkedEntityEvent {
 
 	private static final long serialVersionUID = 261522353893713633L;
 
-	public AfterLinkSaveEvent(Object source, Object child) {
-		super(source, child);
+	public AfterLinkSaveEvent(Object source, Object old) {
+		super(source, old);
 	}
 }

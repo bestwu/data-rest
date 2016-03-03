@@ -51,6 +51,7 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 	private final List<AbstractJackson2HttpMessageConverter> messageConverters;
 	private final RepositoryInvokerFactory invokerFactory;
 	private final String idParameterName = new UriTemplate(BaseController.ID_URI).getVariableNames().get(0);
+	public static final String OLD_MODEL = "OLD_MODEL";
 
 	public ModelMethodArgumentResolver(RepositoryInvokerFactory invokerFactory, List<AbstractJackson2HttpMessageConverter> messageConverters) {
 		this.invokerFactory = invokerFactory;
@@ -118,12 +119,17 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 			throw new IllegalArgumentException("id不能为空");
 		}
 
-		Object existingObject = invokerFactory.getInvokerFor(modelClass).invokeFindOne(id);
+		Object objectForUpdate = invokerFactory.getInvokerFor(modelClass).invokeFindOne(id);
 
-		if (existingObject == null) {
+		if (objectForUpdate == null) {
 			throw new ResourceNotFoundException();
 		}
-		return existingObject;
+
+		Object oldModel = BeanUtils.instantiate(objectForUpdate.getClass());
+		BeanUtils.copyProperties(objectForUpdate, oldModel);
+		webRequest.setAttribute(OLD_MODEL, oldModel, NativeWebRequest.SCOPE_REQUEST);
+
+		return objectForUpdate;
 	}
 
 	private Object readObject(MethodParameter parameter, Object modelObject, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {

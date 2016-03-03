@@ -4,6 +4,7 @@ import cn.bestwu.framework.event.*;
 import cn.bestwu.framework.rest.annotation.RepositoryRestController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
+import cn.bestwu.framework.rest.resolver.ModelMethodArgumentResolver;
 import cn.bestwu.framework.rest.support.ETag;
 import cn.bestwu.framework.rest.support.PersistentEntityResource;
 import cn.bestwu.framework.rest.support.RootResourceInformation;
@@ -147,6 +148,9 @@ import java.util.Map;
 		publisher.publishEvent(new BeforeSaveEvent(content));
 		invoker.invokeSave(content);
 		publisher.publishEvent(new AfterSaveEvent(content));
+
+		String oldModel = ModelMethodArgumentResolver.OLD_MODEL;
+		publisher.publishEvent(new AfterLinkSaveEvent(content, request.getAttribute(oldModel)));
 
 		resource.add(getSelfRelLink(resourceInformation, id));
 		publisher.publishEvent(new ResourceAddLinkEvent(content, resource));
