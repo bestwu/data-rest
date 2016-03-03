@@ -167,8 +167,8 @@ import java.util.Map;
 			throw new ResourceNotFoundException();
 		}
 		publisher.publishEvent(new BeforeDeleteEvent(one));
-
 		invoker.invokeDelete(id);
+		publisher.publishEvent(new AfterDeleteEvent(one));
 
 		return noContent();
 	}
@@ -192,8 +192,8 @@ import java.util.Map;
 					throw new ResourceNotFoundException();
 				}
 				publisher.publishEvent(new BeforeDeleteEvent(one));
-
 				invoker.invokeDelete(i);
+				publisher.publishEvent(new AfterDeleteEvent(one));
 			} catch (EmptyResultDataAccessException | ResourceNotFoundException ignored) {
 			}
 		});
