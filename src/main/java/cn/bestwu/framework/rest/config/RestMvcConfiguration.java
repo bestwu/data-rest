@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.validator.HibernateValidator;
+import org.springframework.aop.SpringProxy;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,13 +96,19 @@ public class RestMvcConfiguration {
 	protected static class ControllerConfiguration {
 	}
 
-	@Autowired
-	private ApplicationEventPublisher publisher;
+	@Configuration
+	@ConditionalOnWebApplication
+	@ConditionalOnClass(SpringProxy.class)
+	protected static class LoggerConfiguration {
+		@Autowired
+		private ApplicationEventPublisher publisher;
 
-	@Bean
-	@Order(Ordered.HIGHEST_PRECEDENCE + 10)
-	public LogAspect logAspect() {
-		return new LogAspect(publisher);
+		@Bean
+		@ConditionalOnProperty(value = "logging.logAspect.enabled")
+		@Order(Ordered.HIGHEST_PRECEDENCE + 10)
+		public LogAspect logAspect() {
+			return new LogAspect(publisher);
+		}
 	}
 
 	@Bean

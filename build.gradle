@@ -59,8 +59,6 @@ dependencyManagement {
 }
 
 dependencies {
-    //data
-    compile 'org.springframework.boot:spring-boot-starter-aop'
     //web
     compile 'org.springframework.boot:spring-boot-starter-web'
     compile 'org.springframework.hateoas:spring-hateoas'
@@ -70,6 +68,7 @@ dependencies {
     compile 'commons-io:commons-io'
 
     //optional
+    optional 'org.springframework.boot:spring-boot-starter-aop'
     optional 'org.springframework.boot:spring-boot-starter-data-jpa'
     optional 'com.mysema.querydsl:querydsl-jpa'
     optional 'org.springframework.boot:spring-boot-starter-data-mongodb'

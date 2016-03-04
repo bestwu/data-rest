@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.converter.json.MappingJacksonValue;
+import org.springframework.http.server.ServletServerHttpRequest;
 
 import javax.servlet.RequestDispatcher;
 import java.util.Map;
@@ -61,7 +63,6 @@ public class LogAspect extends BaseController {
 				principalName = source.getContent();
 			}
 
-			String user_agent = getUserAgent();
 			String requestMethod = request.getMethod();
 			Map<String, String[]> parameterMap;
 			try {
@@ -80,22 +81,25 @@ public class LogAspect extends BaseController {
 				}
 				parameterMap = null;
 			}
-			String parameters = StringUtil.subString(StringUtil.valueOf(parameterMap), 100);
-			String MSG_CODE = "{}/{} 的 [{}] {} {} 参数：{} 结果： {}";
-			logger.info(MSG_CODE, ipAddress, user_agent, principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName, requestMethod,
-					servletPath, parameters,
-					StringUtil.subString(String.valueOf(result), 100));
 
-			if (logger.isDebugEnabled()) {
-				logger.debug("parameters:\n{}", StringUtil.valueOf(parameterMap, true));
-				if (requestJsonViewResponseBodyAdvice == null)
-					logger.debug("result:\n{}", StringUtil.valueOf(result, true));
-				else {
-					MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
-					requestJsonViewResponseBodyAdvice.beforeBodyWrite(mappingJacksonValue, request);
-					logger.debug("result:\n{}", StringUtil.valueOf(mappingJacksonValue, true));
-				}
+			ServletServerHttpRequest servletServerHttpRequest = new ServletServerHttpRequest(request);
+			HttpHeaders headers = servletServerHttpRequest.getHeaders();
+			String MSG_CODE = "{} 的 [{}] {} {} \nrequest headers:\n{} \nrequest parameters:\n{} \nresponse:\n{}";
+
+			if (requestJsonViewResponseBodyAdvice != null) {
+				MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
+				requestJsonViewResponseBodyAdvice.beforeBodyWrite(mappingJacksonValue, request);
+				result = mappingJacksonValue;
 			}
+
+			if (logger.isDebugEnabled())
+				logger.info(MSG_CODE, ipAddress, principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName, requestMethod,
+						servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true),
+						StringUtil.valueOf(result, true));
+			else
+				logger.info(MSG_CODE, ipAddress, principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName, requestMethod,
+						servletPath, StringUtil.valueOf(headers, true), StringUtil.subString(StringUtil.valueOf(parameterMap), 100),
+						StringUtil.subString(StringUtil.valueOf(result), 100));
 		}
 	}
 
