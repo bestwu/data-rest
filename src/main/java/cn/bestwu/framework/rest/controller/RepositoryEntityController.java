@@ -105,14 +105,15 @@ import java.util.Map;
 	public Object show(RootResourceInformation resourceInformation, @PathVariable String id) {
 		RepositoryInvoker invoker = resourceInformation.getInvoker();
 
-		Object one = invoker.invokeFindOne(id);
+		Object content = invoker.invokeFindOne(id);
 
-		if (one == null) {
+		if (content == null) {
 			throw new ResourceNotFoundException();
 		}
-		publisher.publishEvent(new BeforeShowEvent(one));
-		PersistentEntityResource<Object> resource = new PersistentEntityResource<>(one, resourceInformation.getEntity(), getSelfRelLink(resourceInformation, id));
-		publisher.publishEvent(new ResourceAddLinkEvent(one, resource));
+		publisher.publishEvent(new BeforeShowEvent(content));
+		PersistentEntityResource<Object> resource = new PersistentEntityResource<>(content, resourceInformation.getEntity());
+
+		link(resource, getSelfRelLink(resourceInformation, id));
 		return ok(resource);
 	}
 
@@ -129,8 +130,7 @@ import java.util.Map;
 		invoker.invokeSave(content);
 		publisher.publishEvent(new AfterCreateEvent(content));
 
-		resource.add(getSelfRelLink(resourceInformation, getId(resourceInformation.getEntity(), content)));
-		publisher.publishEvent(new ResourceAddLinkEvent(content, resource));
+		link(resource, getSelfRelLink(resourceInformation, getId(resourceInformation.getEntity(), content)));
 		return created(resource);
 	}
 
@@ -152,8 +152,7 @@ import java.util.Map;
 		String oldModel = ModelMethodArgumentResolver.OLD_MODEL;
 		publisher.publishEvent(new AfterLinkSaveEvent(content, request.getAttribute(oldModel)));
 
-		resource.add(getSelfRelLink(resourceInformation, id));
-		publisher.publishEvent(new ResourceAddLinkEvent(content, resource));
+		link(resource, getSelfRelLink(resourceInformation, id));
 		return updated(resource);
 	}
 

@@ -1,6 +1,9 @@
 package cn.bestwu.framework.rest.controller;
 
+import cn.bestwu.framework.event.AddLinkEvent;
 import cn.bestwu.framework.event.DefaultSortEvent;
+import cn.bestwu.framework.event.SelfRelEvent;
+import cn.bestwu.framework.rest.support.PersistentEntityResource;
 import cn.bestwu.framework.rest.support.Response;
 import cn.bestwu.framework.util.StringUtil;
 import org.slf4j.Logger;
@@ -10,6 +13,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.Link;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -108,5 +112,14 @@ public abstract class BaseController extends Response {
 			pageable = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), new Sort(orders));
 		}
 		return pageable;
+	}
+
+	protected void link(PersistentEntityResource resource, Link defaultSelfRel) {
+		Object content = resource.getContent();
+		publisher.publishEvent(new SelfRelEvent(content, resource));
+		if (resource.getLinks() == null) {
+			resource.add(defaultSelfRel);
+		}
+		publisher.publishEvent(new AddLinkEvent(content, resource));
 	}
 }
