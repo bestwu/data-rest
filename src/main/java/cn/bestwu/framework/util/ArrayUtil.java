@@ -1,5 +1,7 @@
 package cn.bestwu.framework.util;
 
+import java.lang.reflect.Array;
+
 /**
  * Array 工具类
  */
@@ -49,4 +51,22 @@ public class ArrayUtil {
 		return (array == null || array.length == 0);
 	}
 
+	public static String toString(String separator, Object... array) {
+		int length = Array.getLength(array);
+		int iMax = length - 1;
+		if (iMax == -1)
+			return "";
+
+		StringBuilder b = new StringBuilder();
+		for (int i = 0; ; i++) {
+			b.append(Array.get(array, i));
+			if (i == iMax)
+				return b.toString();
+			b.append(separator);
+		}
+	}
+
+	public static String toString(Object... array) {
+		return toString(",", array);
+	}
 }
