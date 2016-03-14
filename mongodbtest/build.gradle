@@ -1,0 +1,39 @@
+dependencies {
+    compile project(':data-rest')
+    compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    compile 'com.mysema.querydsl:querydsl-mongodb'
+    compile 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+
+    testCompile 'com.mysema.querydsl:querydsl-apt'
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+}
+
+def taskGroup = 'app'
+
+def testquerydslSourcesDir = file('src/testquerydsl/java')
+task generateTestMongodbQueryDSL(type: JavaCompile, group: taskGroup) {
+    source = 'src/test/java/cn/bestwu/framework/mongodb/model'
+    classpath = configurations.compile + configurations.testCompile + configurations.runtime
+    options.compilerArgs = ['-proc:only', '-processor', 'org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor']
+    options.encoding = 'UTF-8'
+    destinationDir = testquerydslSourcesDir
+}
+project.compileTestJava {
+    source testquerydslSourcesDir
+}
+
+compileTestJava.dependsOn generateTestMongodbQueryDSL
+
+idea {
+    module {
+        jdkName = '1.8'
+
+        inheritOutputDirs = false
+
+//        sourceDirs += querydslSourcesDir
+        testSourceDirs += testquerydslSourcesDir
+
+        downloadJavadoc = false
+        downloadSources = true
+    }
+}

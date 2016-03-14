@@ -11,265 +11,61 @@ buildscript {
     dependencies {
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
         classpath 'io.spring.gradle:dependency-management-plugin:0.5.4.RELEASE'
-
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.5'
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.0.1"
     }
 }
 
-group 'cn.bestwu'
-version '1.0.0-SNAPSHOT'
+subprojects {
+
+    group 'cn.bestwu'
+    version '1.0.0-SNAPSHOT'
 
 
-apply plugin: 'java'
-apply plugin: "io.spring.dependency-management"
-apply plugin: 'propdeps'
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: "io.spring.dependency-management"
+    apply plugin: 'propdeps'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    [compileJava, javadoc, compileTestJava]*.options*.encoding = 'UTF-8'
+    [compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:none', '-Xlint:unchecked']
+
+    repositories {
+        try {
+            maven { url mavenLocalUrl }
+        } catch (ignored) {
+            mavenLocal()
+        }
+        jcenter()
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
+        }
+        dependencies {
+            dependency 'com.mysema.querydsl:querydsl-apt:3.7.1'
+            dependency 'com.mysema.querydsl:querydsl-jpa:3.7.1'
+            dependency 'com.mysema.querydsl:querydsl-mongodb:3.7.1'
+            dependency 'org.hibernate:hibernate-search-orm:5.3.0.Final'
+            dependency 'org.apache.lucene:lucene-highlighter:4.10.4'
+
+            dependency 'org.atteo:evo-inflector:1.2.1'
+            dependency 'commons-io:commons-io:2.4'
+            dependency 'com.belerweb:pinyin4j:2.5.0'
+        }
+    }
+}
+
 apply plugin: 'idea'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-[compileJava, javadoc, compileTestJava]*.options*.encoding = 'UTF-8'
-[compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:none', '-Xlint:unchecked']
-
-repositories {
-    try {
-        maven { url mavenLocalUrl }
-    } catch (ignored) {
-        mavenLocal()
-    }
-    jcenter()
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
-    }
-    dependencies {
-        dependency 'com.mysema.querydsl:querydsl-apt:3.7.1'
-        dependency 'com.mysema.querydsl:querydsl-jpa:3.7.1'
-        dependency 'com.mysema.querydsl:querydsl-mongodb:3.7.1'
-        dependency 'org.hibernate:hibernate-search-orm:5.3.0.Final'
-        dependency 'org.apache.lucene:lucene-highlighter:4.10.4'
-
-        dependency 'org.atteo:evo-inflector:1.2.1'
-        dependency 'commons-io:commons-io:2.4'
-        dependency 'com.belerweb:pinyin4j:2.5.0'
-    }
-}
-
-dependencies {
-    //web
-    compile 'org.springframework.boot:spring-boot-starter-web'
-    compile 'org.springframework.hateoas:spring-hateoas'
-
-    //utils
-    compile 'org.atteo:evo-inflector'
-    compile 'commons-io:commons-io'
-
-    //optional
-    optional 'org.springframework.boot:spring-boot-starter-aop'
-    optional 'org.springframework.boot:spring-boot-starter-data-jpa'
-    optional 'com.mysema.querydsl:querydsl-jpa'
-    optional 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    optional 'com.mysema.querydsl:querydsl-mongodb'
-    optional 'org.hibernate:hibernate-search-orm'
-    optional 'org.apache.lucene:lucene-highlighter'
-    optional 'org.springframework.boot:spring-boot-starter-mail'
-    optional 'com.belerweb:pinyin4j'
-    //test
-    testCompile "com.h2database:h2"
-    testCompile 'com.mysema.querydsl:querydsl-apt'
-    testCompile 'org.springframework.boot:spring-boot-starter-test'
-}
-
-def taskGroup = 'app'
-
-//Querydsl
-//def querydslSourcesDir = file('src/querydsl/java')
-//task generateQueryDSL(type: JavaCompile, group: taskGroup) {
-//    source = sourceSets.main.java
-//    classpath = configurations.compile + configurations.testCompile + configurations.runtime
-//    options.compilerArgs = ['-proc:only', '-processor', 'com.mysema.query.apt.jpa.JPAAnnotationProcessor']
-//    options.encoding = 'UTF-8'
-//    destinationDir = querydslSourcesDir
-//}
-//project.compileJava {
-//    source querydslSourcesDir
-//}
-//compileJava.dependsOn generateQueryDSL
-
-def testquerydslSourcesDir = file('src/testquerydsl/java')
-task generateTestJPAQueryDSL(type: JavaCompile, group: taskGroup) {
-    source = 'src/test/java/cn/bestwu/framework/jpa/model'
-    classpath = configurations.compile + configurations.testCompile + configurations.runtime
-    options.compilerArgs = ['-proc:only', '-processor', 'com.mysema.query.apt.jpa.JPAAnnotationProcessor']
-    options.encoding = 'UTF-8'
-    destinationDir = testquerydslSourcesDir
-}
-task generateTestMongodbQueryDSL(type: JavaCompile, group: taskGroup) {
-    source = 'src/test/java/cn/bestwu/framework/mongodb/model'
-    classpath = configurations.compile + configurations.testCompile + configurations.runtime
-    options.compilerArgs = ['-proc:only', '-processor', 'org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor']
-    options.encoding = 'UTF-8'
-    destinationDir = testquerydslSourcesDir
-}
-project.compileTestJava {
-    source testquerydslSourcesDir
-}
-
-compileTestJava.dependsOn generateTestJPAQueryDSL, generateTestMongodbQueryDSL
-
-//
-
 idea {
     project {
         jdkName = '1.8'
         languageLevel = '1.8'
     }
-    module {
-        jdkName = '1.8'
-
-        inheritOutputDirs = false
-
-//        sourceDirs += querydslSourcesDir
-        testSourceDirs += testquerydslSourcesDir
-
-        downloadJavadoc = false
-        downloadSources = true
-    }
 }
 
 wrapper {
     gradleVersion = '2.11'
-}
-
-
-apply plugin: 'com.jfrog.bintray'
-apply plugin: "com.jfrog.artifactory"
-apply plugin: 'maven-publish'
-
-task sourceJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from javadoc
-}
-
-artifacts {
-    archives javadocJar, sourceJar
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            if (plugins.hasPlugin('war')) {
-                from components.web
-            } else {
-                from components.java
-            }
-
-            artifact sourceJar {
-                classifier 'sources'
-            }
-
-            artifact javadocJar {
-                classifier 'javadoc'
-            }
-
-            pom.withXml {
-                Node root = asNode()
-
-                //compile
-                root.dependencies.'*'.findAll() {
-                    it.scope.text() == 'runtime' && project.configurations.compile.dependencies.find { dep ->
-                        dep.group == it.groupId.text() && dep.name == it.artifactId.text()
-                    }
-                }.each {
-                    it.scope*.value = 'compile'
-                }
-                //provided
-                root.dependencies.'*'.findAll() {
-                    it.scope.text() == 'runtime' && project.configurations.provided.dependencies.find { dep ->
-                        dep.group == it.groupId.text() && dep.name == it.artifactId.text()
-                    }
-                }.each {
-                    it.scope*.value = 'provided'
-                }
-                //optional
-                root.dependencies.'*'.findAll() {
-                    it.scope.text() == 'runtime' && project.configurations.optional.dependencies.find { dep ->
-                        dep.group == it.groupId.text() && dep.name == it.artifactId.text()
-                    }
-                }.each {
-                    it.scope*.value = 'compile'
-                    it.appendNode('optional', 'true')
-                }
-
-                root.appendNode('name', 'bestwu data-rest')
-                root.appendNode('packaging', 'jar')
-                root.appendNode('description', 'bestwu data-rest')
-                root.appendNode('url', 'https://bitbucket.org/bestwu/data-rest')
-
-                def license = root.appendNode('licenses').appendNode('license')
-                license.appendNode('name', 'The Apache Software License, Version 2.0')
-                license.appendNode('url', 'http://www.apache.org/licenses/LICENSE-2.0.txt')
-                license.appendNode('distribution', 'repo')
-
-                def developer = root.appendNode('developers').appendNode('developer')
-                developer.appendNode('id', 'bestwu')
-                developer.appendNode('name', 'Peter Wu')
-                developer.appendNode('email', 'piterwu@outlook.com')
-
-                def scm = root.appendNode('scm')
-                scm.appendNode('url', 'https://bitbucket.org/bestwu/data-rest')
-                scm.appendNode('connection', 'scm:https://bestwu@bitbucket.org/bestwu/data-rest.git')
-                scm.appendNode('developerConnection', 'scm:git@bitbucket.org:bestwu/data-rest.git')
-            }
-        }
-    }
-}
-
-bintray {
-    user = bintrayUsername
-    key = bintrayApiKey
-    publications = ['mavenJava']
-
-    publish = true
-    pkg {
-        repo = 'maven'
-        name = 'com.bestwu:data-rest'
-        desc = 'bestwu data-rest'
-        vcsUrl = 'https://bitbucket.org/bestwu/data-rest'
-        licenses = ['Apache-2.0']
-        labels = ['data-rest']
-
-        version {
-            mavenCentralSync {
-                sync = true
-                user = mavenCentralUsername
-                password = mavenCentralPassword
-                close = '1'
-            }
-        }
-    }
-}
-
-artifactory {
-    contextUrl = 'http://oss.jfrog.org'
-    publish {
-        repository {
-            repoKey = 'oss-snapshot-local' //The Artifactory repository key to publish to
-            username = bintrayUsername
-            password = bintrayApiKey
-            maven = true
-        }
-        defaults {
-            publications('mavenJava')
-            publishArtifacts = true
-        }
-    }
 }

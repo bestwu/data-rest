@@ -1,0 +1,12 @@
+logging.logAspect.enabled: true
+logging.level.cn.bestwu: DEBUG
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        search:
+          analyzer: org.apache.lucene.analysis.cjk.CJKAnalyzer
+          default:
+            directory_provider: filesystem
+            indexBase: D:/home/tv/indexes/

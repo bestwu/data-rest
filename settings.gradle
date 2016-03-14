@@ -1,1 +1,6 @@
 rootProject.name = 'data-rest'
+include 'jpatest'
+include 'mongodbtest'
+include 'core'
+findProject(':core')?.name = 'data-rest'
+
