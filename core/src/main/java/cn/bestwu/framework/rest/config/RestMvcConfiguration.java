@@ -4,7 +4,6 @@ import cn.bestwu.framework.rest.aspect.LogAspect;
 import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.converter.DefaultElementMixIn;
 import cn.bestwu.framework.rest.converter.PageMixIn;
-import cn.bestwu.framework.rest.converter.StringToEnumConverterFactory;
 import cn.bestwu.framework.rest.filter.OrderedHttpPutFormContentFilter;
 import cn.bestwu.framework.rest.mapping.RepositoryResourceMappings;
 import cn.bestwu.framework.rest.mapping.SerializationViewMappings;
@@ -35,6 +34,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -268,7 +268,7 @@ public class RestMvcConfiguration {
 			getBeansOfType(Converter.class).forEach(registry::addConverter);
 			getBeansOfType(GenericConverter.class).forEach(registry::addConverter);
 			getBeansOfType(Formatter.class).forEach(registry::addFormatter);
-			registry.addConverterFactory(new StringToEnumConverterFactory());
+			getBeansOfType(ConverterFactory.class).forEach(registry::addConverterFactory);
 		}
 
 		private <T> Collection<T> getBeansOfType(Class<T> type) {

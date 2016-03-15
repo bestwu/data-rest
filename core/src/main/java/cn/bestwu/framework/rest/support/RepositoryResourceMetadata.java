@@ -69,7 +69,7 @@ public class RepositoryResourceMetadata {
 				pathName = ResourceUtil.getRepositoryBasePathName(entity.getType());
 			}
 		} else {
-			exported = true;
+			exported = false;
 			pathName = ResourceUtil.getRepositoryBasePathName(entity.getType());
 		}
 
@@ -122,6 +122,9 @@ public class RepositoryResourceMetadata {
 		RepositoryRestResource annotation = method.getAnnotation(RepositoryRestResource.class);
 		if (annotation == null) {
 			return !contained;
+		}
+		if (!annotation.exported()) {
+			return false;
 		}
 		String[] array = annotation.value();
 		if (array.length == 0) {
