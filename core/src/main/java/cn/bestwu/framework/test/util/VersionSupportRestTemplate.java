@@ -27,6 +27,12 @@ import java.util.Map;
 public class VersionSupportRestTemplate extends TestRestTemplate {
 	protected final Logger logger = LoggerFactory.getLogger(VersionSupportRestTemplate.class);
 
+	private boolean print;
+
+	public void setPrint(boolean print) {
+		this.print = print;
+	}
+
 	public VersionSupportRestTemplate(HttpClientOption... httpClientOptions) {
 		super(httpClientOptions);
 		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
@@ -78,7 +84,7 @@ public class VersionSupportRestTemplate extends TestRestTemplate {
 
 			response = request.execute();
 
-			if (logger.isDebugEnabled()) {
+			if (print && logger.isDebugEnabled()) {
 				logger.debug("------------------------------");
 				logger.debug("requestHeaders:");
 				requestHeaders.forEach((s, strings) -> logger.debug(s + " : " + strings));
@@ -86,7 +92,7 @@ public class VersionSupportRestTemplate extends TestRestTemplate {
 			}
 
 			HttpHeaders responseHeaders = response.getHeaders();
-			if (logger.isDebugEnabled()) {
+			if (print && logger.isDebugEnabled()) {
 				logger.debug("------------------------------");
 				logger.debug("responseHeaders:");
 				responseHeaders.forEach((s, strings) -> logger.debug(s + " : " + strings));
@@ -95,7 +101,7 @@ public class VersionSupportRestTemplate extends TestRestTemplate {
 
 			handleResponse(url, method, response);
 			if (responseExtractor != null) {
-				if (logger.isDebugEnabled()) {
+				if (print && logger.isDebugEnabled()) {
 					logger.debug("------------------------------");
 					response = new PushbackBodyClientHttpResponseWrapper(response);
 					logger.debug("responseBody: \n" + ((PushbackBodyClientHttpResponseWrapper) response).readBody());

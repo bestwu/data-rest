@@ -4,6 +4,7 @@ import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.support.PrincipalNamePutEvent;
 import cn.bestwu.framework.rest.support.RequestJsonViewResponseBodyAdvice;
 import cn.bestwu.framework.rest.support.Resource;
+import cn.bestwu.framework.rest.support.ResourceUtil;
 import cn.bestwu.framework.util.StringUtil;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -86,20 +87,26 @@ public class LogAspect extends BaseController {
 			HttpHeaders headers = servletServerHttpRequest.getHeaders();
 			String MSG_CODE = "{} 的 [{}] {} {} \nrequest headers:\n{} \nrequest parameters:\n{} \nresponse:\n{}";
 
-			if (requestJsonViewResponseBodyAdvice != null) {
-				MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
-				requestJsonViewResponseBodyAdvice.beforeBodyWrite(mappingJacksonValue, request);
-				result = mappingJacksonValue;
-			}
-
-			if (logger.isDebugEnabled())
+			if (logger.isDebugEnabled()) {
+				String requestSignature = ResourceUtil.getRequestSignature(request);
+				String resultStr;
+				if ("GET_LOGS_INDEX".equals(requestSignature)) {
+					resultStr = StringUtil.subString(result.toString(), 100);
+				} else {
+					if (requestJsonViewResponseBodyAdvice != null) {
+						MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
+						requestJsonViewResponseBodyAdvice.beforeBodyWrite(mappingJacksonValue, request);
+						result = mappingJacksonValue;
+					}
+					resultStr = StringUtil.valueOf(result, true);
+				}
 				logger.info(MSG_CODE, ipAddress, principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName, requestMethod,
 						servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true),
-						StringUtil.valueOf(result, true));
-			else
+						resultStr);
+			} else
 				logger.info(MSG_CODE, ipAddress, principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName, requestMethod,
 						servletPath, StringUtil.valueOf(headers, true), StringUtil.subString(StringUtil.valueOf(parameterMap), 100),
-						StringUtil.subString(StringUtil.valueOf(result), 100));
+						StringUtil.subString(String.valueOf(result), 100));
 		}
 	}
 
