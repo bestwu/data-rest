@@ -111,6 +111,7 @@ public class RestMvcConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean(Jackson2ObjectMapperBuilder.class)
 	public Jackson2ObjectMapperBuilder jacksonBuilder() {
 		Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
 		builder.serializationInclusion(JsonInclude.Include.NON_NULL);
