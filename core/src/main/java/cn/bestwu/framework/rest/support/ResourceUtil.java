@@ -1,5 +1,6 @@
 package cn.bestwu.framework.rest.support;
 
+import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
 import cn.bestwu.framework.util.StringUtil;
 import org.atteo.evo.inflector.English;
@@ -46,7 +47,7 @@ public class ResourceUtil {
 
 		String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
 		if (repositoryBasePathName != null) {
-			apiSignature = apiSignature.replace("{repository}", repositoryBasePathName);
+			apiSignature = apiSignature.replace(BaseController.BASE_NAME, repositoryBasePathName);
 		}
 		String searchName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME);
 		if (searchName != null) {

@@ -25,9 +25,6 @@ public class RepositoryResourceMetadata {
 	 * this resource is exported
 	 */
 	private boolean exported;
-	/**
-	 * 数据模型 对应的 {repository}，默认
-	 */
 	private String pathName;
 
 	private PersistentEntity<?, ?> entity;

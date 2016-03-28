@@ -35,7 +35,7 @@ public class RootController extends BaseController {
 	/*
 	 * 拼音
 	 */
-	@RequestMapping(value = "/util/pinyin", method = RequestMethod.GET)
+	@RequestMapping(value = "/utils/pinyin", method = RequestMethod.GET)
 	public Object pinyin(String[] word) {
 		Assert.notEmpty(word, getText("param.notnull", "word"));
 
@@ -78,7 +78,7 @@ public class RootController extends BaseController {
 	/*
 	 * 验证码
 	 */
-	@RequestMapping(value = "/util/captcha", method = RequestMethod.GET)
+	@RequestMapping(value = "/utils/captcha", method = RequestMethod.GET)
 	public void vCode(HttpSession httpSession, HttpServletResponse response) throws IOException {
 		response.setContentType("image/jpeg");
 		response.setHeader("Pragma", "No-cache");

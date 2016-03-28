@@ -33,7 +33,7 @@ public abstract class BaseController extends Response {
 	/**
 	 * 基本实体名
 	 */
-	private static final String BASE_NAME = "{repository}";
+	public static final String BASE_NAME = "{repository}";
 	/**
 	 * iduri
 	 */
