@@ -422,7 +422,6 @@ public class RestMvcConfiguration {
 			if (QueryDslUtils.QUERY_DSL_PRESENT)
 				argumentResolvers.add(0, new QuerydslPredicateArgumentResolver(querydslBindingsFactory(), querydslPredicateBuilder(), publisher));
 			argumentResolvers.add(new ETagArgumentResolver());
-			argumentResolvers.add(new MultipartFileHolderMethodArgumentResolver());
 		}
 
 		/*
