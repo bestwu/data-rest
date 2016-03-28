@@ -20,11 +20,9 @@ import org.springframework.web.servlet.mvc.condition.RequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * 支持Rest @RequestMapping produces MediaType 参数 version的RequestMappingHandlerMapping
@@ -125,6 +123,10 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		int secondSlashIndex = lookupPath.indexOf('/', lookupPath.startsWith("/") ? 1 : 0);
 		boolean noSecondSlashIndex = secondSlashIndex == -1;
 		return noSecondSlashIndex ? lookupPath.substring(1) : lookupPath.substring(1, secondSlashIndex);
+	}
+
+	@Override protected HandlerMethod handleNoMatch(Set<RequestMappingInfo> requestMappingInfos, String lookupPath, HttpServletRequest request) throws ServletException {
+		return null;
 	}
 
 	@Override protected Comparator<RequestMappingInfo> getMappingComparator(HttpServletRequest request) {
