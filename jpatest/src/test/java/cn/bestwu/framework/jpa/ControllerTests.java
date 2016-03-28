@@ -1,7 +1,7 @@
 package cn.bestwu.framework.jpa;
 
 import cn.bestwu.framework.jpa.model.TestUser;
-import cn.bestwu.framework.test.util.VersionSupportRestTemplate;
+import cn.bestwu.framework.test.util.TRestTemplate;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +37,7 @@ public class ControllerTests {
 
 	@Test
 	public void testRest() throws Exception {
-		VersionSupportRestTemplate restTemplate = new VersionSupportRestTemplate();
+		TRestTemplate restTemplate = new TRestTemplate();
 
 		//save
 		TestUser testUser = new TestUser();

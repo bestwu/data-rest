@@ -10,13 +10,29 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.feed.AtomFeedHttpMessageConverter;
+import org.springframework.http.converter.feed.RssChannelHttpMessageConverter;
+import org.springframework.http.converter.json.GsonHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
+import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
+import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
+import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.client.*;
 import org.springframework.web.util.UriTemplate;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,8 +40,8 @@ import java.util.Map;
  *
  * @author Peter Wu
  */
-public class VersionSupportRestTemplate extends TestRestTemplate {
-	protected final Logger logger = LoggerFactory.getLogger(VersionSupportRestTemplate.class);
+public class TRestTemplate extends TestRestTemplate {
+	protected final Logger logger = LoggerFactory.getLogger(TRestTemplate.class);
 
 	private boolean print;
 
@@ -33,14 +49,55 @@ public class VersionSupportRestTemplate extends TestRestTemplate {
 		this.print = print;
 	}
 
-	public VersionSupportRestTemplate(HttpClientOption... httpClientOptions) {
+	public TRestTemplate(HttpClientOption... httpClientOptions) {
 		super(httpClientOptions);
 		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
 		requestFactory.setOutputStreaming(false);
 		setRequestFactory(requestFactory);
+
+		boolean romePresent =
+				ClassUtils.isPresent("com.rometools.rome.feed.WireFeed", RestTemplate.class.getClassLoader());
+
+		final boolean jaxb2Present =
+				ClassUtils.isPresent("javax.xml.bind.Binder", RestTemplate.class.getClassLoader());
+
+		final boolean jackson2Present =
+				ClassUtils.isPresent("com.fasterxml.jackson.databind.ObjectMapper", RestTemplate.class.getClassLoader()) &&
+						ClassUtils.isPresent("com.fasterxml.jackson.core.JsonGenerator", RestTemplate.class.getClassLoader());
+
+		final boolean jackson2XmlPresent =
+				ClassUtils.isPresent("com.fasterxml.jackson.dataformat.xml.XmlMapper", RestTemplate.class.getClassLoader());
+
+		final boolean gsonPresent =
+				ClassUtils.isPresent("com.google.gson.Gson", RestTemplate.class.getClassLoader());
+
+		final List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+		messageConverters.add(new ByteArrayHttpMessageConverter());
+		messageConverters.add(new StringHttpMessageConverter(Charset.forName("UTF-8")));//UTF-8 编码
+		messageConverters.add(new ResourceHttpMessageConverter());
+		messageConverters.add(new SourceHttpMessageConverter<>());
+		messageConverters.add(new AllEncompassingFormHttpMessageConverter());
+
+		if (romePresent) {
+			messageConverters.add(new AtomFeedHttpMessageConverter());
+			messageConverters.add(new RssChannelHttpMessageConverter());
+		}
+
+		if (jackson2XmlPresent) {
+			messageConverters.add(new MappingJackson2XmlHttpMessageConverter());
+		} else if (jaxb2Present) {
+			messageConverters.add(new Jaxb2RootElementHttpMessageConverter());
+		}
+
+		if (jackson2Present) {
+			messageConverters.add(new MappingJackson2HttpMessageConverter());
+		} else if (gsonPresent) {
+			messageConverters.add(new GsonHttpMessageConverter());
+		}
+		setMessageConverters(messageConverters);
 	}
 
-	public VersionSupportRestTemplate(String username, String password, HttpClientOption... httpClientOptions) {
+	public TRestTemplate(String username, String password, HttpClientOption... httpClientOptions) {
 		super(username, password, httpClientOptions);
 	}
 
