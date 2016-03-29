@@ -1,5 +1,6 @@
 package cn.bestwu.framework.rest.support;
 
+import cn.bestwu.framework.data.annotation.DisableSelfRel;
 import cn.bestwu.framework.event.SelfRelEvent;
 import cn.bestwu.framework.rest.controller.RepositoryEntityController;
 import cn.bestwu.framework.util.Sha1DigestUtil;
@@ -253,10 +254,12 @@ public class Response {
 			}
 
 			PersistentEntityResource<Object> resource = new PersistentEntityResource<>(source, persistentEntity);
-			publisher.publishEvent(new SelfRelEvent(source, resource));
-			if (resource.getLinks() == null) {
-				Link link = baseLinkBuilder.slash(getId(persistentEntity, source)).withSelfRel();
-				resource.add(link);
+			if (!persistentEntity.getType().isAnnotationPresent(DisableSelfRel.class)) {
+				publisher.publishEvent(new SelfRelEvent(source, resource));
+				if (resource.getLinks() == null) {
+					Link link = baseLinkBuilder.slash(getId(persistentEntity, source)).withSelfRel();
+					resource.add(link);
+				}
 			}
 			return resource;
 		}
