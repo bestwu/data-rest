@@ -9,6 +9,7 @@ import cn.bestwu.framework.rest.support.RootResourceInformation;
 import org.hibernate.search.annotations.Indexed;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.Link;
@@ -17,14 +18,11 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-/**
- * Entity 模型 基本控制类
- * 对应资源的CRUD操作API
- */
 @RepositoryRestController
+@ConditionalOnBean(SearchRepository.class)
 @RequestMapping(value = BaseController.BASE_URI) public class RepositorySearchController extends BaseController {
 
-	@Autowired(required = false)
+	@Autowired
 	private SearchRepository searchRepository;
 
 	/*
