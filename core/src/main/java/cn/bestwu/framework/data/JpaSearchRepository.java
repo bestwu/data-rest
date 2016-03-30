@@ -83,7 +83,7 @@ public class JpaSearchRepository implements SearchRepository {
 				if (highLightFieldArray == null) {
 					highLightFieldArray = fieldArray;
 				}
-				highLight(query, searchFactory.getAnalyzer(modelType), result, modelType, highLightFieldArray);
+				jpaHighLight(query, searchFactory.getAnalyzer(modelType), result, modelType, highLightFieldArray);
 			} else {
 				result.forEach(t -> publisher.publishEvent(new SearchResultEvent(t)));
 			}
@@ -241,8 +241,9 @@ public class JpaSearchRepository implements SearchRepository {
 	 * @param data      要高亮的数据
 	 * @param modelType modelType
 	 * @param fields    需要高亮的字段   @return 高亮数据
+	 * @param <T>       t
 	 */
-	private <T> void highLight(Query query, Analyzer analyzer, List<T> data, Class<T> modelType, String... fields) {
+	@Override public <T> void jpaHighLight(Query query, Analyzer analyzer, List<T> data, Class<T> modelType, String... fields) {
 		QueryScorer queryScorer = new QueryScorer(query);
 		Highlighter highlighter = new Highlighter(defaultFormatter, queryScorer);
 		for (T t : data) {

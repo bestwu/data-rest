@@ -59,6 +59,7 @@ public class DataRestConfiguration {
 	}
 
 	@Configuration
+	@ConditionalOnMissingBean(SearchRepository.class)
 	@ConditionalOnClass(Search.class)
 	protected static class JpaSearchRepositoryConfiguration {
 
