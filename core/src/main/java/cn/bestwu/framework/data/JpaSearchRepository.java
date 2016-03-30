@@ -16,6 +16,7 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -179,17 +180,27 @@ public class JpaSearchRepository implements SearchRepository {
 			highLightFieldArray = highLightFieldsCache.get(modelType);
 		} else {
 			Set<String> fields = new HashSet<>();
-			Arrays.stream(modelType.getDeclaredFields()).forEach(field -> {
-				if (field.isAnnotationPresent(HighLight.class)) {
-					fields.add(field.getName());
-				}
-			});
+			Arrays.stream(modelType.getDeclaredFields()).forEach(field -> addHighLightFields(fields, field, null));
 			if (!fields.isEmpty()) {
 				highLightFieldArray = fields.toArray(new String[fields.size()]);
 				highLightFieldsCache.put(modelType, highLightFieldArray);
 			}
 		}
 		return highLightFieldArray;
+	}
+
+	private void addHighLightFields(Set<String> fields, java.lang.reflect.Field field, String parentFieldName) {
+		String fieldName = field.getName();
+		if (parentFieldName != null) {
+			fieldName = parentFieldName + "." + fieldName;
+		}
+		if (field.isAnnotationPresent(HighLight.class)) {
+			fields.add(fieldName);
+		} else if (field.isAnnotationPresent(IndexedEmbedded.class)) {
+			for (java.lang.reflect.Field fieldField : field.getType().getDeclaredFields()) {
+				addHighLightFields(fields, fieldField, fieldName);
+			}
+		}
 	}
 
 	/*
@@ -201,15 +212,25 @@ public class JpaSearchRepository implements SearchRepository {
 			fieldArray = fieldsCache.get(modelType);
 		} else {
 			Set<String> fields = new HashSet<>();
-			Arrays.stream(modelType.getDeclaredFields()).forEach(field -> {
-				if (field.isAnnotationPresent(Field.class)) {
-					fields.add(field.getName());
-				}
-			});
+			Arrays.stream(modelType.getDeclaredFields()).forEach(field -> addSearchFields(fields, field, null));
 			fieldArray = fields.toArray(new String[fields.size()]);
 			fieldsCache.put(modelType, fieldArray);
 		}
 		return fieldArray;
+	}
+
+	private void addSearchFields(Set<String> fields, java.lang.reflect.Field field, String parentFieldName) {
+		String fieldName = field.getName();
+		if (parentFieldName != null) {
+			fieldName = parentFieldName + "." + fieldName;
+		}
+		if (field.isAnnotationPresent(Field.class)) {
+			fields.add(fieldName);
+		} else if (field.isAnnotationPresent(IndexedEmbedded.class)) {
+			for (java.lang.reflect.Field fieldField : field.getType().getDeclaredFields()) {
+				addSearchFields(fields, fieldField, fieldName);
+			}
+		}
 	}
 
 	/**
@@ -227,18 +248,63 @@ public class JpaSearchRepository implements SearchRepository {
 		for (T t : data) {
 			publisher.publishEvent(new SearchResultEvent(t));
 			for (String fieldName : fields) {
-				try {
-					Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getReadMethod(), t);
-					String highLightFieldValue = highlighter.getBestFragment(analyzer, fieldName, String.valueOf(fieldValue));
-					if (highLightFieldValue != null) {
-						ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getWriteMethod(), t, highLightFieldValue);
-					}
-				} catch (Exception e) {
-					//不处理，只记录日志
-					logger.error("高亮显示关键字失败", e);
-				}
+				hightLightField(analyzer, modelType, highlighter, t, fieldName);
 			}
 		}
 	}
+
+	private <T> void hightLightField(Analyzer analyzer, Class<?> modelType, Highlighter highlighter, T t, String fieldName) {
+		try {
+			if (fieldName.contains(".")) {
+				String[] split = fieldName.split("\\.");
+				String pfieldName = split[0];
+				Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, pfieldName).getReadMethod(), t);
+				Class<?> fieldType = modelType.getDeclaredField(pfieldName).getType();
+				String propertyName = split[1];
+				hightLightField(analyzer, fieldType, highlighter, fieldValue, propertyName);
+			} else {
+				Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getReadMethod(), t);
+				String text = String.valueOf(fieldValue);
+				if (!text.contains("<font color=\"#ff0000\">")) {
+					String highLightFieldValue = highlighter.getBestFragment(analyzer, fieldName, text);
+					if (highLightFieldValue != null) {
+						ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getWriteMethod(), t, highLightFieldValue);
+					}
+				}
+			}
+		} catch (Exception e) {
+			//不处理，只记录日志
+			logger.error("高亮显示关键字失败", e);
+		}
+	}
+
+	//	/**
+	//	 * 高亮显示文章
+	//	 *
+	//	 * @param query     {@link Query}
+	//	 * @param analyzer  analyzer
+	//	 * @param data      要高亮的数据
+	//	 * @param modelType modelType
+	//	 * @param fields    需要高亮的字段   @return 高亮数据
+	//	 */
+	//	private <T> void highLight(Query query, Analyzer analyzer, List<T> data, Class<T> modelType, String... fields) {
+	//		QueryScorer queryScorer = new QueryScorer(query);
+	//		Highlighter highlighter = new Highlighter(defaultFormatter, queryScorer);
+	//		for (T t : data) {
+	//			publisher.publishEvent(new SearchResultEvent(t));
+	//			for (String fieldName : fields) {
+	//				try {
+	//					Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getReadMethod(), t);
+	//					String highLightFieldValue = highlighter.getBestFragment(analyzer, fieldName, String.valueOf(fieldValue));
+	//					if (highLightFieldValue != null) {
+	//						ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getWriteMethod(), t, highLightFieldValue);
+	//					}
+	//				} catch (Exception e) {
+	//					//不处理，只记录日志
+	//					logger.error("高亮显示关键字失败", e);
+	//				}
+	//			}
+	//		}
+	//	}
 
 }
