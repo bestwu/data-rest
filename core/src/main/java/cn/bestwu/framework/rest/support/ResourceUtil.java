@@ -96,4 +96,12 @@ public class ResourceUtil {
 		return MediaType.valueOf(versionAcceptParam).getParameter(Version.VERSION_PARAM_NAME);
 	}
 
+	/**
+	 * @param request http request
+	 * @param verion  比较的版本号，不能为null
+	 * @return 请求的版本号是否匹配 version
+	 */
+	public static boolean requestVersionEquals(HttpServletRequest request, String verion) {
+		return verion.equalsIgnoreCase(getRequestVersion(request));
+	}
 }

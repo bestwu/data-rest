@@ -69,7 +69,7 @@ public class SerializationViewMappings {
 		}
 		String requestVersion = ResourceUtil.getRequestVersion(request);
 		for (VersionedSerializationView jsonView : jsonViews) {
-			if (jsonView.getVersion().equals(requestVersion)) {
+			if (jsonView.getVersion().equalsIgnoreCase(requestVersion)) {
 				return jsonView.getSerializationView();
 			}
 		}
