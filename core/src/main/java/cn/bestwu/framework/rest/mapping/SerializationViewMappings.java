@@ -46,7 +46,7 @@ public class SerializationViewMappings {
 			if (firstPut) {
 				jsonViews = new ArrayList<>();
 			}
-			jsonViews.add(new VersionedSerializationView(version, clazz));
+			jsonViews.add(new VersionedSerializationView(version.toLowerCase(), clazz));
 			if (firstPut) {
 				cache.put(signature, jsonViews);
 			}

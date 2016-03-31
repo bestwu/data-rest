@@ -80,7 +80,7 @@ import java.util.*;
  */
 @Configuration
 @ConditionalOnWebApplication
-@Import({ MessageSourceConfiguration.class })
+@Import({ MessageSourceConfiguration.class, JacksonObjectMapperBuilderConfiguration.class })
 public class RestMvcConfiguration {
 
 	@Configuration

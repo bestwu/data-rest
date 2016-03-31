@@ -8,6 +8,7 @@ import cn.bestwu.framework.rest.config.RestMvcConfiguration;
 import org.hibernate.search.jpa.Search;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
@@ -15,6 +16,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.Ordered;
 import org.springframework.data.auditing.AuditableBeanWrapperFactory;
 import org.springframework.data.auditing.MappingAuditableBeanWrapperFactory;
 import org.springframework.data.mapping.context.MappingContext;
@@ -33,6 +35,7 @@ import java.util.List;
  * @author Peter Wu
  */
 @Configuration
+@AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 9)
 @Import({ RestMvcConfiguration.class })
 public class DataRestConfiguration {
 
