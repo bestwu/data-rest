@@ -2,16 +2,12 @@ package cn.bestwu.framework.rest.config;
 
 import cn.bestwu.framework.rest.aspect.LogAspect;
 import cn.bestwu.framework.rest.controller.BaseController;
-import cn.bestwu.framework.rest.converter.DefaultElementMixIn;
-import cn.bestwu.framework.rest.converter.PageMixIn;
 import cn.bestwu.framework.rest.filter.OrderedHttpPutFormContentFilter;
 import cn.bestwu.framework.rest.mapping.RepositoryResourceMappings;
 import cn.bestwu.framework.rest.mapping.SerializationViewMappings;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
 import cn.bestwu.framework.rest.resolver.*;
 import cn.bestwu.framework.rest.support.*;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.validator.HibernateValidator;
@@ -37,7 +33,6 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.core.io.Resource;
-import org.springframework.data.domain.Page;
 import org.springframework.data.querydsl.QueryDslUtils;
 import org.springframework.data.querydsl.SimpleEntityPathResolver;
 import org.springframework.data.querydsl.binding.FixQuerydslPredicateBuilder;
@@ -52,7 +47,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -108,18 +102,6 @@ public class RestMvcConfiguration {
 		public LogAspect logAspect() {
 			return new LogAspect(publisher);
 		}
-	}
-
-	@Bean
-	@ConditionalOnMissingBean(Jackson2ObjectMapperBuilder.class)
-	public Jackson2ObjectMapperBuilder jacksonBuilder() {
-		Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-		builder.serializationInclusion(JsonInclude.Include.NON_NULL);
-		builder.featuresToEnable(SerializationFeature.WRITE_ENUMS_USING_INDEX);
-		builder.featuresToDisable(SerializationFeature.WRITE_NULL_MAP_VALUES, SerializationFeature.FAIL_ON_EMPTY_BEANS);
-		builder.mixIn(Page.class, PageMixIn.class);
-		builder.mixIn(Object.class, DefaultElementMixIn.class);
-		return builder;
 	}
 
 	@Bean
