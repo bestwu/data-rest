@@ -2,12 +2,16 @@ package cn.bestwu.framework.rest.config;
 
 import cn.bestwu.framework.rest.aspect.LogAspect;
 import cn.bestwu.framework.rest.controller.BaseController;
+import cn.bestwu.framework.rest.converter.DefaultElementMixIn;
+import cn.bestwu.framework.rest.converter.PageMixIn;
 import cn.bestwu.framework.rest.filter.OrderedHttpPutFormContentFilter;
 import cn.bestwu.framework.rest.mapping.RepositoryResourceMappings;
 import cn.bestwu.framework.rest.mapping.SerializationViewMappings;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
 import cn.bestwu.framework.rest.resolver.*;
 import cn.bestwu.framework.rest.support.*;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.validator.HibernateValidator;
@@ -33,6 +37,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.querydsl.QueryDslUtils;
 import org.springframework.data.querydsl.SimpleEntityPathResolver;
 import org.springframework.data.querydsl.binding.FixQuerydslPredicateBuilder;
@@ -80,13 +85,21 @@ import java.util.*;
  */
 @Configuration
 @ConditionalOnWebApplication
-@Import({ MessageSourceConfiguration.class, JacksonObjectMapperBuilderConfiguration.class })
+@Import({ MessageSourceConfiguration.class })
 public class RestMvcConfiguration {
 
 	@Configuration
 	@ConditionalOnWebApplication
 	@ComponentScan(basePackageClasses = BaseController.class)
 	protected static class ControllerConfiguration {
+	}
+
+	@Bean
+	public Module defaultModule() {
+		SimpleModule module = new SimpleModule();
+		module.setMixInAnnotation(Page.class, PageMixIn.class);
+		module.setMixInAnnotation(Object.class, DefaultElementMixIn.class);
+		return module;
 	}
 
 	@Configuration
