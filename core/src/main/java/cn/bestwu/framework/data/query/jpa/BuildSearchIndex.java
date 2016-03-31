@@ -1,4 +1,4 @@
-package cn.bestwu.framework.data;
+package cn.bestwu.framework.data.query.jpa;
 
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;

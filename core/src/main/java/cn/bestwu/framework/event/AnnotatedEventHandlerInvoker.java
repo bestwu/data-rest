@@ -88,7 +88,6 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 			inspect(bean, method, HandleDefaultPredicate.class, DefaultPredicateEvent.class);
 			inspect(bean, method, HandleAddPredicate.class, AddPredicateEvent.class);
 			inspect(bean, method, HandleBeforeSearch.class, BeforeSearchEvent.class);
-			inspect(bean, method, HandleSearchResult.class, SearchResultEvent.class);
 		}, USER_METHODS);
 
 		return bean;

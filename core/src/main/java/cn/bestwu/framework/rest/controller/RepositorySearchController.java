@@ -1,7 +1,9 @@
 package cn.bestwu.framework.rest.controller;
 
-import cn.bestwu.framework.data.JpaSearchRepository;
-import cn.bestwu.framework.data.SearchRepository;
+import cn.bestwu.framework.data.query.ResultHandler;
+import cn.bestwu.framework.data.query.SearchRepository;
+import cn.bestwu.framework.data.query.jpa.HighLightResultHandler;
+import cn.bestwu.framework.data.query.jpa.JpaSearchRepository;
 import cn.bestwu.framework.rest.annotation.RepositoryRestController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.rest.support.PersistentEntityResource;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 	@Autowired
 	private SearchRepository searchRepository;
+	@Autowired(required = false)
+	private ResultHandler resultHandler;
 
 	/*
 	 * 全文搜索
@@ -36,10 +40,16 @@ import org.springframework.web.bind.annotation.RequestMethod;
 		Assert.hasText(keyword, getText("param.notnull", "keyword"));
 
 		Class<?> modelType = resourceInformation.getModelType();
-		if (JpaSearchRepository.class.equals(AopProxyUtils.ultimateTargetClass(searchRepository)) && !modelType.isAnnotationPresent(Indexed.class)) {
+		boolean isJpaSearchRepository = JpaSearchRepository.class.equals(AopProxyUtils.ultimateTargetClass(searchRepository));
+		if (isJpaSearchRepository && !modelType.isAnnotationPresent(Indexed.class)) {
 			throw new ResourceNotFoundException();
 		}
-		Page page = searchRepository.search(modelType, keyword, pageable, highLight);
+		if (resultHandler == null) {
+			if (highLight && isJpaSearchRepository) {//MongodbSearchRepository 不支持高亮
+				resultHandler = new HighLightResultHandler();
+			}
+		}
+		Page page = searchRepository.search(modelType, keyword, pageable, resultHandler);
 		Link selfRel = ControllerLinkBuilder
 				.linkTo(RepositorySearchController.class, RepositorySearchController.class.getMethod("search", RootResourceInformation.class, String.class, Pageable.class, boolean.class),
 						resourceInformation.getPathName())

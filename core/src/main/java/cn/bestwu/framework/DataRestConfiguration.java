@@ -1,8 +1,8 @@
 package cn.bestwu.framework;
 
-import cn.bestwu.framework.data.JpaSearchRepository;
-import cn.bestwu.framework.data.MongodbSearchRepository;
-import cn.bestwu.framework.data.SearchRepository;
+import cn.bestwu.framework.data.query.MongodbSearchRepository;
+import cn.bestwu.framework.data.query.SearchRepository;
+import cn.bestwu.framework.data.query.jpa.JpaSearchRepository;
 import cn.bestwu.framework.event.AnnotatedEventHandlerInvoker;
 import cn.bestwu.framework.rest.config.RestMvcConfiguration;
 import org.hibernate.search.jpa.Search;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -19,7 +20,10 @@ import org.springframework.data.auditing.MappingAuditableBeanWrapperFactory;
 import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mapping.context.PersistentEntities;
 import org.springframework.data.mongodb.core.query.TextCriteria;
+import org.springframework.data.repository.support.Repositories;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,9 +67,14 @@ public class DataRestConfiguration {
 	@ConditionalOnClass(Search.class)
 	protected static class JpaSearchRepositoryConfiguration {
 
+		@PersistenceContext
+		private EntityManager entityManager;
+		@Autowired
+		private ApplicationEventPublisher publisher;
+
 		@Bean
 		public SearchRepository searchRepository() {
-			return new JpaSearchRepository();
+			return new JpaSearchRepository(entityManager, publisher);
 		}
 	}
 
@@ -74,9 +83,12 @@ public class DataRestConfiguration {
 	@ConditionalOnClass(TextCriteria.class)
 	protected static class MongodbSearchRepositoryConfiguration {
 
+		@Autowired
+		private Repositories repositories;
+
 		@Bean
 		public SearchRepository searchRepository() {
-			return new MongodbSearchRepository();
+			return new MongodbSearchRepository(repositories);
 		}
 	}
 }
