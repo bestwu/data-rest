@@ -54,4 +54,13 @@ public interface Version {
 			return 1;
 		return 0;
 	}
+
+	/**
+	 * @param version1 version1
+	 * @param version2 version2
+	 * @return version1 是否包含 version2
+	 */
+	static boolean included(String version1, String version2) {
+		return version1.contains(version2) || version1.matches(version2);
+	}
 }

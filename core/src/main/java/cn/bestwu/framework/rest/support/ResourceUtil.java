@@ -78,6 +78,8 @@ public class ResourceUtil {
 				}
 			}
 			if (!StringUtils.hasText(version))
+				version = request.getParameter("_" + Version.VERSION_PARAM_NAME);
+			if (!StringUtils.hasText(version))
 				version = Version.DEFAULT_VERSION;
 
 			request.setAttribute(request_version_key, version);
@@ -104,4 +106,5 @@ public class ResourceUtil {
 	public static boolean requestVersionEquals(HttpServletRequest request, String verion) {
 		return verion.equalsIgnoreCase(getRequestVersion(request));
 	}
+
 }

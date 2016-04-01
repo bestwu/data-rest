@@ -431,6 +431,9 @@ public class RestMvcConfiguration {
 
 		@Override protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 			converters.add(mappingJackson2HttpMessageConverter);
+			if (mappingJackson2XmlHttpMessageConverter != null) {
+				converters.add(mappingJackson2XmlHttpMessageConverter);
+			}
 			converters.add(stringHttpMessageConverter);
 		}
 
@@ -462,6 +465,13 @@ public class RestMvcConfiguration {
 			super.configureDefaultServletHandling(configurer);
 		}
 
+		@Override
+		protected void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+			configurer.defaultContentType(MediaType.APPLICATION_JSON);
+			configurer.favorParameter(true);
+			configurer.parameterName("_format");
+		}
+
 		@Bean
 		public RepositoryResourceMappings repositoryResourceMappings() {
 			return new RepositoryResourceMappings(repositories());
@@ -471,8 +481,7 @@ public class RestMvcConfiguration {
 		private ProxyPathMapper proxyPathMapper;
 
 		@Override protected RequestMappingHandlerMapping createRequestMappingHandlerMapping() {
-			return new VersionRepositoryRestRequestMappingHandlerMapping(mvcContentNegotiationManager(),
-					repositoryResourceMappings(), proxyPathMapper);
+			return new VersionRepositoryRestRequestMappingHandlerMapping(repositoryResourceMappings(), proxyPathMapper);
 		}
 
 		@Override public RequestMappingHandlerMapping requestMappingHandlerMapping() {

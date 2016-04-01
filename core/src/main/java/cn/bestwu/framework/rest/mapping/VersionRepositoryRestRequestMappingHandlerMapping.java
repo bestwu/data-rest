@@ -2,27 +2,22 @@ package cn.bestwu.framework.rest.mapping;
 
 import cn.bestwu.framework.rest.annotation.RepositoryRestController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
-import cn.bestwu.framework.rest.support.ProxyPathMapper;
-import cn.bestwu.framework.rest.support.RepositoryResourceMetadata;
-import cn.bestwu.framework.rest.support.ResourceType;
-import cn.bestwu.framework.rest.support.Version;
+import cn.bestwu.framework.rest.support.*;
 import cn.bestwu.framework.util.ArrayUtil;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
-import org.springframework.util.MimeType;
 import org.springframework.util.StringUtils;
-import org.springframework.web.HttpMediaTypeNotAcceptableException;
-import org.springframework.web.accept.ContentNegotiationManager;
-import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.condition.ProducesRequestCondition;
 import org.springframework.web.servlet.mvc.condition.RequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 支持Rest @RequestMapping produces MediaType 参数 version的RequestMappingHandlerMapping
@@ -40,17 +35,12 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 
 	private final String[] IGNORED_LOOKUP_PATH = { "/oauth/authorize", "/oauth/token", "/oauth/check_token", "/oauth/confirm_access", "/oauth/error" };
 
-	public final MediaType DEFAULT_MEDIA_TYPE = MediaType.parseMediaType("*/*");
-
-	private final ContentNegotiationManager contentNegotiationManager;
 	private final RepositoryResourceMappings repositoryResourceMappings;
 	private final ProxyPathMapper proxyPathMapper;
 
-	public VersionRepositoryRestRequestMappingHandlerMapping(ContentNegotiationManager contentNegotiationManager, RepositoryResourceMappings repositoryResourceMappings,
+	public VersionRepositoryRestRequestMappingHandlerMapping(RepositoryResourceMappings repositoryResourceMappings,
 			ProxyPathMapper proxyPathMapper) {
-		Assert.notNull(contentNegotiationManager);
 		Assert.notNull(repositoryResourceMappings);
-		this.contentNegotiationManager = contentNegotiationManager;
 		this.repositoryResourceMappings = repositoryResourceMappings;
 		this.proxyPathMapper = proxyPathMapper;
 	}
@@ -153,7 +143,7 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		if (result != 0) {
 			return result;
 		}
-		result = versionsConditionCompareTo(me.getProducesCondition(), other.getProducesCondition(), request);//版本比较
+		result = versionCompareTo(getVersions(me.getProducesCondition().getProducibleMediaTypes()), getVersions(other.getProducesCondition().getProducibleMediaTypes()), request);//版本比较
 		if (result != 0) {
 			return result;
 		}
@@ -172,141 +162,75 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		return 0;
 	}
 
+	private List<String> getVersions(Set<MediaType> mediaTypes) {
+		return mediaTypes.stream().map(mediaType -> mediaType.getParameter(Version.VERSION_PARAM_NAME)).filter(StringUtils::hasText).collect(Collectors.toList());
+	}
+
 	/*
 	 * ProducesCondition CompareTo
 	 */
-	private int versionsConditionCompareTo(ProducesRequestCondition me, ProducesRequestCondition other, HttpServletRequest request) {
-		try {
-
-			List<MediaType> meProducibleMediaTypes = new ArrayList<>(me.getProducibleMediaTypes());
-			if (meProducibleMediaTypes.isEmpty()) {
-				meProducibleMediaTypes.add(DEFAULT_MEDIA_TYPE);
-			}
-			List<MediaType> otherProducibleMediaTypes = new ArrayList<>(other.getProducibleMediaTypes());
-			if (otherProducibleMediaTypes.isEmpty()) {
-				otherProducibleMediaTypes.add(DEFAULT_MEDIA_TYPE);
-			}
-			meProducibleMediaTypes.sort(VERSION_COMPARATOR);
-			otherProducibleMediaTypes.sort(VERSION_COMPARATOR);
-
-			List<MediaType> acceptedMediaTypes = getAcceptedMediaTypes(request);
-			for (MediaType acceptedMediaType : acceptedMediaTypes) {
-				int thisIndex, otherIndex, result;
-
-				thisIndex = equalVersion(meProducibleMediaTypes, acceptedMediaType);
-				otherIndex = equalVersion(otherProducibleMediaTypes, acceptedMediaType);
-				result = compareMatchingMediaTypes(meProducibleMediaTypes, thisIndex, otherProducibleMediaTypes, otherIndex);
-				if (result != 0) {
-					return result;
-				}
-
-				thisIndex = includedVersion(meProducibleMediaTypes, acceptedMediaType);
-				otherIndex = includedVersion(otherProducibleMediaTypes, acceptedMediaType);
-				result = compareMatchingMediaTypes(meProducibleMediaTypes, thisIndex, otherProducibleMediaTypes, otherIndex);
-				if (result != 0) {
-					return result;
-				}
-			}
-			return 0;
-		} catch (HttpMediaTypeNotAcceptableException ex) {
-			// should never happen
-			throw new IllegalStateException("Cannot compare without having any requested media types", ex);
+	private int versionCompareTo(List<String> me, List<String> other, HttpServletRequest request) {
+		if (me.isEmpty()) {
+			me.add(Version.DEFAULT_VERSION);
 		}
+		if (other.isEmpty()) {
+			other.add(Version.DEFAULT_VERSION);
+		}
+		Comparator<String> comparator = Version::compareVersion;
+		me.sort(comparator);
+		other.sort(comparator);
+
+		String acceptedVersion = ResourceUtil.getRequestVersion(request);
+		int thisIndex, otherIndex, result;
+
+		thisIndex = equalVersion(me, acceptedVersion);
+		otherIndex = equalVersion(other, acceptedVersion);
+		result = compareMatchingMediaTypes(me, thisIndex, other, otherIndex);
+		if (result != 0) {
+			return result;
+		}
+
+		thisIndex = includedVersion(me, acceptedVersion);
+		otherIndex = includedVersion(other, acceptedVersion);
+		result = compareMatchingMediaTypes(me, thisIndex, other, otherIndex);
+		if (result != 0) {
+			return result;
+		}
+		return 0;
 	}
 
-	/**
-	 * 含版本的MediaType 比较器
-	 */
-	public static final Comparator<MediaType> VERSION_COMPARATOR = new MimeType.SpecificityComparator<MediaType>() {
-
-		@Override public int compare(MediaType mimeType1, MediaType mimeType2) {
-			//VERSION compare
-			int qualityComparison = compareVersion(mimeType1, mimeType2);
-			if (qualityComparison != 0) {
-				return qualityComparison;  // audio/*;q=0.7 < audio/*;q=0.3
-			}
-			return super.compare(mimeType1, mimeType2);
-		}
-
-		/*
-		 * 比较版本
-		 */
-		private int compareVersion(MediaType mediaType1, MediaType mediaType2) {
-			String version1 = mediaType1.getParameter(Version.VERSION_PARAM_NAME);
-			String version2 = mediaType2.getParameter(Version.VERSION_PARAM_NAME);
-			if (!StringUtils.hasText(version1)) {
-				version1 = Version.DEFAULT_VERSION;
-			}
-			if (!StringUtils.hasText(version2)) {
-				version2 = Version.DEFAULT_VERSION;
-			}
-
-			return Version.compareVersion(version1, version2);
-		}
-
-	};
-
-	private int compareMatchingMediaTypes(List<MediaType> mediaTypes1, int index1, List<MediaType> mediaTypes2, int index2) {
+	private int compareMatchingMediaTypes(List<String> versions1, int index1, List<String> versions2, int index2) {
 
 		int result = 0;
 		if (index1 != index2) {
 			result = index2 - index1;
 		} else if (index1 != -1) {
-			MediaType mediaType1 = mediaTypes1.get(index1);
-			MediaType mediaType2 = mediaTypes2.get(index2);
-			result = VERSION_COMPARATOR.compare(mediaType1, mediaType2);
-			result = (result != 0) ? result : mediaType1.compareTo(mediaType2);
+			String version1 = versions1.get(index1);
+			String version2 = versions2.get(index2);
+			result = Version.compareVersion(version1, version2);
+			result = (result != 0) ? result : version1.compareTo(version2);
 		}
 		return result;
 	}
 
-	private int equalVersion(List<MediaType> mediaTypes, MediaType accepteMediaType) {
-		for (int i = 0; i < mediaTypes.size(); i++) {
-			MediaType currentMediaType = mediaTypes.get(i);
-			if (equals(accepteMediaType, currentMediaType)) {
+	private int equalVersion(List<String> versions, String accepteVersion) {
+		for (int i = 0; i < versions.size(); i++) {
+			String currentVersion = versions.get(i);
+			if (accepteVersion.equals(currentVersion)) {
 				return i;
 			}
 		}
 		return -1;
 	}
 
-	private int includedVersion(List<MediaType> mediaTypes, MediaType mediaType) {
-		for (int i = 0; i < mediaTypes.size(); i++) {
-			MediaType currentMediaType = mediaTypes.get(i);
-			if (included(mediaType, currentMediaType)) {
+	private int includedVersion(List<String> versions, String acceptedVersion) {
+		for (int i = 0; i < versions.size(); i++) {
+			String currentVersion = versions.get(i);
+			if (Version.included(acceptedVersion, currentVersion)) {
 				return i;
 			}
 		}
 		return -1;
-	}
-
-	private boolean equals(MediaType accepteMediaType, MediaType currentMediaType) {
-		String currentVersion = currentMediaType.getParameter(Version.VERSION_PARAM_NAME);
-		String acceptedVersion = accepteMediaType.getParameter(Version.VERSION_PARAM_NAME);
-		if (!StringUtils.hasText(currentVersion)) {
-			currentVersion = Version.DEFAULT_VERSION;
-		}
-		if (!StringUtils.hasText(acceptedVersion)) {
-			return true;
-		} else
-			return acceptedVersion.equalsIgnoreCase(currentVersion);
-	}
-
-	private boolean included(MediaType accepteMediaType, MediaType currentMediaType) {
-		String acceptedVersion = accepteMediaType.getParameter(Version.VERSION_PARAM_NAME);
-		String currentVersion = currentMediaType.getParameter(Version.VERSION_PARAM_NAME);
-		if (!StringUtils.hasText(currentVersion)) {
-			currentVersion = Version.DEFAULT_VERSION;
-		}
-		if (!StringUtils.hasText(acceptedVersion)) {
-			return true;
-		} else
-			return currentVersion.contains(acceptedVersion) || currentVersion.matches(acceptedVersion);
-	}
-
-	private List<MediaType> getAcceptedMediaTypes(HttpServletRequest request) throws HttpMediaTypeNotAcceptableException {
-		List<MediaType> mediaTypes = this.contentNegotiationManager.resolveMediaTypes(new ServletWebRequest(request));
-		return mediaTypes.isEmpty() ? Collections.singletonList(MediaType.ALL) : mediaTypes;
 	}
 
 	//------------------------------------------------------------------------------

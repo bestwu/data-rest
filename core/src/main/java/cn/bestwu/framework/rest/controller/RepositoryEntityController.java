@@ -111,8 +111,8 @@ import java.util.Map;
 			throw new ResourceNotFoundException();
 		}
 		publisher.publishEvent(new BeforeShowEvent(content));
-		PersistentEntityResource<Object> resource = new PersistentEntityResource<>(content, resourceInformation.getEntity());
 
+		PersistentEntityResource<Object> resource = new PersistentEntityResource<>(content, resourceInformation.getEntity());
 		link(resource, getSelfRelLink(resourceInformation, id));
 		return ok(resource);
 	}

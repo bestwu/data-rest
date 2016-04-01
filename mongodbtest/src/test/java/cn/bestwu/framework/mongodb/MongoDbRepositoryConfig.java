@@ -1,13 +1,11 @@
 package cn.bestwu.framework.mongodb;
 
-import cn.bestwu.framework.EnableDataRest;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 
 @SpringBootApplication
-@EnableDataRest
 public class MongoDbRepositoryConfig extends SpringBootServletInitializer {
 
 	/*

@@ -70,7 +70,7 @@ public class ControllerTests {
 		Assert.assertEquals("wu2_modify", getResult.get("lastName"));
 
 		//index
-		Map page = restTemplate.getForObject(getBaseUrl() + "/testUsers", HashMap.class);
+		Map page = restTemplate.getForObject(getBaseUrl() + "/testUsers?_format=xml", HashMap.class);
 		Assert.assertEquals(2, page.get("totalElements"));
 
 		//search
