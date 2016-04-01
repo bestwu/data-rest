@@ -72,7 +72,7 @@ public class Response {
 		return headers;
 	}
 
-	private static HttpHeaders noCache() {
+	protected static HttpHeaders noCache() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, max-age=0, must-revalidate");
 		headers.add(HttpHeaders.PRAGMA, "no-cache");

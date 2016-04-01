@@ -46,7 +46,7 @@ public class CustomErrorController extends BaseController implements ErrorContro
 	public ResponseEntity<Object> errorPlain(HttpServletRequest request) throws JsonProcessingException {
 		Map<String, Object> body = getErrorAttributes(request, getTraceParameter(request));
 		HttpStatus status = getStatus(request);
-		return new ResponseEntity<>(getString(body), status);
+		return ResponseEntity.status(status).headers(noCache()).body(getString(body));
 	}
 
 	@RequestMapping
@@ -55,9 +55,9 @@ public class CustomErrorController extends BaseController implements ErrorContro
 		Map<String, Object> body = getErrorAttributes(request, getTraceParameter(request));
 		HttpStatus status = getStatus(request);
 		if (status.equals(HttpStatus.NOT_ACCEPTABLE)) {
-			return new ResponseEntity<>(getString(body), status);
+			return ResponseEntity.status(status).headers(noCache()).body(getString(body));
 		}
-		return new ResponseEntity<>(body, status);
+		return ResponseEntity.status(status).headers(noCache()).body(body);
 	}
 
 	private boolean getTraceParameter(HttpServletRequest request) {
