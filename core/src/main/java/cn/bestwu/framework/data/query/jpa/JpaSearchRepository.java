@@ -40,7 +40,7 @@ public class JpaSearchRepository implements SearchRepository {
 
 	private Logger logger = LoggerFactory.getLogger(JpaSearchRepository.class);
 	private Map<Class, String[]> fieldsCache = new HashMap<>();
-	private Map<Class, String[]> highLightFieldsCache = new HashMap<>();
+	private Map<Class, String[]> highlightFieldsCache = new HashMap<>();
 
 	private final EntityManager entityManager;
 	private final ApplicationEventPublisher publisher;
@@ -66,14 +66,14 @@ public class JpaSearchRepository implements SearchRepository {
 
 	private <T> String[] getHighLightFields(Class<T> modelType) {
 		String[] highLightFields;
-		if (highLightFieldsCache.containsKey(modelType)) {
-			highLightFields = highLightFieldsCache.get(modelType);
+		if (highlightFieldsCache.containsKey(modelType)) {
+			highLightFields = highlightFieldsCache.get(modelType);
 		} else {
 			highLightFields = JpaSearchFieldUtil.getAnnotationedFields(modelType, HighLight.class);
 			if (highLightFields.length == 0) {
 				highLightFields = getSearchFields(modelType);
 			}
-			highLightFieldsCache.put(modelType, highLightFields);
+			highlightFieldsCache.put(modelType, highLightFields);
 		}
 		return highLightFields;
 	}
@@ -119,12 +119,12 @@ public class JpaSearchRepository implements SearchRepository {
 
 		//处理搜索结果
 		if (resultHandler != null) {
-			if (resultHandler instanceof HighLightResultHandler) {
-				HighLightResultHandler highLightResultHandler = (HighLightResultHandler) resultHandler;
-				highLightResultHandler.setQuery(luceneQuery);
-				highLightResultHandler.setAnalyzer(searchFactory.getAnalyzer(modelType));
-				highLightResultHandler.setHighLightFields(getHighLightFields(modelType));
-				highLightResultHandler.setModelType(modelType);
+			if (resultHandler instanceof HighlightResultHandler) {
+				HighlightResultHandler highlightResultHandler = (HighlightResultHandler) resultHandler;
+				highlightResultHandler.setQuery(luceneQuery);
+				highlightResultHandler.setAnalyzer(searchFactory.getAnalyzer(modelType));
+				highlightResultHandler.setHighLightFields(getHighLightFields(modelType));
+				highlightResultHandler.setModelType(modelType);
 			}
 			resultHandler.accept(result);
 		}

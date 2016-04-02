@@ -2,7 +2,7 @@ package cn.bestwu.framework.rest.controller;
 
 import cn.bestwu.framework.data.query.ResultHandler;
 import cn.bestwu.framework.data.query.SearchRepository;
-import cn.bestwu.framework.data.query.jpa.HighLightResultHandler;
+import cn.bestwu.framework.data.query.jpa.HighlightResultHandler;
 import cn.bestwu.framework.data.query.jpa.JpaSearchRepository;
 import cn.bestwu.framework.rest.annotation.RepositoryRestController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
@@ -46,7 +46,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 		}
 		if (resultHandler == null) {
 			if (highLight && isJpaSearchRepository) {//MongodbSearchRepository 不支持高亮
-				resultHandler = new HighLightResultHandler();
+				resultHandler = new HighlightResultHandler();
 			}
 		}
 		Page page = searchRepository.search(modelType, keyword, pageable, resultHandler);

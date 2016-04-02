@@ -18,9 +18,9 @@ import java.util.List;
 /**
  * 处理搜索结果的函数接口
  */
-public class HighLightResultHandler implements ResultHandler {
+public class HighlightResultHandler implements ResultHandler {
 
-	private Logger logger = LoggerFactory.getLogger(HighLightResultHandler.class);
+	private Logger logger = LoggerFactory.getLogger(HighlightResultHandler.class);
 	private Query query;
 	private Analyzer analyzer;
 	private Class<?> modelType;
@@ -34,10 +34,10 @@ public class HighLightResultHandler implements ResultHandler {
 
 	//--------------------------------------------
 
-	public HighLightResultHandler() {
+	public HighlightResultHandler() {
 	}
 
-	public HighLightResultHandler(String preTag, String postTag) {
+	public HighlightResultHandler(String preTag, String postTag) {
 		this.preTag = preTag;
 		this.postTag = postTag;
 	}
