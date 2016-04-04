@@ -17,20 +17,29 @@ import java.util.Map;
 public class PersistentEntityResource<T> extends Resource<T> {
 
 	@JsonIgnore
-	private PersistentEntity<?, ?> entity;
+	private final PersistentEntity<?, ?> entity;
 	@JsonView(Object.class)
 	private Map<String, String> links;
+
+	public PersistentEntityResource(T content, Link... links) {
+		super(content);
+		entity = null;
+		if (ArrayUtil.isNotEmpty(links)) {
+			this.links = new HashMap<>();
+			Arrays.stream(links).forEach(link -> this.links.put(link.getRel(), link.getHref()));
+		}
+	}
 
 	public PersistentEntityResource(T content, PersistentEntity<?, ?> entity, Link... links) {
 		super(content);
 
 		Assert.notNull(entity);
+		this.entity = entity;
 
 		if (ArrayUtil.isNotEmpty(links)) {
 			this.links = new HashMap<>();
 			Arrays.stream(links).forEach(link -> this.links.put(link.getRel(), link.getHref()));
 		}
-		this.entity = entity;
 	}
 
 	private PersistentEntityResource(T content, PersistentEntity<?, ?> entity, Map<String, String> links) {
@@ -42,10 +51,6 @@ public class PersistentEntityResource<T> extends Resource<T> {
 	//--------------------------------------------
 	public PersistentEntity<?, ?> getEntity() {
 		return entity;
-	}
-
-	public void setEntity(PersistentEntity<?, ?> entity) {
-		this.entity = entity;
 	}
 
 	public Map<String, String> getLinks() {

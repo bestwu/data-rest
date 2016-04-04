@@ -130,12 +130,23 @@ public class Response {
 	}
 
 	/**
+	 * @param object object
+	 * @return 200 ResponseEntity
+	 */
+	protected ResponseEntity noCache(Object object) {
+		return ResponseEntity.ok().headers(noCache()).body(object);
+	}
+
+	/**
 	 * 给Pageable 的各资源加自描述链接信息
 	 *
 	 * @param resource resource
-	 * @return ResponseEntity
+	 * @return 200 ResponseEntity
 	 */
 	protected ResponseEntity ok(PersistentEntityResource<?> resource) {
+		if (resource.getEntity() == null) {
+			return ResponseEntity.ok(resource);
+		}
 		Object source = resource.getContent();
 		Assert.notNull(source);
 		if (source instanceof Page<?>) {
