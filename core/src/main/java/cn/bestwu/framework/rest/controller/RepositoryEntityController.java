@@ -7,6 +7,7 @@ import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandl
 import cn.bestwu.framework.rest.resolver.ModelMethodArgumentResolver;
 import cn.bestwu.framework.rest.support.ETag;
 import cn.bestwu.framework.rest.support.PersistentEntityResource;
+import cn.bestwu.framework.rest.support.ResourceType;
 import cn.bestwu.framework.rest.support.RootResourceInformation;
 import org.springframework.core.MethodParameter;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -17,6 +18,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.core.AnnotationAttribute;
 import org.springframework.hateoas.core.MethodParameters;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,9 +28,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Entity 模型 基本控制类
@@ -36,6 +36,77 @@ import java.util.Map;
  */
 @RepositoryRestController
 @RequestMapping(value = BaseController.BASE_URI) public class RepositoryEntityController extends BaseController {
+
+	private static final String LINK_HEADER = "Link";
+	private static final List<String> ACCEPT_PATCH_HEADERS = Collections.singletonList(//
+			MediaType.APPLICATION_JSON_VALUE);
+
+	/**
+	 * {@code HEAD /{repsoitory}}
+	 *
+	 * @param resourceInformation resourceInformation
+	 * @return ResponseEntity
+	 */
+	@RequestMapping(method = RequestMethod.HEAD)
+	public ResponseEntity<?> headCollectionResource(RootResourceInformation resourceInformation) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(LINK_HEADER, getBaseLinkBuilder(resourceInformation.getPathName()).withSelfRel().toString());
+
+		return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);
+	}
+
+	/**
+	 * {@code HEAD /{repsoitory}/{id}}
+	 *
+	 * @param resourceInformation resourceInformation
+	 * @param id                  id
+	 * @return ResponseEntity
+	 */
+	@RequestMapping(value = ID_URI, method = RequestMethod.HEAD)
+	public ResponseEntity<?> headForItemResource(RootResourceInformation resourceInformation, @PathVariable String id) {
+
+		Object domainObject = getItemResource(resourceInformation, id);
+
+		HttpHeaders headers = prepareHeaders(resourceInformation.getEntity(), domainObject);
+		headers.add(LINK_HEADER, getSelfRelLink(resourceInformation, id).toString());
+
+		return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);
+	}
+
+	/**
+	 * {@code OPTIONS /{repository}}.
+	 *
+	 * @param information information
+	 * @return ResponseEntity
+	 */
+	@RequestMapping(method = RequestMethod.OPTIONS)
+	public ResponseEntity<?> optionsForCollectionResource(RootResourceInformation information) {
+
+		HttpHeaders headers = new HttpHeaders();
+		Set<HttpMethod> supportedMethods = information.getResourceMetadata().getSupportedHttpMethods(ResourceType.COLLECTION);
+
+		headers.setAllow(supportedMethods);
+
+		return new ResponseEntity<>(headers, HttpStatus.OK);
+	}
+
+	/**
+	 * {@code OPTIONS /{repository}/{id}}.
+	 *
+	 * @param information information
+	 * @return ResponseEntity
+	 */
+	@RequestMapping(value = ID_URI, method = RequestMethod.OPTIONS)
+	public ResponseEntity<?> optionsForItemResource(RootResourceInformation information) {
+
+		HttpHeaders headers = new HttpHeaders();
+		Set<HttpMethod> supportedMethods = information.getResourceMetadata().getSupportedHttpMethods(ResourceType.ITEM);
+
+		headers.setAllow(supportedMethods);
+		headers.put("Accept-Patch", ACCEPT_PATCH_HEADERS);
+
+		return new ResponseEntity<>(headers, HttpStatus.OK);
+	}
 
 	/*
 	 * Repository方法搜索
@@ -103,6 +174,16 @@ import java.util.Map;
 	 */
 	@RequestMapping(value = ID_URI, method = RequestMethod.GET)
 	public Object show(RootResourceInformation resourceInformation, @PathVariable String id) {
+		Object content = getItemResource(resourceInformation, id);
+
+		publisher.publishEvent(new BeforeShowEvent(content));
+
+		PersistentEntityResource<Object> resource = new PersistentEntityResource<>(content, resourceInformation.getEntity());
+		link(resource, getSelfRelLink(resourceInformation, id));
+		return ok(resource);
+	}
+
+	private Object getItemResource(RootResourceInformation resourceInformation, @PathVariable String id) {
 		RepositoryInvoker invoker = resourceInformation.getInvoker();
 
 		Object content = invoker.invokeFindOne(id);
@@ -110,11 +191,8 @@ import java.util.Map;
 		if (content == null) {
 			throw new ResourceNotFoundException();
 		}
-		publisher.publishEvent(new BeforeShowEvent(content));
 
-		PersistentEntityResource<Object> resource = new PersistentEntityResource<>(content, resourceInformation.getEntity());
-		link(resource, getSelfRelLink(resourceInformation, id));
-		return ok(resource);
+		return content;
 	}
 
 	/*

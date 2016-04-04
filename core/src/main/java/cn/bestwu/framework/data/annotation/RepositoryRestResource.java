@@ -1,5 +1,7 @@
 package cn.bestwu.framework.data.annotation;
 
+import org.springframework.http.HttpMethod;
+
 import java.lang.annotation.*;
 
 /**
@@ -10,31 +12,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface RepositoryRestResource {
-
-	/**
-	 * HTTP GET method
-	 */
-	String GET = "GET";
-	/**
-	 * HTTP POST method
-	 */
-	String POST = "POST";
-	/**
-	 * HTTP PUT method
-	 */
-	String PUT = "PUT";
-	/**
-	 * HTTP DELETE method
-	 */
-	String DELETE = "DELETE";
-	/**
-	 * HTTP HEAD method
-	 */
-	String HEAD = "HEAD";
-	/**
-	 * HTTP OPTIONS method
-	 */
-	String OPTIONS = "OPTIONS";
 
 	/**
 	 * @return 是否自动引出接口
@@ -51,7 +28,7 @@ public @interface RepositoryRestResource {
 	 *
 	 * @return supportedHttpMethods
 	 */
-	String[] value() default {};
+	HttpMethod[] value() default {};
 
 	/**
 	 * The path segment under which this resource is to be exported.

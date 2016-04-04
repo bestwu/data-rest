@@ -51,7 +51,7 @@ public class Response {
 	 * @param value  must not be {@literal null}.
 	 * @return HttpHeaders
 	 */
-	private HttpHeaders prepareHeaders(PersistentEntity<?, ?> entity, Object value) {
+	protected HttpHeaders prepareHeaders(PersistentEntity<?, ?> entity, Object value) {
 
 		// Add ETag
 		HttpHeaders headers = ETag.from(entity, value).addTo(new HttpHeaders());

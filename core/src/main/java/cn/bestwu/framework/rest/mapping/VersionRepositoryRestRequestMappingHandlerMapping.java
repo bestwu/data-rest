@@ -4,6 +4,7 @@ import cn.bestwu.framework.rest.annotation.RepositoryRestController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.rest.support.*;
 import cn.bestwu.framework.util.ArrayUtil;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -99,7 +100,7 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 						resourceType = ResourceType.COLLECTION;
 					}
 
-					repositoryResourceMetadata.verifySupportedMethod(request.getMethod(), resourceType);
+					repositoryResourceMetadata.verifySupportedMethod(HttpMethod.valueOf(request.getMethod()), resourceType);
 
 					return handlerMethod;
 				} else

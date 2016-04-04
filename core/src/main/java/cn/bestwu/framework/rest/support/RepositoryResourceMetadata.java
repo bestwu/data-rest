@@ -7,12 +7,14 @@ import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.util.ArrayUtil;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.repository.core.CrudMethods;
+import org.springframework.http.HttpMethod;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 资源元数据
@@ -29,7 +31,7 @@ public class RepositoryResourceMetadata {
 
 	private PersistentEntity<?, ?> entity;
 
-	private Map<ResourceType, Set<String>> supportedHttpMethods;
+	private Map<ResourceType, Set<HttpMethod>> supportedHttpMethods;
 
 	private Map<String, Method> searchMethods;
 
@@ -71,7 +73,7 @@ public class RepositoryResourceMetadata {
 		}
 
 		if (exported) {
-			Map<ResourceType, Set<String>> supportedHttpMethods = new HashMap<>();
+			Map<ResourceType, Set<HttpMethod>> supportedHttpMethods = new HashMap<>();
 
 			Method findAllMethod = crudMethods.getFindAllMethod();
 			Method findOneMethod = crudMethods.getFindOneMethod();
@@ -79,31 +81,33 @@ public class RepositoryResourceMetadata {
 			Method deleteMethod = crudMethods.getDeleteMethod();
 
 			//ResourceType.COLLECTION
-			Set<String> collectionMethods = new HashSet<>();
+			Set<HttpMethod> collectionMethods = new HashSet<>();
 
-			if (exposesMethod(findAllMethod, RepositoryRestResource.GET)) {
-				collectionMethods.add(RepositoryRestResource.GET);
+			if (exposesMethod(findAllMethod, HttpMethod.GET)) {
+				collectionMethods.add(HttpMethod.HEAD);
+				collectionMethods.add(HttpMethod.GET);
 			}
-			if (exposesMethod(saveMethod, RepositoryRestResource.POST)) {
-				collectionMethods.add(RepositoryRestResource.POST);
+			if (exposesMethod(saveMethod, HttpMethod.POST)) {
+				collectionMethods.add(HttpMethod.POST);
 			}
-			if (exposesMethod(deleteMethod, RepositoryRestResource.DELETE)) {
-				collectionMethods.add(RepositoryRestResource.DELETE);
+			if (exposesMethod(deleteMethod, HttpMethod.DELETE)) {
+				collectionMethods.add(HttpMethod.DELETE);
 			}
 
 			supportedHttpMethods.put(ResourceType.COLLECTION, Collections.unmodifiableSet(collectionMethods));
 
 			//ResourceType.ITEM
-			Set<String> itemMethods = new HashSet<>();
+			Set<HttpMethod> itemMethods = new HashSet<>();
 
-			if (exposesMethod(findOneMethod, RepositoryRestResource.GET)) {
-				itemMethods.add(RepositoryRestResource.GET);
+			if (exposesMethod(findOneMethod, HttpMethod.GET)) {
+				itemMethods.add(HttpMethod.HEAD);
+				itemMethods.add(HttpMethod.GET);
 			}
-			if (exposesMethod(saveMethod, RepositoryRestResource.PUT)) {
-				itemMethods.add(RepositoryRestResource.PUT);
+			if (exposesMethod(saveMethod, HttpMethod.PUT)) {
+				itemMethods.add(HttpMethod.PUT);
 			}
-			if (exposesMethod(deleteMethod, RepositoryRestResource.DELETE)) {
-				itemMethods.add(RepositoryRestResource.DELETE);
+			if (exposesMethod(deleteMethod, HttpMethod.DELETE)) {
+				itemMethods.add(HttpMethod.DELETE);
 			}
 
 			supportedHttpMethods.put(ResourceType.ITEM, Collections.unmodifiableSet(itemMethods));
@@ -112,7 +116,7 @@ public class RepositoryResourceMetadata {
 		}
 	}
 
-	private boolean exposesMethod(Method method, String httpMethod) {
+	private boolean exposesMethod(Method method, HttpMethod httpMethod) {
 		if (method == null) {
 			return false;
 		}
@@ -123,7 +127,7 @@ public class RepositoryResourceMetadata {
 		if (!annotation.exported()) {
 			return false;
 		}
-		String[] array = annotation.value();
+		HttpMethod[] array = annotation.value();
 		if (array.length == 0) {
 			return true;
 		}
@@ -149,17 +153,24 @@ public class RepositoryResourceMetadata {
 		return entity.getType();
 	}
 
-	public void verifySupportedMethod(String requestHttpMethod, ResourceType resourceType) throws HttpRequestMethodNotSupportedException {
+	public void verifySupportedMethod(HttpMethod requestHttpMethod, ResourceType resourceType) throws HttpRequestMethodNotSupportedException {
+		if (HttpMethod.OPTIONS.equals(requestHttpMethod)) {
+			return;
+		}
 		if (resourceType == null) {
 			throw new ResourceNotFoundException();
 		}
-		Set<String> supportedHttpMethods = this.supportedHttpMethods.get(resourceType);
+		Set<HttpMethod> supportedHttpMethods = this.supportedHttpMethods.get(resourceType);
 		if (supportedHttpMethods == null || supportedHttpMethods.isEmpty()) {
 			throw new ResourceNotFoundException();
 		}
 		if (!supportedHttpMethods.contains(requestHttpMethod)) {
-			throw new HttpRequestMethodNotSupportedException(requestHttpMethod, supportedHttpMethods);
+			throw new HttpRequestMethodNotSupportedException(requestHttpMethod.name(), supportedHttpMethods.stream().map(Enum::name).collect(Collectors.toSet()));
 		}
+	}
+
+	public Set<HttpMethod> getSupportedHttpMethods(ResourceType resourceType) {
+		return supportedHttpMethods.get(resourceType);
 	}
 
 	public boolean enableAllDataInOnePage() {
