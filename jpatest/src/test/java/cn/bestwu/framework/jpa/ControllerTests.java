@@ -70,14 +70,14 @@ public class ControllerTests {
 		Assert.assertEquals("wu2_modify", getResult.get("lastName"));
 
 		//index
-		Map page = restTemplate.getForObject(getBaseUrl() + "/testUsers?_format=xml", HashMap.class);
+		Map page = restTemplate.getForObject(getBaseUrl() + "/testUsers", HashMap.class);
 		Assert.assertEquals(2, page.get("totalElements"));
 
 		//search
-		ResponseEntity<HashMap> entity = restTemplate.getForEntity(getBaseUrl() + "/testUsers/search?keyword=wu2_modify", HashMap.class);
+		ResponseEntity<HashMap> entity = restTemplate.getForEntity(getBaseUrl() + "/testUsers/search/fulltext?keyword=wu2_modify", HashMap.class);
 		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
 		Assert.assertEquals(1, entity.getBody().get("totalElements"));
-		entity = restTemplate.getForEntity(getBaseUrl() + "/testUser2s/search?keyword=wu2_modify", HashMap.class);
+		entity = restTemplate.getForEntity(getBaseUrl() + "/testUser2s/search/fulltext?keyword=wu2_modify", HashMap.class);
 		Assert.assertEquals(HttpStatus.NOT_FOUND, entity.getStatusCode());
 
 		//delete

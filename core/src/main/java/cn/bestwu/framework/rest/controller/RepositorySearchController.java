@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 	/*
 	 * 全文搜索
 	 */
-	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	@RequestMapping(value = "/search/fulltext", method = RequestMethod.GET)
 	public Object search(RootResourceInformation resourceInformation, String keyword, Pageable pageable, boolean highLight) throws NoSuchMethodException {
 		if (searchRepository == null) {
 			throw new ResourceNotFoundException();

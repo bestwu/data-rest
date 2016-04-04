@@ -4,7 +4,7 @@ dependencies {
     compile 'com.mysema.querydsl:querydsl-jpa'
     compile 'org.hibernate:hibernate-search-orm'
     compile 'org.apache.lucene:lucene-highlighter'
-    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
+//    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
 
     testCompile 'com.mysema.querydsl:querydsl-apt'
     testCompile "com.h2database:h2"
