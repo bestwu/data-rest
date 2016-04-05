@@ -146,4 +146,19 @@ public class StringUtil {
 		}
 	}
 
+	/*
+	 * 截取一定长度的字符
+	 */
+	public static String subStringWithEllipsis(String str, int length) {
+		if (str == null) {
+			return null;
+		}
+		int l = str.length();
+		if (l > length) {
+			return str.substring(0, length) + "...";
+		} else {
+			return str;
+		}
+	}
+
 }
