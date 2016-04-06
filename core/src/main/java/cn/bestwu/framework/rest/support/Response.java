@@ -68,15 +68,25 @@ public class Response {
 		if (lastModifiedDate != null) {
 			headers.setLastModified(lastModifiedDate.getTimeInMillis());
 		}
-
+		headers.set(HttpHeaders.CACHE_CONTROL, "no-cache, must-revalidate");
+		headers.set(HttpHeaders.PRAGMA, "no-cache");
+		headers.set(HttpHeaders.EXPIRES, "-1");
 		return headers;
 	}
 
 	protected static HttpHeaders noCache() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, max-age=0, must-revalidate");
-		headers.add(HttpHeaders.PRAGMA, "no-cache");
-		headers.add(HttpHeaders.EXPIRES, "-1");
+		headers.set(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, max-age=0, must-revalidate");
+		headers.set(HttpHeaders.PRAGMA, "no-cache");
+		headers.set(HttpHeaders.EXPIRES, "-1");
+		return headers;
+	}
+
+	private static HttpHeaders cacheControl() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set(HttpHeaders.CACHE_CONTROL, "no-cache, must-revalidate");
+		headers.set(HttpHeaders.PRAGMA, "no-cache");
+		headers.set(HttpHeaders.EXPIRES, "-1");
 		return headers;
 	}
 
@@ -124,7 +134,7 @@ public class Response {
 	 */
 	protected ResponseEntity ok(Object object) {
 		if (supportClientCache)
-			return ResponseEntity.ok(object);
+			return ResponseEntity.ok().headers(cacheControl()).body(object);
 		else
 			return ResponseEntity.ok().headers(noCache()).body(object);
 	}
@@ -178,7 +188,7 @@ public class Response {
 		}
 
 		if (supportClientCache)
-			return ResponseEntity.ok(resource);
+			return ResponseEntity.ok().headers(cacheControl()).body(resource);
 		else
 			return ResponseEntity.ok().headers(noCache()).body(resource);
 	}
@@ -277,7 +287,7 @@ public class Response {
 
 		public ResponseEntity.BodyBuilder getBodyBuilder() {
 			if (supportClientCache) {
-				HttpHeaders httpHeaders = new HttpHeaders();
+				HttpHeaders headers = new HttpHeaders();
 				if (hasEtag) {
 					String eTagValue = "";
 					int size = eTagValues.size();
@@ -288,14 +298,17 @@ public class Response {
 					}
 					eTagValue = "\"".concat(Sha1DigestUtil.shaHex(eTagValue)).concat("\"");
 
-					httpHeaders.setETag(eTagValue);
+					headers.setETag(eTagValue);
 				}
 				if (hasLastModified) {
 					Collections.sort(LastModifieds, (x, y) -> (x < y) ? 1 : ((Objects.equals(x, y)) ? 0 : -1));
-					httpHeaders.setLastModified(LastModifieds.get(0));
+					headers.setLastModified(LastModifieds.get(0));
 				}
 
-				return ResponseEntity.ok().headers(httpHeaders);
+				headers.set(HttpHeaders.CACHE_CONTROL, "no-cache, must-revalidate");
+				headers.set(HttpHeaders.PRAGMA, "no-cache");
+				headers.set(HttpHeaders.EXPIRES, "-1");
+				return ResponseEntity.ok().headers(headers);
 			} else
 				return ResponseEntity.ok().headers(noCache());
 		}
