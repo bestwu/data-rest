@@ -16,8 +16,6 @@ import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,7 +36,6 @@ import java.util.Map;
 @Transactional(readOnly = true)
 public class JpaSearchRepository implements SearchRepository {
 
-	private Logger logger = LoggerFactory.getLogger(JpaSearchRepository.class);
 	private Map<Class, String[]> fieldsCache = new HashMap<>();
 	private Map<Class, String[]> highlightFieldsCache = new HashMap<>();
 

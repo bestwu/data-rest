@@ -28,7 +28,11 @@ public class HighlightResultHandler implements ResultHandler {
 	 * 需要高亮的字段
 	 */
 	private String[] highLightFields;
-
+	/**
+	 * //<span style=\"color: #ff0000; \"> </span>
+	 * <p>
+	 * <font></font> 客户端兼容性更高
+	 */
 	private String preTag = "<font color=\"#ff0000\">";
 	private String postTag = "</font>";
 
