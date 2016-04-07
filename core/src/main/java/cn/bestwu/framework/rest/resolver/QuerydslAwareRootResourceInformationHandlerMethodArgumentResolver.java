@@ -18,7 +18,6 @@ package cn.bestwu.framework.rest.resolver;
 import cn.bestwu.framework.event.AddPredicateEvent;
 import cn.bestwu.framework.event.DefaultPredicateEvent;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
-import cn.bestwu.framework.rest.support.ParameterUtil;
 import cn.bestwu.framework.rest.support.Resource;
 import cn.bestwu.framework.rest.support.RootResourceInformation;
 import com.mysema.query.types.Predicate;
@@ -88,7 +87,6 @@ public class QuerydslAwareRootResourceInformationHandlerMethodArgumentResolver
 		QuerydslBindings bindings = factory.createBindingsFor(null, type);
 		MultiValueMap<String, String> parameters = toMultiValueMap(webRequest.getParameterMap());
 		{//设置默认条件
-			ParameterUtil.setPredicateDefaultActiveParameter(parameters);
 			publisher.publishEvent(new DefaultPredicateEvent(parameters, modelType));
 		}
 		Predicate predicate = predicateBuilder.getPredicate(type, parameters, bindings);

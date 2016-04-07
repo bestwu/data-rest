@@ -70,7 +70,6 @@ public class QuerydslPredicateArgumentResolver implements HandlerMethodArgumentR
 
 		Class<?> modelType = typeInformation.getType();
 		{//设置默认条件
-			ParameterUtil.setPredicateDefaultActiveParameter(parameters);
 			publisher.publishEvent(new DefaultPredicateEvent(parameters, modelType));
 		}
 		Predicate predicate = predicateBuilder.getPredicate(typeInformation, parameters, bindings);
