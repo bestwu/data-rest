@@ -49,7 +49,11 @@ public class CustomRestTemplate extends TestRestTemplate {
 	}
 
 	public CustomRestTemplate(HttpClientOption... httpClientOptions) {
-		super(httpClientOptions);
+		this(null, null, httpClientOptions);
+	}
+
+	public CustomRestTemplate(String username, String password, HttpClientOption... httpClientOptions) {
+		super(username, password, httpClientOptions);
 		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
 		requestFactory.setOutputStreaming(false);
 		setRequestFactory(requestFactory);
@@ -94,10 +98,6 @@ public class CustomRestTemplate extends TestRestTemplate {
 			messageConverters.add(new GsonHttpMessageConverter());
 		}
 		setMessageConverters(messageConverters);
-	}
-
-	public CustomRestTemplate(String username, String password, HttpClientOption... httpClientOptions) {
-		super(username, password, httpClientOptions);
 	}
 
 	public <T> T execute(String url, HttpMethod method, RequestCallback requestCallback,
