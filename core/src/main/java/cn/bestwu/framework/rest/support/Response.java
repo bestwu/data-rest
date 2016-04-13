@@ -69,25 +69,24 @@ public class Response {
 		if (lastModifiedDate != null) {
 			headers.setLastModified(lastModifiedDate.getTimeInMillis());
 		}
-		headers.set(HttpHeaders.CACHE_CONTROL, "no-cache, must-revalidate");
-		headers.set(HttpHeaders.PRAGMA, "no-cache");
-		headers.set(HttpHeaders.EXPIRES, "-1");
-		return headers;
+		return cacheControl(headers);
 	}
 
 	protected static HttpHeaders noCache() {
 		HttpHeaders headers = new HttpHeaders();
-		headers.set(HttpHeaders.CACHE_CONTROL, "no-cache, no-store, max-age=0, must-revalidate");
-		headers.set(HttpHeaders.PRAGMA, "no-cache");
-		headers.set(HttpHeaders.EXPIRES, "-1");
+		headers.setCacheControl("no-cache, no-store, max-age=0, must-revalidate");
+		headers.setPragma("no-cache");
+		headers.setExpires(-1);
 		return headers;
 	}
 
-	private static HttpHeaders cacheControl() {
-		HttpHeaders headers = new HttpHeaders();
-		headers.set(HttpHeaders.CACHE_CONTROL, "no-cache, must-revalidate");
-		headers.set(HttpHeaders.PRAGMA, "no-cache");
-		headers.set(HttpHeaders.EXPIRES, "-1");
+	private static HttpHeaders cacheControl(HttpHeaders headers) {
+		if (headers == null) {
+			headers = new HttpHeaders();
+		}
+		headers.setCacheControl("no-cache, must-revalidate");
+		headers.setPragma("no-cache");
+		headers.setExpires(-1);
 		return headers;
 	}
 
@@ -108,6 +107,7 @@ public class Response {
 	 * @return 201 ResponseEntity
 	 */
 	protected ResponseEntity created(PersistentEntityResource<?> entityResource) {
+		addLink(entityResource);
 		if (supportClientCache)
 			return ResponseEntity.created(URI.create(entityResource.getLinks().get(Link.REL_SELF))).headers(prepareHeaders(entityResource.getEntity(), entityResource.getContent()))
 					.body(entityResource);
@@ -122,6 +122,7 @@ public class Response {
 	 * @return 200 ResponseEntity
 	 */
 	protected ResponseEntity updated(PersistentEntityResource<?> entityResource) {
+		addLink(entityResource);
 		if (supportClientCache)
 			return ResponseEntity.ok().location(URI.create(entityResource.getLinks().get(Link.REL_SELF))).headers(prepareHeaders(entityResource.getEntity(), entityResource.getContent()))
 					.body(entityResource);
@@ -133,76 +134,93 @@ public class Response {
 	 * @param object object
 	 * @return 200 ResponseEntity
 	 */
-	protected ResponseEntity ok(Object object) {
-		if (supportClientCache)
-			return ResponseEntity.ok().headers(cacheControl()).body(object);
-		else
-			return ResponseEntity.ok().headers(noCache()).body(object);
+	protected ResponseEntity noCache(Object object) {
+		return ok(object, false);
 	}
 
 	/**
 	 * @param object object
 	 * @return 200 ResponseEntity
 	 */
-	protected ResponseEntity noCache(Object object) {
-		return ResponseEntity.ok().headers(noCache()).body(object);
+	protected ResponseEntity ok(Object object) {
+		return ok(object, supportClientCache);
 	}
 
 	/**
 	 * 给Pageable 的各资源加自描述链接信息
 	 *
-	 * @param resource resource
+	 * @param resource           resource
+	 * @param supportClientCache supportClientCache
 	 * @return 200 ResponseEntity
 	 */
-	protected ResponseEntity ok(PersistentEntityResource<?> resource) {
-		if (resource.getEntity() == null) {
-			return ResponseEntity.ok(resource);
-		}
-		Object source = resource.getContent();
-		Assert.notNull(source);
-		if (source instanceof Page<?>) {
-			Page<?> page = (Page<?>) source;
-			List<?> content = page.getContent();
-			if (!content.isEmpty()) {
-				ResourceConverter converter = getResourceConverter(resource);
+	private ResponseEntity ok(Object resource, boolean supportClientCache) {
+		if (resource instanceof PersistentEntityResource) {
+			PersistentEntityResource<?> persistentEntityResource = (PersistentEntityResource<?>) resource;
+			PersistentEntity<?, ?> persistentEntity = persistentEntityResource.getEntity();
+			Object source = persistentEntityResource.getContent();
+			Assert.notNull(source);
+			addLink(persistentEntityResource);
 
-				page = page.map(converter);
-				ResponseEntity.BodyBuilder bodyBuilder = converter.getBodyBuilder();
-				return bodyBuilder.body(resource.map(page));
+			if (source instanceof Page<?>) {
+				Page<?> page = (Page<?>) source;
+				List<?> content = page.getContent();
+				if (!content.isEmpty()) {
+					ResourceConverter converter = getResourceConverter(persistentEntityResource, supportClientCache);
+
+					page = page.map(converter);
+					ResponseEntity.BodyBuilder bodyBuilder = converter.getBodyBuilder();
+					return bodyBuilder.body(persistentEntityResource.map(page));
+				}
+			} else if (source instanceof Iterable<?>) {
+				Iterable<?> iterable = (Iterable<?>) source;
+				if (iterable.iterator().hasNext()) {
+					ResourceConverter converter = getResourceConverter(persistentEntityResource, supportClientCache);
+
+					List<PersistentEntityResource<?>> newContent = new ArrayList<>();
+					iterable.forEach(object -> newContent.add(converter.convert(object)));
+					ResponseEntity.BodyBuilder bodyBuilder = converter.getBodyBuilder();
+					return bodyBuilder.body(persistentEntityResource.map(newContent));
+				}
+			} else {
+				if (supportClientCache)
+					return ResponseEntity.ok().headers(prepareHeaders(persistentEntity, source)).body(resource);
+				else
+					return ResponseEntity.ok().headers(noCache()).body(resource);
 			}
-		} else if (source instanceof Iterable<?>) {
-			Iterable<?> iterable = (Iterable<?>) source;
-			if (iterable.iterator().hasNext()) {
-				ResourceConverter converter = getResourceConverter(resource);
-
-				List<PersistentEntityResource<?>> newContent = new ArrayList<>();
-				iterable.forEach(object -> newContent.add(converter.convert(object)));
-				ResponseEntity.BodyBuilder bodyBuilder = converter.getBodyBuilder();
-				return bodyBuilder.body(resource.map(newContent));
-			}
-		} else {
-			if (supportClientCache)
-				return ResponseEntity.ok().headers(prepareHeaders(resource.getEntity(), resource.getContent())).body(resource);
-			else
-				return ResponseEntity.ok().headers(noCache()).body(resource);
-
 		}
 
 		if (supportClientCache)
-			return ResponseEntity.ok().headers(cacheControl()).body(resource);
+			return ResponseEntity.ok().headers(cacheControl(null)).body(resource);
 		else
 			return ResponseEntity.ok().headers(noCache()).body(resource);
 	}
 
+	private void addLink(PersistentEntityResource<?> resource) {
+		PersistentEntity<?, ?> persistentEntity = resource.getEntity();
+		Object content = resource.getContent();
+
+		if (content instanceof Iterable<?>) {
+			if ((resource.getLinks() == null || resource.getLinks().get(Link.REL_SELF) == null))
+				resource.add(getBaseLinkBuilder(ResourceUtil.getRepositoryBasePathName(persistentEntity.getType())).withSelfRel());
+		} else {
+			publisher.publishEvent(new SelfRelEvent(content, resource));
+			if (resource.getLinks() == null || resource.getLinks().get(Link.REL_SELF) == null) {
+				resource.add(getBaseLinkBuilder(ResourceUtil.getRepositoryBasePathName(persistentEntity.getType())).slash(getId(persistentEntity, content)).withSelfRel());
+			}
+			publisher.publishEvent(new AddLinkEvent(content, resource));
+		}
+	}
+
 	/**
-	 * @param resource resource
+	 * @param resource           resource
+	 * @param supportClientCache supportClientCache
 	 * @return 资源转换器
 	 */
-	private ResourceConverter getResourceConverter(PersistentEntityResource<?> resource) {
+	private ResourceConverter getResourceConverter(PersistentEntityResource<?> resource, boolean supportClientCache) {
 		PersistentEntity<?, ?> entity = resource.getEntity();
 		String repositoryBasePathName = ResourceUtil.getRepositoryBasePathName(entity.getType());
 		ControllerLinkBuilder baseLinkBuilder = getBaseLinkBuilder(repositoryBasePathName);
-		return new ResourceConverter(entity, baseLinkBuilder);
+		return new ResourceConverter(supportClientCache, entity, baseLinkBuilder);
 	}
 
 	/**
@@ -219,10 +237,6 @@ public class Response {
 		return persistentEntity.getIdentifierAccessor(entity).getIdentifier();
 	}
 
-	protected Object getId(Object entity) {
-		return getPersistentEntity(entity.getClass()).getIdentifierAccessor(entity).getIdentifier();
-	}
-
 	protected ResponseEntity noContent() {
 		return ResponseEntity.noContent().build();
 	}
@@ -232,18 +246,20 @@ public class Response {
 	 *
 	 * @author Peter Wu
 	 */
-	public class ResourceConverter implements Converter<Object, PersistentEntityResource<?>> {
+	private class ResourceConverter implements Converter<Object, PersistentEntityResource<?>> {
 
 		private List<String> eTagValues = new ArrayList<>();
 		private List<Long> LastModifieds = new ArrayList<>();
 
 		private boolean hasEtag = true;
 		private boolean hasLastModified = true;
+		private final boolean supportClientCache;
 
 		private PersistentEntity<?, ?> persistentEntity = null;
 		private ControllerLinkBuilder baseLinkBuilder = null;
 
-		public ResourceConverter(PersistentEntity<?, ?> persistentEntity, ControllerLinkBuilder baseLinkBuilder) {
+		public ResourceConverter(boolean supportClientCache, PersistentEntity<?, ?> persistentEntity, ControllerLinkBuilder baseLinkBuilder) {
+			this.supportClientCache = supportClientCache;
 			this.persistentEntity = persistentEntity;
 			this.baseLinkBuilder = baseLinkBuilder;
 		}
@@ -307,10 +323,7 @@ public class Response {
 					headers.setLastModified(LastModifieds.get(0));
 				}
 
-				headers.set(HttpHeaders.CACHE_CONTROL, "no-cache, must-revalidate");
-				headers.set(HttpHeaders.PRAGMA, "no-cache");
-				headers.set(HttpHeaders.EXPIRES, "-1");
-				return ResponseEntity.ok().headers(headers);
+				return ResponseEntity.ok().headers(cacheControl(headers));
 			} else
 				return ResponseEntity.ok().headers(noCache());
 		}

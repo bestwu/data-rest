@@ -68,7 +68,7 @@ import java.util.*;
 		Object domainObject = getItemResource(resourceInformation, id);
 
 		HttpHeaders headers = prepareHeaders(resourceInformation.getEntity(), domainObject);
-		headers.add(LINK_HEADER, getSelfRelLink(resourceInformation, id).toString());
+		headers.add(LINK_HEADER, getBaseLinkBuilder(resourceInformation.getPathName()).slash(id).withSelfRel().toString());
 
 		return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);
 	}
@@ -178,9 +178,7 @@ import java.util.*;
 
 		publisher.publishEvent(new BeforeShowEvent(content));
 
-		PersistentEntityResource<Object> resource = new PersistentEntityResource<>(content, resourceInformation.getEntity());
-		link(resource, getSelfRelLink(resourceInformation, id));
-		return ok(resource);
+		return ok(new PersistentEntityResource<>(content, resourceInformation.getEntity()));
 	}
 
 	private Object getItemResource(RootResourceInformation resourceInformation, @PathVariable String id) {
@@ -208,7 +206,6 @@ import java.util.*;
 		invoker.invokeSave(content);
 		publisher.publishEvent(new AfterCreateEvent(content));
 
-		link(resource, getSelfRelLink(resourceInformation, getId(resourceInformation.getEntity(), content)));
 		return created(resource);
 	}
 
@@ -230,7 +227,6 @@ import java.util.*;
 		String oldModel = ModelMethodArgumentResolver.OLD_MODEL;
 		publisher.publishEvent(new AfterLinkSaveEvent(content, request.getAttribute(oldModel)));
 
-		link(resource, getSelfRelLink(resourceInformation, id));
 		return updated(resource);
 	}
 
@@ -280,13 +276,6 @@ import java.util.*;
 		});
 
 		return noContent();
-	}
-
-	/*
-	 * 得到Link
-	 */
-	private Link getSelfRelLink(RootResourceInformation resourceInformation, Object id) {
-		return getBaseLinkBuilder(resourceInformation.getPathName()).slash(id).withSelfRel();
 	}
 
 }

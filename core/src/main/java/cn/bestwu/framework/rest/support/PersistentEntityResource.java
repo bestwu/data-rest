@@ -21,15 +21,6 @@ public class PersistentEntityResource<T> extends Resource<T> {
 	@JsonView(Object.class)
 	private Map<String, String> links;
 
-	public PersistentEntityResource(T content, Link... links) {
-		super(content);
-		entity = null;
-		if (ArrayUtil.isNotEmpty(links)) {
-			this.links = new HashMap<>();
-			Arrays.stream(links).forEach(link -> this.links.put(link.getRel(), link.getHref()));
-		}
-	}
-
 	public PersistentEntityResource(T content, PersistentEntity<?, ?> entity, Link... links) {
 		super(content);
 
