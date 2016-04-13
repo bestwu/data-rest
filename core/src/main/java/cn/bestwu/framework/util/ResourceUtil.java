@@ -1,5 +1,6 @@
 package cn.bestwu.framework.util;
 
+import cn.bestwu.framework.data.annotation.PathName;
 import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
 import cn.bestwu.framework.rest.support.Version;
@@ -31,6 +32,10 @@ public class ResourceUtil {
 	 * @return 资源名
 	 */
 	public static String getRepositoryBasePathName(Class<?> clazz) {
+		PathName pathName = clazz.getAnnotation(PathName.class);
+		if (pathName != null) {
+			return pathName.value();
+		}
 		return English.plural(clazz.getSimpleName().toLowerCase());
 	}
 

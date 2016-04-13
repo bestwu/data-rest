@@ -63,15 +63,11 @@ public class RepositoryResourceMetadata {
 		RepositoryRestResource annotation = repositoryInterface.getAnnotation(RepositoryRestResource.class);
 		if (annotation != null) {
 			exported = annotation.exported();
-			pathName = annotation.pathName();
 			contained = annotation.contained();
-			if ("".equals(pathName)) {
-				pathName = ResourceUtil.getRepositoryBasePathName(entity.getType());
-			}
 		} else {
 			exported = false;
-			pathName = ResourceUtil.getRepositoryBasePathName(entity.getType());
 		}
+		pathName = ResourceUtil.getRepositoryBasePathName(entity.getType());
 
 		if (exported) {
 			Map<ResourceType, Set<HttpMethod>> supportedHttpMethods = new HashMap<>();

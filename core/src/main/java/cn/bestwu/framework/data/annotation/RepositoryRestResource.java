@@ -30,11 +30,4 @@ public @interface RepositoryRestResource {
 	 */
 	HttpMethod[] value() default {};
 
-	/**
-	 * The path segment under which this resource is to be exported.
-	 *
-	 * @return A valid path segment.
-	 */
-	String pathName() default "";
-
 }
