@@ -4,7 +4,7 @@ import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.support.PrincipalNamePutEvent;
 import cn.bestwu.framework.rest.support.RequestJsonViewResponseBodyAdvice;
 import cn.bestwu.framework.rest.support.Resource;
-import cn.bestwu.framework.rest.support.ResourceUtil;
+import cn.bestwu.framework.util.ResourceUtil;
 import cn.bestwu.framework.util.StringUtil;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;

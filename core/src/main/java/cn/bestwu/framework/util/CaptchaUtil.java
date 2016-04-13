@@ -1,4 +1,4 @@
-package cn.bestwu.framework.rest.support;
+package cn.bestwu.framework.util;
 
 import javax.imageio.ImageIO;
 import java.awt.*;

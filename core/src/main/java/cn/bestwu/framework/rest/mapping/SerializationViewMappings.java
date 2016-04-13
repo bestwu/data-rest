@@ -1,6 +1,6 @@
 package cn.bestwu.framework.rest.mapping;
 
-import cn.bestwu.framework.rest.support.ResourceUtil;
+import cn.bestwu.framework.util.ResourceUtil;
 import cn.bestwu.framework.rest.support.Version;
 import cn.bestwu.framework.rest.support.VersionedSerializationView;
 
@@ -22,7 +22,7 @@ public class SerializationViewMappings {
 	}
 
 	/**
-	 * key: api 自定义 Signature: requestMethd+RequestMapping mapping 如：GET_IMAGES
+	 * key: api 自定义 Signature: requestMethd+RequestMapping mapping 如：get_users
 	 */
 	private final Map<String, List<VersionedSerializationView>> cache = new HashMap<>();
 
@@ -31,22 +31,22 @@ public class SerializationViewMappings {
 			return;
 		}
 
-		Class<?>[] classes = serializationViewsClass.getDeclaredClasses();
+		Class<?>[] classes = serializationViewsClass.getClasses();
 		Arrays.stream(classes).forEach(clazz -> {
-			String className = clazz.getSimpleName();//例子：GET_IMAGES_V_1_0
-			String signature = className.replaceAll("^(.*)_V_.*$", "$1");
-			String version = className.replaceAll("^.*_V_(.*)$", "$1");
+			String className = clazz.getSimpleName();//例子：get_users_v_1_0
+			String signature = className.replaceAll("^(.*)_v_.*$", "$1");
+			String version = className.replaceAll("^.*_v_(.*)$", "$1");
 			if (version.equals(signature)) {
 				version = Version.DEFAULT_VERSION;
 			} else {
-				version = version.replace("_", ".");
+				version = version.replace("_", ".").toLowerCase();
 			}
 			List<VersionedSerializationView> jsonViews = cache.get(signature);
 			boolean firstPut = jsonViews == null;
 			if (firstPut) {
 				jsonViews = new ArrayList<>();
 			}
-			jsonViews.add(new VersionedSerializationView(version.toLowerCase(), clazz));
+			jsonViews.add(new VersionedSerializationView(version, clazz));
 			if (firstPut) {
 				cache.put(signature, jsonViews);
 			}

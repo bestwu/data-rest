@@ -2,7 +2,7 @@
 package cn.bestwu.framework.rest.controller;
 
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
-import cn.bestwu.framework.rest.support.CaptchaUtil;
+import cn.bestwu.framework.util.CaptchaUtil;
 import cn.bestwu.framework.util.PinyinUtil;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;

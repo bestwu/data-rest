@@ -2,7 +2,6 @@ package cn.bestwu.framework.rest.resolver;
 
 import cn.bestwu.framework.event.AddPredicateEvent;
 import cn.bestwu.framework.event.DefaultPredicateEvent;
-import cn.bestwu.framework.rest.support.ParameterUtil;
 import cn.bestwu.framework.rest.support.Resource;
 import com.mysema.query.types.Predicate;
 import org.springframework.context.ApplicationEventPublisher;

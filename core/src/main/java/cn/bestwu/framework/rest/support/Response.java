@@ -4,6 +4,7 @@ import cn.bestwu.framework.data.annotation.DisableSelfRel;
 import cn.bestwu.framework.event.AddLinkEvent;
 import cn.bestwu.framework.event.SelfRelEvent;
 import cn.bestwu.framework.rest.controller.RepositoryEntityController;
+import cn.bestwu.framework.util.ResourceUtil;
 import cn.bestwu.framework.util.Sha1DigestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -2,14 +2,17 @@ package cn.bestwu.framework.rest.mapping;
 
 import cn.bestwu.framework.rest.annotation.RepositoryRestController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
-import cn.bestwu.framework.rest.support.*;
+import cn.bestwu.framework.rest.support.ProxyPathMapper;
+import cn.bestwu.framework.rest.support.RepositoryResourceMetadata;
+import cn.bestwu.framework.rest.support.ResourceType;
+import cn.bestwu.framework.rest.support.Version;
 import cn.bestwu.framework.util.ArrayUtil;
+import cn.bestwu.framework.util.ResourceUtil;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.condition.RequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
@@ -121,50 +124,17 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 	}
 
 	@Override protected Comparator<RequestMappingInfo> getMappingComparator(HttpServletRequest request) {
-		return (info1, info2) -> compareTo(info1, info2, request);
-	}
-
-	/*
-	 * MappingComparator
-	 */
-	private int compareTo(RequestMappingInfo me, RequestMappingInfo other, HttpServletRequest request) {
-		int result = me.getPatternsCondition().compareTo(other.getPatternsCondition(), request);
-		if (result != 0) {
-			return result;
-		}
-		result = me.getParamsCondition().compareTo(other.getParamsCondition(), request);
-		if (result != 0) {
-			return result;
-		}
-		result = me.getHeadersCondition().compareTo(other.getHeadersCondition(), request);
-		if (result != 0) {
-			return result;
-		}
-		result = me.getConsumesCondition().compareTo(other.getConsumesCondition(), request);
-		if (result != 0) {
-			return result;
-		}
-		result = versionCompareTo(getVersions(me.getProducesCondition().getProducibleMediaTypes()), getVersions(other.getProducesCondition().getProducibleMediaTypes()), request);//版本比较
-		if (result != 0) {
-			return result;
-		}
-		result = me.getProducesCondition().compareTo(other.getProducesCondition(), request);
-		if (result != 0) {
-			return result;
-		}
-		result = me.getMethodsCondition().compareTo(other.getMethodsCondition(), request);
-		if (result != 0) {
-			return result;
-		}
-		result = customConditionCompareTo(me.getCustomCondition(), other.getCustomCondition(), request);
-		if (result != 0) {
-			return result;
-		}
-		return 0;
+		return (info1, info2) -> {
+			int result = versionCompareTo(getVersions(info1.getProducesCondition().getProducibleMediaTypes()), getVersions(info2.getProducesCondition().getProducibleMediaTypes()), request);//版本比较
+			if (result != 0) {
+				return result;
+			}
+			return info1.compareTo(info2, request);
+		};
 	}
 
 	private List<String> getVersions(Set<MediaType> mediaTypes) {
-		return mediaTypes.stream().map(mediaType -> mediaType.getParameter(Version.VERSION_PARAM_NAME)).filter(StringUtils::hasText).collect(Collectors.toList());
+		return mediaTypes.stream().map(mediaType -> mediaType.getParameter(Version.VERSION_PARAM_NAME).toLowerCase()).filter(StringUtils::hasText).collect(Collectors.toList());
 	}
 
 	/*
@@ -217,7 +187,7 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 	private int equalVersion(List<String> versions, String accepteVersion) {
 		for (int i = 0; i < versions.size(); i++) {
 			String currentVersion = versions.get(i);
-			if (accepteVersion.equals(currentVersion)) {
+			if (accepteVersion.equalsIgnoreCase(currentVersion)) {
 				return i;
 			}
 		}
@@ -232,29 +202,6 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 			}
 		}
 		return -1;
-	}
-
-	//------------------------------------------------------------------------------
-
-	/*
-	 * CustomCondition CompareTo
-	 */
-	@SuppressWarnings("unchecked")
-	private int customConditionCompareTo(RequestCondition me, RequestCondition other, HttpServletRequest request) {
-		if (me == null && other == null) {
-			return 0;
-		} else if (me == null) {
-			return 1;
-		} else if (other == null) {
-			return -1;
-		} else {
-			Class<?> clazz = me.getClass();
-			Class<?> otherClazz = other.getClass();
-			if (!clazz.equals(otherClazz)) {
-				throw new ClassCastException("Incompatible request conditions: " + clazz + " and " + otherClazz);
-			}
-			return me.compareTo(other, request);
-		}
 	}
 
 }

@@ -1,8 +1,8 @@
-package cn.bestwu.framework.rest.support;
+package cn.bestwu.framework.util;
 
 import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
-import cn.bestwu.framework.util.StringUtil;
+import cn.bestwu.framework.rest.support.Version;
 import org.atteo.evo.inflector.English;
 import org.springframework.hateoas.core.AnnotationMappingDiscoverer;
 import org.springframework.http.MediaType;
@@ -31,7 +31,7 @@ public class ResourceUtil {
 	 * @return 资源名
 	 */
 	public static String getRepositoryBasePathName(Class<?> clazz) {
-		return English.plural(StringUtils.uncapitalize(clazz.getSimpleName()));
+		return English.plural(clazz.getSimpleName().toLowerCase());
 	}
 
 	/**
@@ -43,7 +43,7 @@ public class ResourceUtil {
 		if (handlerMethod == null) {
 			return null;
 		}
-		String apiSignature = request.getMethod() + DISCOVERER.getMapping(handlerMethod.getMethod());
+		String apiSignature = request.getMethod().toLowerCase() + DISCOVERER.getMapping(handlerMethod.getMethod());
 
 		String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
 		if (repositoryBasePathName != null) {
@@ -54,7 +54,7 @@ public class ResourceUtil {
 			apiSignature = apiSignature.replace("{search}", searchName);
 		}
 
-		apiSignature = StringUtil.addUnderscores(apiSignature.replaceAll("[{}]", "").replace("/", "_")).toUpperCase();
+		apiSignature = apiSignature.replaceAll("[{}]", "").replace("/", "_");
 		return apiSignature;
 	}
 
@@ -71,7 +71,7 @@ public class ResourceUtil {
 				String element = accept.nextElement();
 				String[] split = element.split(",");
 				for (String s : split) {
-					version = getVersion(s);
+					version = MediaType.valueOf(s).getParameter(Version.VERSION_PARAM_NAME);
 					if (StringUtils.hasText(version)) {
 						break;
 					}
@@ -82,20 +82,11 @@ public class ResourceUtil {
 			if (!StringUtils.hasText(version))
 				version = Version.DEFAULT_VERSION;
 
+			version = version.toLowerCase();
 			request.setAttribute(request_version_key, version);
 		}
 
 		return version;
-	}
-
-	/**
-	 * 解析版本号
-	 *
-	 * @param versionAcceptParam versionAcceptParam
-	 * @return 版本号
-	 */
-	public static String getVersion(String versionAcceptParam) {
-		return MediaType.valueOf(versionAcceptParam).getParameter(Version.VERSION_PARAM_NAME);
 	}
 
 	/**

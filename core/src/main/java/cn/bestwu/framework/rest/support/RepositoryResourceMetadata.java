@@ -5,6 +5,7 @@ import cn.bestwu.framework.data.annotation.RepositoryRestResource;
 import cn.bestwu.framework.data.annotation.SearchResource;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.util.ArrayUtil;
+import cn.bestwu.framework.util.ResourceUtil;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.repository.core.CrudMethods;
 import org.springframework.http.HttpMethod;
@@ -49,7 +50,7 @@ public class RepositoryResourceMetadata {
 			if (searchResource != null) {
 				String searchResourceName = searchResource.value();
 				if (!StringUtils.hasText(searchResourceName)) {
-					searchResourceName = StringUtils.uncapitalize(method.getName().replace("find", "").replace("findBy", "").replace("query", "").replace("queryBy", ""));
+					searchResourceName = method.getName().replace("find", "").replace("findBy", "").replace("query", "").replace("queryBy", "").toLowerCase();
 				}
 				if (searchMethods == null) {
 					searchMethods = new HashMap<>();

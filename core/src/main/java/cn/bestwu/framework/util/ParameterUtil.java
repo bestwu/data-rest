@@ -1,4 +1,4 @@
-package cn.bestwu.framework.rest.support;
+package cn.bestwu.framework.util;
 
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
