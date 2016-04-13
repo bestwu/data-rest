@@ -1,6 +1,6 @@
 package cn.bestwu.framework.jpa;
 
-import cn.bestwu.framework.test.util.TRestTemplate;
+import cn.bestwu.framework.support.client.CustomRestTemplate;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +23,7 @@ public class ExcludeTest {
 	@Value("${local.server.port}")
 	private int port;
 
-	TRestTemplate restTemplate = new TRestTemplate();
+	CustomRestTemplate restTemplate = new CustomRestTemplate();
 
 	protected String getBaseUrl() {
 		String host = "http://127.0.0.1";

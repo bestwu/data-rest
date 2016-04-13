@@ -1,7 +1,7 @@
 package cn.bestwu.framework.mongodb;
 
 import cn.bestwu.framework.mongodb.model.TestUser;
-import cn.bestwu.framework.test.util.TRestTemplate;
+import cn.bestwu.framework.support.client.CustomRestTemplate;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +37,7 @@ public class ControllerTests {
 
 	@Test
 	public void testRest() throws Exception {
-		TRestTemplate restTemplate = new TRestTemplate();
+		CustomRestTemplate restTemplate = new CustomRestTemplate();
 
 		//save
 		TestUser testUser = new TestUser();

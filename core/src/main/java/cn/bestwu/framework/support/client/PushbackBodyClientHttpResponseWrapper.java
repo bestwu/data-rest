@@ -1,4 +1,4 @@
-package cn.bestwu.framework.test.util;
+package cn.bestwu.framework.support.client;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;
@@ -21,11 +21,6 @@ public class PushbackBodyClientHttpResponseWrapper implements ClientHttpResponse
 	public PushbackBodyClientHttpResponseWrapper(ClientHttpResponse response) {
 		this.response = response;
 		readlimit = 1024 * 1024 * 10;
-	}
-
-	public PushbackBodyClientHttpResponseWrapper(ClientHttpResponse response, int readlimit) throws IOException {
-		this.response = response;
-		this.readlimit = readlimit;
 	}
 
 	@Override

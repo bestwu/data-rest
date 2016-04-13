@@ -1,4 +1,4 @@
-package cn.bestwu.framework.test.util;
+package cn.bestwu.framework.support.client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,6 @@ import org.springframework.http.converter.feed.AtomFeedHttpMessageConverter;
 import org.springframework.http.converter.feed.RssChannelHttpMessageConverter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
@@ -40,8 +39,8 @@ import java.util.Map;
  *
  * @author Peter Wu
  */
-public class TRestTemplate extends TestRestTemplate {
-	protected final Logger logger = LoggerFactory.getLogger(TRestTemplate.class);
+public class CustomRestTemplate extends TestRestTemplate {
+	protected final Logger logger = LoggerFactory.getLogger(CustomRestTemplate.class);
 
 	private boolean print;
 
@@ -49,7 +48,7 @@ public class TRestTemplate extends TestRestTemplate {
 		this.print = print;
 	}
 
-	public TRestTemplate(HttpClientOption... httpClientOptions) {
+	public CustomRestTemplate(HttpClientOption... httpClientOptions) {
 		super(httpClientOptions);
 		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
 		requestFactory.setOutputStreaming(false);
@@ -76,7 +75,7 @@ public class TRestTemplate extends TestRestTemplate {
 		messageConverters.add(new StringHttpMessageConverter(Charset.forName("UTF-8")));//UTF-8 编码
 		messageConverters.add(new ResourceHttpMessageConverter());
 		messageConverters.add(new SourceHttpMessageConverter<>());
-		messageConverters.add(new AllEncompassingFormHttpMessageConverter());
+		messageConverters.add(new UTF8AllEncompassingFormHttpMessageConverter());
 
 		if (romePresent) {
 			messageConverters.add(new AtomFeedHttpMessageConverter());
@@ -97,7 +96,7 @@ public class TRestTemplate extends TestRestTemplate {
 		setMessageConverters(messageConverters);
 	}
 
-	public TRestTemplate(String username, String password, HttpClientOption... httpClientOptions) {
+	public CustomRestTemplate(String username, String password, HttpClientOption... httpClientOptions) {
 		super(username, password, httpClientOptions);
 	}
 
@@ -136,8 +135,6 @@ public class TRestTemplate extends TestRestTemplate {
 			if (mediaType != null) {
 				requestHeaders.setAccept(Collections.singletonList(mediaType));
 			}
-
-			//			requestHeaders.add("Authorization", "Bearer c788a252-8f42-4229-943c-0544268e9c65");
 
 			response = request.execute();
 
