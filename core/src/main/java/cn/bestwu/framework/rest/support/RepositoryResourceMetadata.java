@@ -50,7 +50,7 @@ public class RepositoryResourceMetadata {
 			if (searchResource != null) {
 				String searchResourceName = searchResource.value();
 				if (!StringUtils.hasText(searchResourceName)) {
-					searchResourceName = method.getName().replace("find", "").replace("findBy", "").replace("query", "").replace("queryBy", "").toLowerCase();
+					searchResourceName = StringUtils.uncapitalize(method.getName().replace("find", "").replace("findBy", "").replace("query", "").replace("queryBy", ""));
 				}
 				if (searchMethods == null) {
 					searchMethods = new HashMap<>();

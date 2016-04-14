@@ -36,7 +36,7 @@ public class ResourceUtil {
 		if (pathName != null) {
 			return pathName.value();
 		}
-		return English.plural(clazz.getSimpleName().toLowerCase());
+		return English.plural(StringUtils.uncapitalize(clazz.getSimpleName()));
 	}
 
 	/**
@@ -99,7 +99,7 @@ public class ResourceUtil {
 	 * @param verion  比较的版本号，不能为null
 	 * @return 请求的版本号是否匹配 version
 	 */
-	public static boolean requestVersionEquals(HttpServletRequest request, String verion) {
+	public static boolean equalsVersion(HttpServletRequest request, String verion) {
 		return verion.equalsIgnoreCase(getRequestVersion(request));
 	}
 
