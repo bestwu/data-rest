@@ -9,7 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
@@ -54,9 +53,9 @@ public class CustomRestTemplate extends TestRestTemplate {
 
 	public CustomRestTemplate(String username, String password, HttpClientOption... httpClientOptions) {
 		super(username, password, httpClientOptions);
-		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-		requestFactory.setOutputStreaming(false);
-		setRequestFactory(requestFactory);
+//		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+//		requestFactory.setOutputStreaming(false);
+//		setRequestFactory(requestFactory);
 
 		boolean romePresent =
 				ClassUtils.isPresent("com.rometools.rome.feed.WireFeed", RestTemplate.class.getClassLoader());

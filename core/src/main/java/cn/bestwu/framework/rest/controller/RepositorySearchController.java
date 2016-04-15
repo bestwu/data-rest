@@ -44,10 +44,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 		if (isJpaSearchRepository && !modelType.isAnnotationPresent(Indexed.class)) {
 			throw new ResourceNotFoundException();
 		}
-		if (resultHandler == null) {
-			if (highLight && isJpaSearchRepository) {//MongodbSearchRepository 不支持高亮
-				resultHandler = new HighlightResultHandler();
+		ResultHandler resultHandler = this.resultHandler;
+		if (highLight) {
+			if (resultHandler == null) {
+				if (isJpaSearchRepository) {
+					resultHandler = new HighlightResultHandler();
+				} else {
+					//MongodbSearchRepository 不支持默认高亮
+				}
 			}
+		} else {
+			resultHandler = null;
 		}
 		Page page = searchRepository.search(modelType, keyword, pageable, resultHandler);
 		Link selfRel = ControllerLinkBuilder
