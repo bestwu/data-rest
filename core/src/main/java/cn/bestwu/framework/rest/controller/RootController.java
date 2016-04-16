@@ -4,10 +4,10 @@ package cn.bestwu.framework.rest.controller;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.util.CaptchaUtil;
 import cn.bestwu.framework.util.PinyinUtil;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.util.Assert;
+import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +19,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -67,7 +68,7 @@ public class RootController extends BaseController {
 
 		File logFile = new File(logFilePath);
 		if (logFile.exists()) {
-			return FileUtils.readFileToString(logFile, Charset.forName("UTF-8"));
+			return StreamUtils.copyToString(new FileInputStream(logFile), Charset.forName("UTF-8"));
 		} else {
 			throw new ResourceNotFoundException(getText("log.notFound"));
 		}

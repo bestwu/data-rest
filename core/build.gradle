@@ -21,7 +21,6 @@ dependencies {
 
     //utils
     compile 'org.atteo:evo-inflector'
-    compile 'commons-io:commons-io'
 
     //optional
     optional 'org.springframework.boot:spring-boot-starter-aop'

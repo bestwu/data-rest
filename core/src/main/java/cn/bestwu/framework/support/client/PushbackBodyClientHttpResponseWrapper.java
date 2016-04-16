@@ -1,9 +1,9 @@
 package cn.bestwu.framework.support.client;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
 public class PushbackBodyClientHttpResponseWrapper implements ClientHttpResponse {
 
 	private final ClientHttpResponse response;
-
+	private Charset defaultCharset = Charset.forName("UTF-8");
 	private PushbackInputStream pushbackInputStream;
 
 	private final int readlimit;
@@ -39,13 +39,14 @@ public class PushbackBodyClientHttpResponseWrapper implements ClientHttpResponse
 			return null;
 		} else if (body.markSupported()) {
 			body.mark(readlimit);
-			String bodyString = IOUtils.toString(body);
+			String bodyString = StreamUtils.copyToString(body, defaultCharset);
 			body.reset();
 			return bodyString;
 		} else {
 			this.pushbackInputStream = new PushbackInputStream(body, readlimit);
-			String bodyString = IOUtils.toString(pushbackInputStream);
-			pushbackInputStream.unread(bodyString.getBytes(Charset.forName("UTF-8")));
+			String bodyString = StreamUtils.copyToString(pushbackInputStream, defaultCharset);
+
+			pushbackInputStream.unread(bodyString.getBytes(defaultCharset));
 			return bodyString;
 		}
 	}
