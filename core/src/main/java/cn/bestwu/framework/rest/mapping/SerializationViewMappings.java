@@ -39,7 +39,7 @@ public class SerializationViewMappings {
 			if (version.equals(signature)) {
 				version = Version.DEFAULT_VERSION;
 			} else {
-				version = version.replace("_", ".").toLowerCase();
+				version = version.replace("_", ".");
 			}
 			List<VersionedSerializationView> jsonViews = cache.get(signature);
 			boolean firstPut = jsonViews == null;
@@ -69,7 +69,7 @@ public class SerializationViewMappings {
 		}
 		String requestVersion = ResourceUtil.getRequestVersion(request);
 		for (VersionedSerializationView jsonView : jsonViews) {
-			if (jsonView.getVersion().equalsIgnoreCase(requestVersion)) {
+			if (Version.equals(jsonView.getVersion(), requestVersion)) {
 				return jsonView.getSerializationView();
 			}
 		}

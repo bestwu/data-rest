@@ -134,14 +134,7 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 	}
 
 	private List<String> getVersions(Set<MediaType> mediaTypes) {
-		return mediaTypes.stream().map(mediaType -> {
-			String version = mediaType.getParameter(Version.VERSION_PARAM_NAME);
-			if (version != null) {
-				return version.toLowerCase();
-			} else {
-				return null;
-			}
-		}).filter(StringUtils::hasText).collect(Collectors.toList());
+		return mediaTypes.stream().map(mediaType -> mediaType.getParameter(Version.VERSION_PARAM_NAME)).filter(StringUtils::hasText).collect(Collectors.toList());
 	}
 
 	/*
@@ -194,7 +187,7 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 	private int equalVersion(List<String> versions, String accepteVersion) {
 		for (int i = 0; i < versions.size(); i++) {
 			String currentVersion = versions.get(i);
-			if (accepteVersion.equalsIgnoreCase(currentVersion)) {
+			if (Version.equals(accepteVersion, currentVersion)) {
 				return i;
 			}
 		}

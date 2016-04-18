@@ -1,5 +1,7 @@
 package cn.bestwu.framework.rest.support;
 
+import org.springframework.util.Assert;
+
 /**
  * 接口版本信息
  *
@@ -62,5 +64,15 @@ public interface Version {
 	 */
 	static boolean included(String version1, String version2) {
 		return version1.contains(version2) || version1.matches(version2);
+	}
+
+	/**
+	 * @param version1 version1
+	 * @param version2 version2
+	 * @return version1 是否等于 version2
+	 */
+	static boolean equals(String version1, String version2) {
+		Assert.notNull(version1);
+		return version1.equalsIgnoreCase(version2);
 	}
 }

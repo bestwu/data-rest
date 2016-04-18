@@ -87,7 +87,6 @@ public class ResourceUtil {
 			if (!StringUtils.hasText(version))
 				version = Version.DEFAULT_VERSION;
 
-			version = version.toLowerCase();
 			request.setAttribute(request_version_key, version);
 		}
 
@@ -100,7 +99,7 @@ public class ResourceUtil {
 	 * @return 请求的版本号是否匹配 version
 	 */
 	public static boolean equalsVersion(HttpServletRequest request, String verion) {
-		return verion.equalsIgnoreCase(getRequestVersion(request));
+		return Version.equals(verion, getRequestVersion(request));
 	}
 
 }
