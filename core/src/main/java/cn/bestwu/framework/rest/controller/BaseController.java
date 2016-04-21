@@ -1,6 +1,7 @@
 package cn.bestwu.framework.rest.controller;
 
 import cn.bestwu.framework.event.DefaultSortEvent;
+import cn.bestwu.framework.rest.resolver.ModelMethodArgumentResolver;
 import cn.bestwu.framework.rest.support.Response;
 import cn.bestwu.framework.util.ParameterUtil;
 import cn.bestwu.framework.util.ResourceUtil;
@@ -123,6 +124,11 @@ public abstract class BaseController extends Response {
 
 	protected boolean equalsVersion(String version) {
 		return ResourceUtil.equalsVersion(request, version);
+	}
+
+	protected Object getOldModel() {
+		String oldModel = ModelMethodArgumentResolver.OLD_MODEL;
+		return request.getAttribute(oldModel);
 	}
 
 	/**
