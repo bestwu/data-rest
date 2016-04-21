@@ -90,7 +90,7 @@ public class LogAspect extends BaseController {
 			if (logger.isDebugEnabled()) {
 				String requestSignature = ResourceUtil.getRequestSignature(request);
 				String resultStr;
-				if ("GET_LOGS_INDEX".equals(requestSignature)) {
+				if ("get_logs_index".equals(requestSignature)) {
 					resultStr = StringUtil.subString(result.toString(), 100);
 				} else {
 					if (requestJsonViewResponseBodyAdvice != null) {

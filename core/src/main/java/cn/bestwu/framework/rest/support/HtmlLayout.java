@@ -1,5 +1,6 @@
 package cn.bestwu.framework.rest.support;
 
+import cn.bestwu.framework.util.StringUtil;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
@@ -133,7 +134,7 @@ public final class HtmlLayout extends AbstractStringLayout {
 			escapedLogger = LoggerConfig.ROOT;
 		}
 		sbuf.append("<td title=\"").append(escapedLogger).append(" logger\">");
-		sbuf.append(escapedLogger);
+		sbuf.append(StringUtil.subString(escapedLogger.substring(escapedLogger.lastIndexOf('.') + 1), 20));
 		sbuf.append("</td>").append(Constants.LINE_SEPARATOR);
 
 		if (locationInfo) {

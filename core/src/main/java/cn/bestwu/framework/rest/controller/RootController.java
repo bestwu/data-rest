@@ -51,7 +51,7 @@ public class RootController extends BaseController {
 	/*
 	 * 日志
 	 */
-	@RequestMapping(value = "/logs/{index}", method = RequestMethod.GET, produces = "text/plain")
+	@RequestMapping(value = "/logs/{index}", method = RequestMethod.GET, produces = { "text/html", "text/plain" })
 	public Object showlog(@PathVariable int index) throws IOException, ServletException {
 
 		if (!StringUtils.hasText(logging_path)) {
