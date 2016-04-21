@@ -1,14 +1,10 @@
 package cn.bestwu.framework.util;
 
-import org.apache.tomcat.util.http.fileupload.IOUtils;
-
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import static ch.qos.logback.core.CoreConstants.LINE_SEPARATOR;
 
 public class FileUtil {
 
@@ -103,7 +99,13 @@ public class FileUtil {
 			in = openInputStream(file);
 			return readLines(in, toCharset(encoding));
 		} finally {
-			IOUtils.closeQuietly(in);
+			try {
+				if (in != null) {
+					in.close();
+				}
+			} catch (IOException ioe) {
+				// ignore
+			}
 		}
 	}
 
@@ -144,7 +146,7 @@ public class FileUtil {
 			return;
 		}
 		if (lineEnding == null) {
-			lineEnding = LINE_SEPARATOR;
+			lineEnding = System.getProperty("line.separator");
 		}
 		Charset cs = toCharset(encoding);
 		for (Object line : lines) {
@@ -165,7 +167,13 @@ public class FileUtil {
 			buffer.flush();
 			out.close(); // don't swallow close Exception if copy completes normally
 		} finally {
-			IOUtils.closeQuietly(out);
+			try {
+				if (out != null) {
+					out.close();
+				}
+			} catch (IOException ioe) {
+				// ignore
+			}
 		}
 	}
 

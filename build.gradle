@@ -44,6 +44,10 @@ subprojects {
             mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
         }
         dependencies {
+            dependency("org.springframework.boot:spring-boot-starter:$springBootVersion") {
+                exclude 'org.springframework.boot:spring-boot-starter-logging'
+            }
+            
             dependency 'com.mysema.querydsl:querydsl-apt:3.7.1'
             dependency 'com.mysema.querydsl:querydsl-jpa:3.7.1'
             dependency 'com.mysema.querydsl:querydsl-mongodb:3.7.1'
