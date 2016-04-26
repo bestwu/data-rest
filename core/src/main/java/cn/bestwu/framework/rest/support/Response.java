@@ -81,7 +81,7 @@ public class Response {
 		return headers;
 	}
 
-	private static HttpHeaders cacheControl(HttpHeaders headers) {
+	protected static HttpHeaders cacheControl(HttpHeaders headers) {
 		if (headers == null) {
 			headers = new HttpHeaders();
 		}

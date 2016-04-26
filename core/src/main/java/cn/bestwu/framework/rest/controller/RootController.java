@@ -4,8 +4,11 @@ package cn.bestwu.framework.rest.controller;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.util.CaptchaUtil;
 import cn.bestwu.framework.util.PinyinUtil;
+import cn.bestwu.framework.util.Sha1DigestUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
@@ -68,7 +71,10 @@ public class RootController extends BaseController {
 
 		File logFile = new File(logFilePath);
 		if (logFile.exists()) {
-			return StreamUtils.copyToString(new FileInputStream(logFile), Charset.forName("UTF-8"));
+			String log = StreamUtils.copyToString(new FileInputStream(logFile), Charset.forName("UTF-8"));
+			HttpHeaders httpHeaders = new HttpHeaders();
+			httpHeaders.setETag("\"".concat(Sha1DigestUtil.shaHex(log)).concat("\""));
+			return ResponseEntity.ok().headers(cacheControl(httpHeaders)).body(log);
 		} else {
 			throw new ResourceNotFoundException(getText("log.notFound"));
 		}
