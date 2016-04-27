@@ -57,6 +57,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 			resultHandler = null;
 		}
 		Page page = searchRepository.search(modelType, keyword, pageable, resultHandler);
+
 		Link selfRel = ControllerLinkBuilder
 				.linkTo(RepositorySearchController.class, RepositorySearchController.class.getMethod("search", RootResourceInformation.class, String.class, Pageable.class, boolean.class),
 						resourceInformation.getPathName())
