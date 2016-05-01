@@ -1,7 +1,7 @@
 package cn.bestwu.framework.event;
 
 import cn.bestwu.framework.rest.support.Resource;
-import com.mysema.query.types.Predicate;
+import com.querydsl.core.types.Predicate;
 
 /**
  * 给Predicate 附加条件

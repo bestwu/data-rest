@@ -20,7 +20,7 @@ import cn.bestwu.framework.event.DefaultPredicateEvent;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
 import cn.bestwu.framework.rest.support.Resource;
 import cn.bestwu.framework.rest.support.RootResourceInformation;
-import com.mysema.query.types.Predicate;
+import com.querydsl.core.types.Predicate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.querydsl.QuerydslRepositoryInvokerAdapter;

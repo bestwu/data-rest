@@ -1,18 +1,18 @@
 package cn.bestwu.framework.jpa.model;
 
-import static com.mysema.query.types.PathMetadataFactory.*;
+import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.mysema.query.types.path.*;
+import com.querydsl.core.types.dsl.*;
 
-import com.mysema.query.types.PathMetadata;
+import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
-import com.mysema.query.types.Path;
+import com.querydsl.core.types.Path;
 
 
 /**
  * QTestUser4 is a Querydsl query type for TestUser4
  */
-@Generated("com.mysema.query.codegen.EntitySerializer")
+@Generated("com.querydsl.codegen.EntitySerializer")
 public class QTestUser4 extends EntityPathBase<TestUser4> {
 
     private static final long serialVersionUID = -1565973978L;
@@ -33,7 +33,7 @@ public class QTestUser4 extends EntityPathBase<TestUser4> {
         super(path.getType(), path.getMetadata());
     }
 
-    public QTestUser4(PathMetadata<?> metadata) {
+    public QTestUser4(PathMetadata metadata) {
         super(TestUser4.class, metadata);
     }
 

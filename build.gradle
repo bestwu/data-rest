@@ -17,7 +17,7 @@ buildscript {
 subprojects {
 
     group 'cn.bestwu'
-    version '1.0.0.M2'
+    version '1.0.0-SNAPSHOT'
 
     apply plugin: 'java'
     apply plugin: 'idea'
@@ -44,19 +44,18 @@ subprojects {
             mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
         }
         dependencies {
-            dependency("org.springframework.boot:spring-boot-starter:$springBootVersion") {
-                exclude 'org.springframework.boot:spring-boot-starter-logging'
-            }
+//            dependency("org.springframework.boot:spring-boot-starter:$springBootVersion") {
+//                exclude 'org.springframework.boot:spring-boot-starter-logging'
+//            }
             
-            dependency 'com.mysema.querydsl:querydsl-apt:3.7.1'
-            dependency 'com.mysema.querydsl:querydsl-jpa:3.7.1'
-            dependency 'com.mysema.querydsl:querydsl-mongodb:3.7.1'
-            dependency 'org.hibernate:hibernate-search-orm:5.3.0.Final'
-            dependency 'org.apache.lucene:lucene-highlighter:4.10.4'
+            dependency 'com.querydsl:querydsl-apt:4.1.0'
+            dependency 'com.querydsl:querydsl-jpa:4.1.0'
+            dependency 'com.querydsl:querydsl-mongodb:4.1.0'
+            dependency 'org.hibernate:hibernate-search-orm:5.5.3.Final'
+            dependency 'org.apache.lucene:lucene-highlighter:5.3.1'
 
             dependency 'org.atteo:evo-inflector:1.2.1'
-            dependency 'commons-io:commons-io:2.4'
-            dependency 'com.belerweb:pinyin4j:2.5.0'
+            dependency 'com.belerweb:pinyin4j:2.5.1'
         }
     }
 }
@@ -70,5 +69,5 @@ idea {
 }
 
 wrapper {
-    gradleVersion = '2.11'
+    gradleVersion = '2.13'
 }

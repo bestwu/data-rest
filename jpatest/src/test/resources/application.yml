@@ -2,6 +2,9 @@ logging.logAspect.enabled: true
 logging.level.cn.bestwu: DEBUG
 spring:
   jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
     show-sql: true
     properties:
       hibernate:

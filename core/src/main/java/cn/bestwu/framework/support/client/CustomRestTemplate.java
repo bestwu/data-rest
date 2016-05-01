@@ -1,14 +1,7 @@
 package cn.bestwu.framework.support.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.TestRestTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequest;
-import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.*;
+import org.springframework.http.client.*;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
@@ -21,6 +14,7 @@ import org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConvert
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.util.Assert;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.client.*;
 import org.springframework.web.util.UriTemplate;
@@ -38,24 +32,26 @@ import java.util.Map;
  *
  * @author Peter Wu
  */
-public class CustomRestTemplate extends TestRestTemplate {
-	protected final Logger logger = LoggerFactory.getLogger(CustomRestTemplate.class);
+public class CustomRestTemplate extends RestTemplate {
 
 	private boolean print;
+	private static Charset defaultCharset = Charset.forName("UTF-8");
 
 	public void setPrint(boolean print) {
 		this.print = print;
 	}
 
-	public CustomRestTemplate(HttpClientOption... httpClientOptions) {
-		this(null, null, httpClientOptions);
+	public CustomRestTemplate() {
+		this(null, null);
 	}
 
-	public CustomRestTemplate(String username, String password, HttpClientOption... httpClientOptions) {
-		super(username, password, httpClientOptions);
-//		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-//		requestFactory.setOutputStreaming(false);
-//		setRequestFactory(requestFactory);
+	public CustomRestTemplate(String username, String password) {
+		addAuthentication(username, password);
+		setErrorHandler(new DefaultResponseErrorHandler() {
+			@Override
+			public void handleError(ClientHttpResponse response) {
+			}
+		});
 
 		boolean romePresent =
 				ClassUtils.isPresent("com.rometools.rome.feed.WireFeed", RestTemplate.class.getClassLoader());
@@ -75,8 +71,9 @@ public class CustomRestTemplate extends TestRestTemplate {
 
 		final List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
 		messageConverters.add(new ByteArrayHttpMessageConverter());
-		messageConverters.add(new StringHttpMessageConverter(Charset.forName("UTF-8")));//UTF-8 编码
-		messageConverters.add(new ResourceHttpMessageConverter());
+		messageConverters.add(new StringHttpMessageConverter(defaultCharset));//UTF-8 编码
+		messageConverters.add(new ResourceHttpMessageConverter()
+		);
 		messageConverters.add(new SourceHttpMessageConverter<>());
 		messageConverters.add(new UTF8AllEncompassingFormHttpMessageConverter());
 
@@ -96,7 +93,39 @@ public class CustomRestTemplate extends TestRestTemplate {
 		} else if (gsonPresent) {
 			messageConverters.add(new GsonHttpMessageConverter());
 		}
+
 		setMessageConverters(messageConverters);
+	}
+
+	private void addAuthentication(String username, String password) {
+		if (username == null) {
+			return;
+		}
+		List<ClientHttpRequestInterceptor> interceptors = Collections.singletonList(new BasicAuthorizationInterceptor(username, password));
+		setRequestFactory(new InterceptingClientHttpRequestFactory(getRequestFactory(), interceptors));
+	}
+
+	private static class BasicAuthorizationInterceptor
+			implements ClientHttpRequestInterceptor {
+
+		private final String username;
+
+		private final String password;
+
+		BasicAuthorizationInterceptor(String username, String password) {
+			this.username = username;
+			this.password = (password == null ? "" : password);
+		}
+
+		@Override
+		public ClientHttpResponse intercept(HttpRequest request, byte[] body,
+				ClientHttpRequestExecution execution) throws IOException {
+			String token = Base64Utils.encodeToString(
+					(this.username + ":" + this.password).getBytes(defaultCharset));
+			request.getHeaders().add("Authorization", "Basic " + token);
+			return execution.execute(request, body);
+		}
+
 	}
 
 	public <T> T execute(String url, HttpMethod method, RequestCallback requestCallback,

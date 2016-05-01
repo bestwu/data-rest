@@ -1,8 +1,7 @@
 package cn.bestwu.framework.rest.support;
 
 import cn.bestwu.framework.rest.mapping.SerializationViewMappings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
@@ -15,9 +14,9 @@ import org.springframework.web.servlet.mvc.method.annotation.AbstractMappingJack
 
 import javax.servlet.http.HttpServletRequest;
 
+@Slf4j
 public class RequestJsonViewResponseBodyAdvice extends AbstractMappingJacksonResponseBodyAdvice {
 
-	private final Logger logger = LoggerFactory.getLogger(RequestJsonViewResponseBodyAdvice.class);
 	private SerializationViewMappings serializationViewMappings;
 
 	public RequestJsonViewResponseBodyAdvice(SerializationViewMappings serializationViewMappings) {
@@ -37,8 +36,8 @@ public class RequestJsonViewResponseBodyAdvice extends AbstractMappingJacksonRes
 
 	public void beforeBodyWrite(MappingJacksonValue bodyContainer, HttpServletRequest request) {
 		Class<?> serializationView = serializationViewMappings.getSerializationView(request);
-		if (logger.isDebugEnabled()) {
-			logger.debug("serializationView:{}", serializationView == null ? null : serializationView.getSimpleName());
+		if (log.isDebugEnabled()) {
+			log.debug("serializationView:" + (serializationView == null ? null : serializationView.getSimpleName()));
 		}
 		bodyContainer.setSerializationView(serializationView);
 	}

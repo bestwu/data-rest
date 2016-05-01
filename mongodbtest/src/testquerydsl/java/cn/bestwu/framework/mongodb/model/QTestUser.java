@@ -1,18 +1,18 @@
 package cn.bestwu.framework.mongodb.model;
 
-import static com.mysema.query.types.PathMetadataFactory.*;
+import static com.querydsl.core.types.PathMetadataFactory.*;
 
-import com.mysema.query.types.path.*;
+import com.querydsl.core.types.dsl.*;
 
-import com.mysema.query.types.PathMetadata;
+import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
-import com.mysema.query.types.Path;
+import com.querydsl.core.types.Path;
 
 
 /**
  * QTestUser is a Querydsl query type for TestUser
  */
-@Generated("com.mysema.query.codegen.EntitySerializer")
+@Generated("com.querydsl.codegen.EntitySerializer")
 public class QTestUser extends EntityPathBase<TestUser> {
 
     private static final long serialVersionUID = -1794564649L;
@@ -33,7 +33,7 @@ public class QTestUser extends EntityPathBase<TestUser> {
         super(path.getType(), path.getMetadata());
     }
 
-    public QTestUser(PathMetadata<?> metadata) {
+    public QTestUser(PathMetadata metadata) {
         super(TestUser.class, metadata);
     }
 

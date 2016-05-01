@@ -1,7 +1,6 @@
 package cn.bestwu.framework.rest.resolver;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -15,11 +14,10 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author Peter Wu
  */
+@Slf4j
 public class StandardServletMultipartResolver implements MultipartResolver {
 
 	private boolean resolveLazily = false;
-
-	private final Logger logger = LoggerFactory.getLogger(StandardServletMultipartResolver.class);
 
 	public void setResolveLazily(boolean resolveLazily) {
 		this.resolveLazily = resolveLazily;
@@ -50,14 +48,14 @@ public class StandardServletMultipartResolver implements MultipartResolver {
 				try {
 					part.delete();
 				} catch (Exception ex) {
-					if (logger.isWarnEnabled()) {
-						logger.warn("Failed to perform cleanup of multipart items", ex);
+					if (log.isWarnEnabled()) {
+						log.warn("Failed to perform cleanup of multipart items", ex);
 					}
 				}
 			});
 		} catch (Exception ex) {
-			if (logger.isWarnEnabled()) {
-				logger.warn("Failed to perform cleanup of multipart items", ex);
+			if (log.isWarnEnabled()) {
+				log.warn("Failed to perform cleanup of multipart items", ex);
 			}
 		}
 	}

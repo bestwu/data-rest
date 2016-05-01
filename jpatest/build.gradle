@@ -1,12 +1,12 @@
 dependencies {
     compile project(':data-rest')
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
-    compile 'com.mysema.querydsl:querydsl-jpa'
+    compile 'com.querydsl:querydsl-jpa'
     compile 'org.hibernate:hibernate-search-orm'
     compile 'org.apache.lucene:lucene-highlighter'
 //    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
 
-    testCompile 'com.mysema.querydsl:querydsl-apt'
+    testCompile 'com.querydsl:querydsl-apt'
     testCompile "com.h2database:h2"
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
@@ -18,7 +18,7 @@ def taskGroup = 'app'
 //task generateQueryDSL(type: JavaCompile, group: taskGroup) {
 //    source = sourceSets.main.java
 //    classpath = configurations.compile + configurations.testCompile + configurations.runtime
-//    options.compilerArgs = ['-proc:only', '-processor', 'com.mysema.query.apt.jpa.JPAAnnotationProcessor']
+//    options.compilerArgs = ['-proc:only', '-processor', 'com.querydsl.apt.jpa.JPAAnnotationProcessor']
 //    options.encoding = 'UTF-8'
 //    destinationDir = querydslSourcesDir
 //}
@@ -31,7 +31,7 @@ def testquerydslSourcesDir = file('src/testquerydsl/java')
 task generateTestJPAQueryDSL(type: JavaCompile, group: taskGroup) {
     source = 'src/test/java/cn/bestwu/framework/jpa/model'
     classpath = configurations.compile + configurations.testCompile + configurations.runtime
-    options.compilerArgs = ['-proc:only', '-processor', 'com.mysema.query.apt.jpa.JPAAnnotationProcessor']
+    options.compilerArgs = ['-proc:only', '-processor', 'com.querydsl.apt.jpa.JPAAnnotationProcessor']
     options.encoding = 'UTF-8'
     destinationDir = testquerydslSourcesDir
 }

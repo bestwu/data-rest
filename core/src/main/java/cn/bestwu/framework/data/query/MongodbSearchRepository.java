@@ -1,8 +1,7 @@
 package cn.bestwu.framework.data.query;
 
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +15,8 @@ import java.util.Collections;
 /**
  * @author Peter Wu
  */
+@Slf4j
 public class MongodbSearchRepository implements SearchRepository {
-	private Logger logger = LoggerFactory.getLogger(MongodbSearchRepository.class);
 
 	private final Repositories repositories;
 
@@ -38,7 +37,7 @@ public class MongodbSearchRepository implements SearchRepository {
 		} catch (NoSuchMethodException e) {
 			throw new ResourceNotFoundException();
 		} catch (InvocationTargetException | IllegalAccessException e) {
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			return new PageImpl<>(Collections.emptyList());
 		}
 	}

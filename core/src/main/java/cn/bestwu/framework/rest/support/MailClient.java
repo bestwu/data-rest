@@ -1,8 +1,7 @@
 package cn.bestwu.framework.rest.support;
 
 import cn.bestwu.framework.util.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.MailSendException;
@@ -22,9 +21,8 @@ import java.util.Set;
  *
  * @author Peter Wu
  */
+@Slf4j
 public class MailClient {
-
-	private final Logger logger = LoggerFactory.getLogger(MailClient.class);
 
 	private final JavaMailSenderImpl mailSender;
 	private String from;
@@ -44,8 +42,8 @@ public class MailClient {
 	}
 
 	public void send(String subject, String content, Map<String, String> inlineFiles, String... mailTo) throws MessagingException, UnsupportedEncodingException {
-		if (logger.isDebugEnabled())
-			logger.debug("正在给{}发送邮件", StringUtil.valueOf(mailTo));
+		if (log.isDebugEnabled())
+			log.debug("正在给" + StringUtil.valueOf(mailTo) + "发送邮件");
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
 
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
@@ -66,11 +64,11 @@ public class MailClient {
 		try {
 			mailSender.send(mimeMessage);
 		} catch (MailSendException e) {
-			if (logger.isWarnEnabled())
-				logger.warn("邮件发送失败：{}", e.getMessage());
+			if (log.isWarnEnabled())
+				log.warn("邮件发送失败：" + e.getMessage());
 		}
-		if (logger.isDebugEnabled())
-			logger.debug("邮件发送完成");
+		if (log.isDebugEnabled())
+			log.debug("邮件发送完成");
 	}
 
 }

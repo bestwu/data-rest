@@ -1,9 +1,5 @@
-/gradle
 /.gradle
-/gradlew.bat
-/gradlew
 .idea
-*.iml
 build
 /repo
 /out

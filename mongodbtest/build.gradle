@@ -1,10 +1,10 @@
 dependencies {
     compile project(':data-rest')
     compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    compile 'com.mysema.querydsl:querydsl-mongodb'
+    compile 'com.querydsl:querydsl-mongodb'
     compile 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
 
-    testCompile 'com.mysema.querydsl:querydsl-apt'
+    testCompile 'com.querydsl:querydsl-apt'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
 

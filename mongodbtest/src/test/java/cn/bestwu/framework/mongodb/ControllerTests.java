@@ -5,9 +5,8 @@ import cn.bestwu.framework.support.client.CustomRestTemplate;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.context.web.LocalServerPort;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -24,10 +23,9 @@ import java.util.Map;
  * @author Peter Wu
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = MongoDbRepositoryConfig.class)
-@WebIntegrationTest(value = "server.context-path=/tv", randomPort = true)
+@SpringBootTest(classes = MongoDbRepositoryConfig.class,value = "server.context-path=/tv", webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ControllerTests {
-	@Value("${local.server.port}")
+	@LocalServerPort
 	private int port;
 
 	protected String getBaseUrl() {

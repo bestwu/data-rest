@@ -5,8 +5,7 @@ import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.util.StringUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -44,9 +43,8 @@ import java.util.Map;
  *
  * @author Peter Wu
  */
+@Slf4j
 public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolver {
-
-	private final Logger logger = LoggerFactory.getLogger(ModelMethodArgumentResolver.class);
 
 	private final List<AbstractJackson2HttpMessageConverter> messageConverters;
 	private final RepositoryInvokerFactory invokerFactory;
@@ -67,8 +65,8 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 		Class<?> modelType = parameter.getParameterType();
 		Object model = resolveModel(parameter, mavContainer, webRequest, binderFactory, modelType);
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("请求实体：{}", StringUtil.valueOf(model));
+		if (log.isDebugEnabled()) {
+			log.debug("请求实体：" + StringUtil.valueOf(model));
 		}
 
 		return model;

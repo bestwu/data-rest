@@ -1,14 +1,13 @@
 package cn.bestwu.framework.data.query.jpa;
 
 import cn.bestwu.framework.data.query.ResultHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.ReflectionUtils;
 
@@ -18,9 +17,9 @@ import java.util.List;
 /**
  * 处理搜索结果的函数接口
  */
+@Slf4j
 public class HighlightResultHandler implements ResultHandler {
 
-	private Logger logger = LoggerFactory.getLogger(HighlightResultHandler.class);
 	private Query query;
 	private Analyzer analyzer;
 	private Class<?> modelType;
@@ -81,7 +80,7 @@ public class HighlightResultHandler implements ResultHandler {
 					}
 				} catch (Exception e) {
 					//不处理，只记录日志
-					logger.error("高亮显示关键字失败", e);
+					log.error("高亮显示关键字失败", e);
 				}
 
 			}

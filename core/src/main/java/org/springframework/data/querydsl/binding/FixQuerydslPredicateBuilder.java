@@ -1,14 +1,13 @@
 package org.springframework.data.querydsl.binding;
 
-import com.mysema.query.BooleanBuilder;
-import com.mysema.query.types.Path;
-import com.mysema.query.types.Predicate;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.Property;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.data.mapping.PropertyPath;
-import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.data.querydsl.EntityPathResolver;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.util.Assert;
@@ -32,6 +31,13 @@ public class FixQuerydslPredicateBuilder {
 	private final Map<PropertyPath, Path<?>> paths;
 	private final EntityPathResolver resolver;
 
+	/**
+	 * Creates a new {@link QuerydslPredicateBuilder} for the given {@link ConversionService} and
+	 * {@link EntityPathResolver}.
+	 *
+	 * @param conversionService must not be {@literal null}.
+	 * @param resolver          can be {@literal null}.
+	 */
 	public FixQuerydslPredicateBuilder(ConversionService conversionService, EntityPathResolver resolver) {
 
 		Assert.notNull(conversionService, "ConversionService must not be null!");
@@ -68,22 +74,23 @@ public class FixQuerydslPredicateBuilder {
 				continue;
 			}
 
-			try {
+			String path = entry.getKey();
 
-				PropertyPath propertyPath = PropertyPath.from(entry.getKey(), type);
+			if (!bindings.isPathVisible(path, type.getType())) {
+				continue;
+			}
 
-				if (bindings.isPathVisible(propertyPath)) {
+			PropertyPath propertyPath = bindings.getPropertyPath(path, type);
 
-					Collection<Object> value = convertToPropertyPathSpecificType(entry.getValue(), propertyPath);
+			if (propertyPath == null) {
+				continue;
+			}
 
-					Predicate predicate = invokeBinding(propertyPath, bindings, value);
+			Collection<Object> value = convertToPropertyPathSpecificType(entry.getValue(), propertyPath);
+			Predicate predicate = invokeBinding(propertyPath, bindings, value);
 
-					if (predicate != null) {
-						builder.and(predicate);
-					}
-				}
-			} catch (PropertyReferenceException o_O) {
-				// not a property of the domain object, continue
+			if (predicate != null) {
+				builder.and(predicate);
 			}
 		}
 
@@ -153,9 +160,6 @@ public class FixQuerydslPredicateBuilder {
 		Path<?> entityPath = base != null ? base : resolver.createPath(path.getOwningType().getType());
 
 		Field field = ReflectionUtils.findField(entityPath.getClass(), path.getSegment());
-		if (field == null) {
-			return null;
-		}
 		Object value = ReflectionUtils.getField(field, entityPath);
 
 		if (path.hasNext()) {

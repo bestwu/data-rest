@@ -7,8 +7,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
@@ -23,9 +22,9 @@ import java.util.Locale;
  *
  * @author Peter Wu
  */
+@Slf4j
 public class StringUtil {
 
-	private static Logger logger = LoggerFactory.getLogger(StringUtil.class);
 	private static ObjectMapper objectMapper = new ObjectMapper();
 
 	static {
@@ -125,7 +124,7 @@ public class StringUtil {
 					objectMapper.disable(SerializationFeature.INDENT_OUTPUT);
 				return string;
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 			}
 		}
 		return String.valueOf(object);

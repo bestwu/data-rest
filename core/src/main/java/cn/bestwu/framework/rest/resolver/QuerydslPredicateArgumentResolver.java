@@ -3,7 +3,7 @@ package cn.bestwu.framework.rest.resolver;
 import cn.bestwu.framework.event.AddPredicateEvent;
 import cn.bestwu.framework.event.DefaultPredicateEvent;
 import cn.bestwu.framework.rest.support.Resource;
-import com.mysema.query.types.Predicate;
+import com.querydsl.core.types.Predicate;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.querydsl.binding.*;
@@ -64,7 +64,9 @@ public class QuerydslPredicateArgumentResolver implements HandlerMethodArgumentR
 		QuerydslPredicate annotation = parameter.getParameterAnnotation(QuerydslPredicate.class);
 		TypeInformation<?> typeInformation = extractTypeInfo(parameter).getActualType();
 
-		Class<? extends QuerydslBinderCustomizer> customizer = annotation == null ? null : annotation.bindings();
+		@SuppressWarnings("unchecked")
+		Class<? extends QuerydslBinderCustomizer<?>> customizer = (Class<? extends QuerydslBinderCustomizer<?>>) (annotation == null
+				? null : annotation.bindings());
 		QuerydslBindings bindings = bindingsFactory.createBindingsFor(customizer, typeInformation);
 
 		Class<?> modelType = typeInformation.getType();

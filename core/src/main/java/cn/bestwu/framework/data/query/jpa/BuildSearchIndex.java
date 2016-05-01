@@ -1,18 +1,17 @@
 package cn.bestwu.framework.data.query.jpa;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+@Slf4j
 public class BuildSearchIndex implements ApplicationListener<ContextRefreshedEvent> {
 
-	private Logger logger = LoggerFactory.getLogger(BuildSearchIndex.class);
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -24,7 +23,7 @@ public class BuildSearchIndex implements ApplicationListener<ContextRefreshedEve
 				fullTextEntityManager.createIndexer().startAndWait();
 			}
 		} catch (Exception e) {
-			logger.error("An error occurred trying to build the serach index: ", e);
+			log.error("An error occurred trying to build the serach index: ", e);
 		}
 	}
 }

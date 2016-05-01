@@ -2,6 +2,7 @@ package cn.bestwu.framework.rest.support;
 
 import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.web.ErrorAttributes;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -32,6 +33,7 @@ import java.util.*;
  *
  * @author Peter Wu
  */
+@Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class BaseErrorAttributes extends BaseController implements ErrorAttributes, HandlerExceptionResolver,
 		Ordered {
@@ -49,8 +51,8 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 
 		Throwable e = getError(requestAttributes);
 
-		if (logger.isDebugEnabled() && e != null) {
-			logger.debug(e.getMessage(), e);
+		if (log.isDebugEnabled() && e != null) {
+			log.debug(e.getMessage(), e);
 		}
 
 		Map<String, Object> errorAttributes = new LinkedHashMap<>();
@@ -58,8 +60,8 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 		if (e != null) {
 			message = e.getMessage();
 
-			if (logger.isDebugEnabled()) {
-				logger.debug(message);
+			if (log.isDebugEnabled()) {
+				log.debug(message);
 			}
 
 			if (includeStackTrace) {
@@ -126,7 +128,7 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 						message = getText("data.valid.failed");
 					}
 				} else {
-					logger.error(message, e);
+					log.error(message, e);
 				}
 			} else if (e instanceof DataIntegrityViolationException) {
 				String specificCauseMessage = ((DataIntegrityViolationException) e).getMostSpecificCause().getMessage();
@@ -170,7 +172,7 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 		if (httpStatusCode == null) {
 			httpStatusCode = getStatus(requestAttributes).value();
 			if (httpStatusCode != 403 && httpStatusCode != 401 && httpStatusCode != 404) {
-				logger.error(httpStatusCode + ":" + message, e);
+				log.error(httpStatusCode + ":" + message, e);
 			}
 		}
 		statusCode = statusCode == null ? String.valueOf(httpStatusCode) : statusCode;

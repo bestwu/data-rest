@@ -12,8 +12,7 @@ import cn.bestwu.framework.rest.resolver.*;
 import cn.bestwu.framework.rest.support.*;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.HibernateValidator;
 import org.springframework.aop.SpringProxy;
 import org.springframework.beans.factory.BeanFactory;
@@ -162,9 +161,8 @@ public class RestMvcConfiguration {
 	@ConditionalOnWebApplication
 	@Import(EnableWebMvcConfiguration.class)
 	@EnableConfigurationProperties({ WebMvcProperties.class, ResourceProperties.class })
+	@Slf4j
 	protected static class WebMvcAutoConfigurationAdapter extends WebMvcConfigurerAdapter {
-
-		private static final Log logger = LogFactory.getLog(WebMvcConfigurerAdapter.class);
 
 		@Autowired(required = false)
 		private ResourceProperties resourceProperties = new ResourceProperties();
@@ -274,7 +272,7 @@ public class RestMvcConfiguration {
 		//		@Override
 		//		public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		//			if (!this.resourceProperties.isAddMappings()) {
-		//				logger.debug("Default resource handling disabled");
+		//				log.debug("Default resource handling disabled");
 		//				return;
 		//			}
 		//			Integer cachePeriod = this.resourceProperties.getCachePeriod();
@@ -330,7 +328,7 @@ public class RestMvcConfiguration {
 		public void addViewControllers(ViewControllerRegistry registry) {
 			Resource page = this.resourceProperties.getWelcomePage();
 			if (page != null) {
-				logger.info("Adding welcome page: " + page);
+				log.info("Adding welcome page: " + page);
 				registry.addViewController("/").setViewName("forward:index.html");
 			}
 		}

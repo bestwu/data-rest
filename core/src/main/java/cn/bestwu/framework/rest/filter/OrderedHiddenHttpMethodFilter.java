@@ -19,7 +19,9 @@ import java.util.Locale;
  *
  * @author Peter Wu
  */
-public class OrderedHiddenHttpMethodFilter extends OncePerRequestFilter implements Ordered {
+public class OrderedHiddenHttpMethodFilter extends OncePerRequestFilter
+		implements Ordered {
+
 	/**
 	 * The default order is high to ensure the filter is applied before Spring Security.
 	 */
@@ -27,6 +29,23 @@ public class OrderedHiddenHttpMethodFilter extends OncePerRequestFilter implemen
 			- 10000;
 
 	private int order = DEFAULT_ORDER;
+
+	/**
+	 * Default method parameter: {@code _method}
+	 */
+	public static final String DEFAULT_METHOD_PARAM = "_method";
+
+	private String methodParam = DEFAULT_METHOD_PARAM;
+
+	/**
+	 * Set the parameter name to look for HTTP methods.
+	 *
+	 * @see #DEFAULT_METHOD_PARAM
+	 */
+	public void setMethodParam(String methodParam) {
+		Assert.hasText(methodParam, "'methodParam' must not be empty");
+		this.methodParam = methodParam;
+	}
 
 	@Override
 	public int getOrder() {
@@ -40,22 +59,6 @@ public class OrderedHiddenHttpMethodFilter extends OncePerRequestFilter implemen
 	 */
 	public void setOrder(int order) {
 		this.order = order;
-	}
-
-	/**
-	 * Default method parameter: {@code _method}
-	 */
-	public static final String DEFAULT_METHOD_PARAM = "_method";
-
-	private String methodParam = DEFAULT_METHOD_PARAM;
-
-	/*
-	 * Set the parameter name to look for HTTP methods.
-	 *
-	 */
-	public void setMethodParam(String methodParam) {
-		Assert.hasText(methodParam, "'methodParam' must not be empty");
-		this.methodParam = methodParam;
 	}
 
 	@Override
@@ -78,17 +81,11 @@ public class OrderedHiddenHttpMethodFilter extends OncePerRequestFilter implemen
 		}
 	}
 
-	/**
-	 * Simple {@link HttpServletRequest} wrapper that returns the supplied
-	 * method for {@link HttpServletRequest#getMethod()}.
-	 */
-	private static class HttpMethodRequestWrapper extends
-			HttpServletRequestWrapper {
+	private static class HttpMethodRequestWrapper extends HttpServletRequestWrapper {
 
 		private final String method;
 
-		public HttpMethodRequestWrapper(HttpServletRequest request,
-				String method) {
+		public HttpMethodRequestWrapper(HttpServletRequest request, String method) {
 			super(request);
 			this.method = method;
 		}
@@ -98,5 +95,5 @@ public class OrderedHiddenHttpMethodFilter extends OncePerRequestFilter implemen
 			return this.method;
 		}
 	}
-
 }
+

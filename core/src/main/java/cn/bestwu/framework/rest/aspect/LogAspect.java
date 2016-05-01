@@ -6,11 +6,10 @@ import cn.bestwu.framework.rest.support.RequestJsonViewResponseBodyAdvice;
 import cn.bestwu.framework.rest.support.Resource;
 import cn.bestwu.framework.util.ResourceUtil;
 import cn.bestwu.framework.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
@@ -21,8 +20,8 @@ import javax.servlet.RequestDispatcher;
 import java.util.Map;
 
 @Aspect
+@Slf4j
 public class LogAspect extends BaseController {
-	private final Logger logger = LoggerFactory.getLogger(LogAspect.class);
 	private final String PUT_PARAMETER_MAP = "PUT_PARAMETER_MAP";
 	private final String PRINCIPAL_NAME = "PRINCIPAL_NAME";
 
@@ -50,14 +49,14 @@ public class LogAspect extends BaseController {
 
 	@AfterReturning(value = "@annotation(org.springframework.web.bind.annotation.RequestMapping)", returning = "result")
 	public void log(Object result) {
-		if (logger.isInfoEnabled()) {
+		if (log.isInfoEnabled()) {
 			// request信息
 			String ipAddress = request.getRemoteAddr();
 			Object servletPath = request.getAttribute(RequestDispatcher.FORWARD_SERVLET_PATH);
 			if (servletPath == null) {
 				servletPath = request.getServletPath();
 			}
-			Object principalName = request.getAttribute(PRINCIPAL_NAME);
+			String principalName = (String) request.getAttribute(PRINCIPAL_NAME);
 			if (principalName == null) {
 				Resource<String> source = new Resource<>();
 				publisher.publishEvent(new PrincipalNamePutEvent(source));
@@ -77,8 +76,8 @@ public class LogAspect extends BaseController {
 					}
 				}
 			} catch (Exception e) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("获取请求参数出错", e);
+				if (log.isDebugEnabled()) {
+					log.debug("获取请求参数出错", e);
 				}
 				parameterMap = null;
 			}
@@ -87,7 +86,7 @@ public class LogAspect extends BaseController {
 			HttpHeaders headers = servletServerHttpRequest.getHeaders();
 			String MSG_CODE = "{} 的 [{}] {} {} \nrequest headers:\n{} \nrequest parameters:\n{} \nresponse:\n{}";
 
-			if (logger.isDebugEnabled()) {
+			if (log.isDebugEnabled()) {
 				String requestSignature = ResourceUtil.getRequestSignature(request);
 				String resultStr;
 				if ("get_logs_index".equals(requestSignature)) {
@@ -100,11 +99,11 @@ public class LogAspect extends BaseController {
 					}
 					resultStr = StringUtil.valueOf(result, true);
 				}
-				logger.info(MSG_CODE, ipAddress, principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName, requestMethod,
+				log.info(MSG_CODE, ipAddress, principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName, requestMethod,
 						servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true),
 						resultStr);
 			} else
-				logger.info(MSG_CODE, ipAddress, principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName, requestMethod,
+				log.info(MSG_CODE, ipAddress, principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName, requestMethod,
 						servletPath, StringUtil.valueOf(headers, true), StringUtil.subString(StringUtil.valueOf(parameterMap), 100),
 						StringUtil.subString(String.valueOf(result), 100));
 		}

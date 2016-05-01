@@ -6,8 +6,6 @@ import cn.bestwu.framework.rest.support.Response;
 import cn.bestwu.framework.util.ParameterUtil;
 import cn.bestwu.framework.util.ResourceUtil;
 import cn.bestwu.framework.util.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +32,6 @@ import java.util.function.Consumer;
  */
 public abstract class BaseController extends Response {
 
-	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 	/**
 	 * 基本实体名
 	 */
