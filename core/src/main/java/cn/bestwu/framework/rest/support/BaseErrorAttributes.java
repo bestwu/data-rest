@@ -155,6 +155,8 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 				httpStatusCode = HttpStatus.BAD_REQUEST.value();
 			} else if (e instanceof org.springframework.data.mapping.PropertyReferenceException) {
 				httpStatusCode = HttpStatus.BAD_REQUEST.value();
+			} else if (e instanceof org.springframework.security.oauth2.common.exceptions.InvalidRequestException) {
+				httpStatusCode = HttpStatus.BAD_REQUEST.value();
 			} else {
 				handlerException(e, errorAttributes, errors);
 				statusCode = (String) errorAttributes.get(KEY_STATUS);
