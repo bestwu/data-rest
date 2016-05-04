@@ -25,6 +25,7 @@ dependencies {
     provided "org.projectlombok:lombok"
 
     //optional
+    optional 'cn.bestwu:api-sign:1.0-SNAPSHOT'
     optional 'org.springframework.security.oauth:spring-security-oauth2'
     optional 'org.apache.logging.log4j:log4j-core'
     optional 'org.springframework.boot:spring-boot-starter-aop'

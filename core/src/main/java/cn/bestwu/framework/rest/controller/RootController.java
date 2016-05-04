@@ -1,6 +1,7 @@
 
 package cn.bestwu.framework.rest.controller;
 
+import cn.bestwu.api.sign.ApiSign;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.util.CaptchaUtil;
 import cn.bestwu.framework.util.PinyinUtil;
@@ -39,6 +40,7 @@ public class RootController extends BaseController {
 	/*
 	 * 拼音
 	 */
+	@ApiSign
 	@RequestMapping(value = "/utils/pinyin", method = RequestMethod.GET)
 	public Object pinyin(String[] word) {
 		Assert.notEmpty(word, getText("param.notnull", "word"));

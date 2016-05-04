@@ -1,5 +1,6 @@
 package cn.bestwu.framework.rest.controller;
 
+import cn.bestwu.api.sign.ApiSign;
 import cn.bestwu.framework.data.query.ResultHandler;
 import cn.bestwu.framework.data.query.SearchRepository;
 import cn.bestwu.framework.data.query.jpa.HighlightResultHandler;
@@ -20,6 +21,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+@ApiSign
 @RepositoryRestController
 @ConditionalOnBean(SearchRepository.class)
 @RequestMapping(value = BaseController.BASE_URI) public class RepositorySearchController extends BaseController {

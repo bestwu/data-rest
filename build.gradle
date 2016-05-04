@@ -31,6 +31,7 @@ subprojects {
     [compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:none', '-Xlint:unchecked']
 
     repositories {
+        mavenLocal()
         try {
             maven { url mavenLocalUrl }
         } catch (ignored) {
@@ -47,7 +48,7 @@ subprojects {
 //            dependency("org.springframework.boot:spring-boot-starter:$springBootVersion") {
 //                exclude 'org.springframework.boot:spring-boot-starter-logging'
 //            }
-            
+
             dependency 'com.querydsl:querydsl-apt:4.1.0'
             dependency 'com.querydsl:querydsl-jpa:4.1.0'
             dependency 'com.querydsl:querydsl-mongodb:4.1.0'

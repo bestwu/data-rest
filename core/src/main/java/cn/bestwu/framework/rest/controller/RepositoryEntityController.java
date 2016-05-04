@@ -1,5 +1,6 @@
 package cn.bestwu.framework.rest.controller;
 
+import cn.bestwu.api.sign.ApiSign;
 import cn.bestwu.framework.event.*;
 import cn.bestwu.framework.rest.annotation.RepositoryRestController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
@@ -33,6 +34,7 @@ import java.util.*;
  * Entity 模型 基本控制类
  * 对应资源的CRUD操作API
  */
+@ApiSign
 @RepositoryRestController
 @RequestMapping(value = BaseController.BASE_URI) public class RepositoryEntityController extends BaseController {
 
