@@ -1,6 +1,5 @@
 package cn.bestwu.framework.rest.aspect;
 
-import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.support.PrincipalNamePutEvent;
 import cn.bestwu.framework.rest.support.RequestJsonViewResponseBodyAdvice;
 import cn.bestwu.framework.rest.support.Resource;
@@ -17,15 +16,19 @@ import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.http.server.ServletServerHttpRequest;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @Aspect
 @Slf4j
-public class LogAspect extends BaseController {
+public class LogAspect {
 	private final String PUT_PARAMETER_MAP = "PUT_PARAMETER_MAP";
 	private final String PRINCIPAL_NAME = "PRINCIPAL_NAME";
 
 	protected ApplicationEventPublisher publisher;
+
+	@Autowired(required = false)
+	protected HttpServletRequest request;
 
 	public LogAspect(ApplicationEventPublisher publisher) {
 		this.publisher = publisher;
