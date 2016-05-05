@@ -37,6 +37,7 @@ subprojects {
         } catch (ignored) {
             mavenLocal()
         }
+        maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
         jcenter()
     }
 
