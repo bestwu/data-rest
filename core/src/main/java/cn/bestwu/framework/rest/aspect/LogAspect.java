@@ -50,6 +50,7 @@ public class LogAspect {
 	@Autowired(required = false)
 	private RequestJsonViewResponseBodyAdvice requestJsonViewResponseBodyAdvice;
 
+	@SuppressWarnings("unchecked")
 	@AfterReturning(value = "@annotation(org.springframework.web.bind.annotation.RequestMapping)", returning = "result")
 	public void log(Object result) {
 		if (log.isInfoEnabled()) {
@@ -67,16 +68,13 @@ public class LogAspect {
 			}
 
 			String requestMethod = request.getMethod();
-			Map<String, String[]> parameterMap;
+			Map<String, String[]> parameterMap = null;
 			try {
-				parameterMap = request.getParameterMap();
-
 				if ("PUT".equals(requestMethod)) {
-					@SuppressWarnings("unchecked")
-					Map<String, String[]> putParameterMap = (Map<String, String[]>) request.getAttribute(PUT_PARAMETER_MAP);
-					if (putParameterMap != null) {
-						parameterMap.putAll(putParameterMap);
-					}
+					parameterMap = (Map<String, String[]>) request.getAttribute(PUT_PARAMETER_MAP);
+				}
+				if (parameterMap == null) {
+					parameterMap = request.getParameterMap();
 				}
 			} catch (Exception e) {
 				if (log.isDebugEnabled()) {
