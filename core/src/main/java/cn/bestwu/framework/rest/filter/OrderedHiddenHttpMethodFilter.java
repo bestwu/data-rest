@@ -40,6 +40,7 @@ public class OrderedHiddenHttpMethodFilter extends OncePerRequestFilter
 	/**
 	 * Set the parameter name to look for HTTP methods.
 	 *
+	 * @param methodParam methodParam
 	 * @see #DEFAULT_METHOD_PARAM
 	 */
 	public void setMethodParam(String methodParam) {
