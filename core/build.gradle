@@ -1,10 +1,5 @@
 buildscript {
     repositories {
-        try {
-            maven { url mavenLocalUrl }
-        } catch (ignored) {
-            mavenLocal()
-        }
         jcenter()
         maven { url 'http://repo.spring.io/plugins-release/' }
     }

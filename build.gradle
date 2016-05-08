@@ -1,10 +1,5 @@
 buildscript {
     repositories {
-        try {
-            maven { url mavenLocalUrl }
-        } catch (ignored) {
-            mavenLocal()
-        }
         jcenter()
         maven { url 'http://repo.spring.io/plugins-release/' }
     }
@@ -31,14 +26,8 @@ subprojects {
     [compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:none', '-Xlint:unchecked']
 
     repositories {
-        mavenLocal()
-        try {
-            maven { url mavenLocalUrl }
-        } catch (ignored) {
-            mavenLocal()
-        }
-        maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
         jcenter()
+        maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
     }
 
     dependencyManagement {
