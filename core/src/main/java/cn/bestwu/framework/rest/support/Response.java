@@ -2,6 +2,7 @@ package cn.bestwu.framework.rest.support;
 
 import cn.bestwu.framework.data.annotation.DisableSelfRel;
 import cn.bestwu.framework.event.AddLinkEvent;
+import cn.bestwu.framework.event.ResultHandleEvent;
 import cn.bestwu.framework.event.SelfRelEvent;
 import cn.bestwu.framework.rest.controller.RepositoryEntityController;
 import cn.bestwu.framework.util.ResourceUtil;
@@ -109,6 +110,7 @@ public class Response {
 	 */
 	protected ResponseEntity created(PersistentEntityResource<?> entityResource) {
 		addLink(entityResource);
+		publisher.publishEvent(new ResultHandleEvent(entityResource.getContent()));
 		if (supportClientCache)
 			return ResponseEntity.created(URI.create(entityResource.getLinks().get(Link.REL_SELF))).headers(prepareHeaders(entityResource.getEntity(), entityResource.getContent()))
 					.body(entityResource);
@@ -124,6 +126,7 @@ public class Response {
 	 */
 	protected ResponseEntity updated(PersistentEntityResource<?> entityResource) {
 		addLink(entityResource);
+		publisher.publishEvent(new ResultHandleEvent(entityResource.getContent()));
 		if (supportClientCache)
 			return ResponseEntity.ok().location(URI.create(entityResource.getLinks().get(Link.REL_SELF))).headers(prepareHeaders(entityResource.getEntity(), entityResource.getContent()))
 					.body(entityResource);
@@ -183,6 +186,7 @@ public class Response {
 					return bodyBuilder.body(persistentEntityResource.map(newContent));
 				}
 			} else {
+				publisher.publishEvent(new ResultHandleEvent(source));
 				if (supportClientCache)
 					return ResponseEntity.ok().headers(prepareHeaders(persistentEntity, source)).body(resource);
 				else
@@ -300,6 +304,7 @@ public class Response {
 					resource.add(link);
 				}
 			}
+			publisher.publishEvent(new ResultHandleEvent(source));
 			publisher.publishEvent(new AddLinkEvent(source, resource));
 			return resource;
 		}
