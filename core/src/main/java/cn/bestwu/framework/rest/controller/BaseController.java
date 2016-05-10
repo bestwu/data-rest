@@ -119,7 +119,7 @@ public abstract class BaseController extends Response {
 		return pageable;
 	}
 
-	protected boolean equalsVersion(String version) {
+	protected boolean versionEquals(String version) {
 		return ResourceUtil.equalsVersion(request, version);
 	}
 
