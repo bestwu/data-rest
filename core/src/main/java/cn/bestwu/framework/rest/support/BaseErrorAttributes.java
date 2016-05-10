@@ -157,14 +157,17 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 				httpStatusCode = HttpStatus.BAD_REQUEST.value();
 			} else if (e instanceof org.springframework.security.oauth2.common.exceptions.InvalidRequestException) {
 				httpStatusCode = HttpStatus.BAD_REQUEST.value();
-			} else {
-				handlerException(e, errorAttributes, errors);
+			}
+			handlerException(e, errorAttributes, errors);
+			if (errorAttributes.containsKey(KEY_STATUS)) {
 				statusCode = (String) errorAttributes.get(KEY_STATUS);
+			}
+			if (errorAttributes.containsKey(KEY_HTTP_STATUS_CODE)) {
 				httpStatusCode = (Integer) errorAttributes.get(KEY_HTTP_STATUS_CODE);
 				errorAttributes.remove(KEY_HTTP_STATUS_CODE);
-				Object handedMessage = errorAttributes.get(KEY_MESSAGE);
-				message = handedMessage == null ? message : (String) handedMessage;
 			}
+			if (errorAttributes.containsKey(KEY_MESSAGE))
+				message = (String) errorAttributes.get(KEY_MESSAGE);
 		} else {
 			message = getAttribute(requestAttributes, "javax.servlet.error.message");
 		}
@@ -173,7 +176,7 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 
 		if (httpStatusCode == null) {
 			httpStatusCode = getStatus(requestAttributes).value();
-			if (httpStatusCode != 403 && httpStatusCode != 401 && httpStatusCode != 404) {
+			if (httpStatusCode != 400 && httpStatusCode != 401 && httpStatusCode != 403 && httpStatusCode != 404) {
 				log.error(httpStatusCode + ":" + message, e);
 			}
 		}
