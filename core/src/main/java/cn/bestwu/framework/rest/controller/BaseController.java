@@ -123,6 +123,11 @@ public abstract class BaseController extends Response {
 		return ResourceUtil.equalsVersion(request, version);
 	}
 
+	protected boolean versionEndsWith(String suffix) {
+		String requestVersion = ResourceUtil.getRequestVersion(request);
+		return requestVersion != null && (requestVersion.endsWith(suffix.toLowerCase()) || requestVersion.endsWith(suffix.toUpperCase()));
+	}
+
 	protected Object getOldModel() {
 		String oldModel = ModelMethodArgumentResolver.OLD_MODEL;
 		return request.getAttribute(oldModel);
