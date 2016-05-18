@@ -1,6 +1,6 @@
 package cn.bestwu.framework.rest.filter;
 
-import org.springframework.boot.context.embedded.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
@@ -53,6 +53,7 @@ public class OrderedHttpPutFormContentFilter extends OncePerRequestFilter implem
 
 	/**
 	 * The default character set to use for reading form data.
+	 *
 	 * @param charset charset
 	 */
 	public void setCharset(Charset charset) {

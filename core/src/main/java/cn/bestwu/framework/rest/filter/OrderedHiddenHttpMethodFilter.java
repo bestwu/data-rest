@@ -1,6 +1,5 @@
 package cn.bestwu.framework.rest.filter;
 
-import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.core.Ordered;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -25,7 +24,7 @@ public class OrderedHiddenHttpMethodFilter extends OncePerRequestFilter
 	/**
 	 * The default order is high to ensure the filter is applied before Spring Security.
 	 */
-	public static final int DEFAULT_ORDER = FilterRegistrationBean.REQUEST_WRAPPER_FILTER_MAX_ORDER
+	public static final int DEFAULT_ORDER = org.springframework.boot.web.servlet.FilterRegistrationBean.REQUEST_WRAPPER_FILTER_MAX_ORDER
 			- 10000;
 
 	private int order = DEFAULT_ORDER;
@@ -82,6 +81,10 @@ public class OrderedHiddenHttpMethodFilter extends OncePerRequestFilter
 		}
 	}
 
+	/**
+	 * Simple {@link HttpServletRequest} wrapper that returns the supplied method for
+	 * {@link HttpServletRequest#getMethod()}.
+	 */
 	private static class HttpMethodRequestWrapper extends HttpServletRequestWrapper {
 
 		private final String method;
