@@ -74,7 +74,7 @@ public class Response {
 		return cacheControl(headers);
 	}
 
-	protected static HttpHeaders noCache() {
+	public static HttpHeaders noCache() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setCacheControl("no-cache, no-store, max-age=0, must-revalidate");
 		headers.setPragma("no-cache");
@@ -82,7 +82,7 @@ public class Response {
 		return headers;
 	}
 
-	protected static HttpHeaders cacheControl(HttpHeaders headers) {
+	public static HttpHeaders cacheControl(HttpHeaders headers) {
 		if (headers == null) {
 			headers = new HttpHeaders();
 		}
