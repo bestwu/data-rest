@@ -147,7 +147,11 @@ public final class HtmlLayout extends AbstractStringLayout {
 		}
 
 		sbuf.append("<td title=\"Message\">");
-		sbuf.append(Transform.escapeHtmlTags(event.getMessage().getFormattedMessage()).replaceAll(REGEXP, "<br />"));
+		String htmlTags = Transform.escapeHtmlTags(event.getMessage().getFormattedMessage());
+		if (htmlTags == null) {
+			htmlTags = "";
+		}
+		sbuf.append(htmlTags.replaceAll(REGEXP, "<br />"));
 		sbuf.append("</td>").append(Constants.LINE_SEPARATOR);
 		sbuf.append("</tr>").append(Constants.LINE_SEPARATOR);
 
