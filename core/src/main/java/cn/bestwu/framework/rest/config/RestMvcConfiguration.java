@@ -349,6 +349,7 @@ public class RestMvcConfiguration {
 		private ApplicationContext applicationContext;
 
 		@Bean
+		@ConditionalOnMissingBean(Repositories.class)
 		public Repositories repositories() {
 			return new Repositories(applicationContext);
 		}

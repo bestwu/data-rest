@@ -43,6 +43,12 @@ public class DataRestConfiguration {
 	private ApplicationContext applicationContext;
 
 	@Bean
+	@ConditionalOnMissingBean(Repositories.class)
+	public Repositories repositories() {
+		return new Repositories(applicationContext);
+	}
+
+	@Bean
 	public PersistentEntities persistentEntities() {
 
 		List<MappingContext<?, ?>> arrayList = new ArrayList<>();
