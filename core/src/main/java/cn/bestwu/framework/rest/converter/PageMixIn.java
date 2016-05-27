@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import java.util.List;
 
-@com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "last", "first", "numberOfElements" })
+@com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "last", "first", "numberOfElements", "sort" })
 public interface PageMixIn<T> {
 
 	@JsonView(Object.class) long getTotalElements();
