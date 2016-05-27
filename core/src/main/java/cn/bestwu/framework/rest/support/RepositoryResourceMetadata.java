@@ -1,5 +1,6 @@
 package cn.bestwu.framework.rest.support;
 
+import cn.bestwu.framework.data.annotation.DisableSelfRel;
 import cn.bestwu.framework.data.annotation.EnableAllDataInOnePage;
 import cn.bestwu.framework.data.annotation.RepositoryRestResource;
 import cn.bestwu.framework.data.annotation.SearchResource;
@@ -96,7 +97,7 @@ public class RepositoryResourceMetadata {
 			//ResourceType.ITEM
 			Set<HttpMethod> itemMethods = new HashSet<>();
 
-			if (exposesMethod(findOneMethod, HttpMethod.GET)) {
+			if (exposesMethod(findOneMethod, HttpMethod.GET) && !entity.getType().isAnnotationPresent(DisableSelfRel.class)) {
 				itemMethods.add(HttpMethod.HEAD);
 				itemMethods.add(HttpMethod.GET);
 			}
