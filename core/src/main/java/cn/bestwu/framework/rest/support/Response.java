@@ -21,6 +21,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
+import org.springframework.util.ClassUtils;
 
 import java.net.URI;
 import java.util.*;
@@ -214,6 +215,15 @@ public class Response {
 			}
 			publisher.publishEvent(new AddLinkEvent(content, resource));
 		}
+	}
+
+	protected Link getEntitySelfLink(Object content) {
+		Class<?> sourceClass = content.getClass();
+		if (ClassUtils.isCglibProxy(content)) {
+			sourceClass = sourceClass.getSuperclass();
+		}
+		PersistentEntity<?, ?> persistentEntity = getPersistentEntity(sourceClass);
+		return getBaseLinkBuilder(ResourceUtil.getRepositoryBasePathName(persistentEntity.getType())).slash(getId(persistentEntity, content)).withSelfRel();
 	}
 
 	/**
