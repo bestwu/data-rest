@@ -2,8 +2,8 @@ dependencies {
     compile project(':data-rest')
     compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
     compile 'com.querydsl:querydsl-mongodb'
-    compile 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
 
+    testCompile 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
     testCompile 'com.querydsl:querydsl-apt'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }

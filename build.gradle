@@ -2,6 +2,7 @@ buildscript {
     repositories {
         jcenter()
         maven { url 'http://repo.spring.io/plugins-release/' }
+        maven { url 'https://repo.spring.io/libs-snapshot' }
     }
     dependencies {
         classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
@@ -28,6 +29,7 @@ subprojects {
     repositories {
         jcenter()
         maven { url "http://oss.jfrog.org/oss-snapshot-local/" }
+        maven { url 'https://repo.spring.io/libs-snapshot' }
     }
 
     dependencyManagement {
