@@ -112,7 +112,7 @@ public abstract class BaseController extends Response {
 			List<Sort.Order> orders = new ArrayList<>();
 			publisher.publishEvent(new DefaultSortEvent(orders, modelType));
 			if (orders.isEmpty()) {
-				orders.add(new Sort.Order(Sort.Direction.DESC, "id"));
+				orders.add(new Sort.Order(Sort.Direction.DESC, getPersistentEntity(modelType).getIdProperty().getName()));
 			}
 			pageable = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), new Sort(orders));
 		}
