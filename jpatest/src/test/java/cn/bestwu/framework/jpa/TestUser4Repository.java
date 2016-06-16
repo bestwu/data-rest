@@ -7,7 +7,6 @@ import org.springframework.http.HttpMethod;
 /**
  * @author Peter Wu
  */
-@RepositoryRestResource(contained = true)
 public interface TestUser4Repository extends QCrudRepository<TestUser4, Long> {
 
 	@RepositoryRestResource(HttpMethod.PUT)

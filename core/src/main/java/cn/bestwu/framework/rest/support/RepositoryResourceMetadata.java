@@ -28,7 +28,7 @@ public class RepositoryResourceMetadata {
 	/**
 	 * this resource is exported
 	 */
-	private boolean exported;
+	private boolean exported = true;
 	private String pathName;
 
 	private PersistentEntity<?, ?> entity;
@@ -64,10 +64,10 @@ public class RepositoryResourceMetadata {
 		RepositoryRestResource annotation = repositoryInterface.getAnnotation(RepositoryRestResource.class);
 		if (annotation != null) {
 			exported = annotation.exported();
-			contained = annotation.contained();
 		} else {
-			exported = false;
+			contained = true;
 		}
+
 		pathName = ResourceUtil.getRepositoryBasePathName(entity.getType());
 
 		if (exported) {
@@ -111,6 +111,10 @@ public class RepositoryResourceMetadata {
 			supportedHttpMethods.put(ResourceType.ITEM, Collections.unmodifiableSet(itemMethods));
 
 			this.supportedHttpMethods = Collections.unmodifiableMap(supportedHttpMethods);
+
+			if (this.supportedHttpMethods.size() == 0) {
+				this.exported = false;
+			}
 		}
 	}
 

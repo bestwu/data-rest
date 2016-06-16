@@ -19,11 +19,6 @@ public @interface RepositoryRestResource {
 	boolean exported() default true;
 
 	/**
-	 * @return 是否以包含方式使用此注解
-	 */
-	boolean contained() default false;
-
-	/**
 	 * {}表示支持注解的方法可映射的所有方法
 	 *
 	 * @return supportedHttpMethods
