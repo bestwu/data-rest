@@ -1,5 +1,7 @@
 package cn.bestwu.framework.rest.aspect;
 
+import cn.bestwu.framework.event.LogEvent;
+import cn.bestwu.framework.rest.support.Log;
 import cn.bestwu.framework.rest.support.PrincipalNamePutEvent;
 import cn.bestwu.framework.rest.support.RequestJsonViewResponseBodyAdvice;
 import cn.bestwu.framework.rest.support.Resource;
@@ -56,7 +58,7 @@ public class LogAspect {
 		if (log.isInfoEnabled()) {
 			// request信息
 			String ipAddress = request.getRemoteAddr();
-			Object servletPath = request.getAttribute(RequestDispatcher.FORWARD_SERVLET_PATH);
+			String servletPath = (String) request.getAttribute(RequestDispatcher.FORWARD_SERVLET_PATH);
 			if (servletPath == null) {
 				servletPath = request.getServletPath();
 			}
@@ -87,8 +89,9 @@ public class LogAspect {
 			HttpHeaders headers = servletServerHttpRequest.getHeaders();
 			String MSG_CODE = "{} 的 [{}] {} {} \nrequest headers:\n{} \nrequest parameters:\n{} \nresponse:\n{}";
 
+			principalName = principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName;
+			String requestSignature = ResourceUtil.getRequestSignature(request);
 			if (log.isDebugEnabled()) {
-				String requestSignature = ResourceUtil.getRequestSignature(request);
 				String resultStr;
 				if ("get_logs_index".equals(requestSignature)) {
 					resultStr = StringUtil.subString(result.toString(), 100);
@@ -100,13 +103,26 @@ public class LogAspect {
 					}
 					resultStr = StringUtil.valueOf(result, true);
 				}
-				log.info(MSG_CODE, ipAddress, principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName, requestMethod,
+				log.info(MSG_CODE, ipAddress, principalName, requestMethod,
 						servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true),
 						resultStr);
 			} else
-				log.info(MSG_CODE, ipAddress, principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName, requestMethod,
+				log.info(MSG_CODE, ipAddress, principalName, requestMethod,
 						servletPath, StringUtil.valueOf(headers, true), StringUtil.subString(StringUtil.valueOf(parameterMap), 100),
 						StringUtil.subString(String.valueOf(result), 100));
+
+			{
+				Log log = new Log();
+				log.setIpAddress(ipAddress);
+				log.setParameters(StringUtil.valueOf(parameterMap));
+				log.setRequestMethod(requestMethod);
+				log.setRequestSignature(requestSignature);
+				log.setServletPath(servletPath);
+				log.setRequestHeaders(StringUtil.valueOf(headers));
+				log.setPrincipalName(principalName);
+
+				publisher.publishEvent(new LogEvent(log));
+			}
 		}
 	}
 
