@@ -114,11 +114,11 @@ public class LogAspect {
 			{
 				Log log = new Log();
 				log.setIpAddress(ipAddress);
-				log.setParameters(StringUtil.valueOf(parameterMap));
+				log.setParameters(StringUtil.valueOf(parameterMap, true));
 				log.setRequestMethod(requestMethod);
 				log.setRequestSignature(requestSignature);
 				log.setServletPath(servletPath);
-				log.setRequestHeaders(StringUtil.valueOf(headers));
+				log.setRequestHeaders(StringUtil.valueOf(headers, true));
 				log.setPrincipalName(principalName);
 
 				publisher.publishEvent(new LogEvent(log));
