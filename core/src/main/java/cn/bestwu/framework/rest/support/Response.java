@@ -1,9 +1,7 @@
 package cn.bestwu.framework.rest.support;
 
 import cn.bestwu.framework.data.annotation.DisableSelfRel;
-import cn.bestwu.framework.event.AddLinkEvent;
-import cn.bestwu.framework.event.ResultHandleEvent;
-import cn.bestwu.framework.event.SelfRelEvent;
+import cn.bestwu.framework.event.ItemResourceEvent;
 import cn.bestwu.framework.rest.controller.RepositoryEntityController;
 import cn.bestwu.framework.util.ResourceUtil;
 import cn.bestwu.framework.util.Sha1DigestUtil;
@@ -110,8 +108,7 @@ public class Response {
 	 * @return 201 ResponseEntity
 	 */
 	protected ResponseEntity created(PersistentEntityResource<?> entityResource) {
-		addLink(entityResource);
-		publisher.publishEvent(new ResultHandleEvent(entityResource.getContent()));
+		itemResourceHandle(entityResource);
 		if (supportClientCache)
 			return ResponseEntity.created(URI.create(entityResource.getLinks().get(Link.REL_SELF))).headers(prepareHeaders(entityResource.getEntity(), entityResource.getContent()))
 					.body(entityResource);
@@ -126,8 +123,7 @@ public class Response {
 	 * @return 200 ResponseEntity
 	 */
 	protected ResponseEntity updated(PersistentEntityResource<?> entityResource) {
-		addLink(entityResource);
-		publisher.publishEvent(new ResultHandleEvent(entityResource.getContent()));
+		itemResourceHandle(entityResource);
 		if (supportClientCache)
 			return ResponseEntity.ok().location(URI.create(entityResource.getLinks().get(Link.REL_SELF))).headers(prepareHeaders(entityResource.getEntity(), entityResource.getContent()))
 					.body(entityResource);
@@ -164,7 +160,7 @@ public class Response {
 			PersistentEntity<?, ?> persistentEntity = persistentEntityResource.getEntity();
 			Object source = persistentEntityResource.getContent();
 			Assert.notNull(source);
-			addLink(persistentEntityResource);
+			itemResourceHandle(persistentEntityResource);
 
 			if (source instanceof Page<?>) {
 				Page<?> page = (Page<?>) source;
@@ -187,7 +183,6 @@ public class Response {
 					return bodyBuilder.body(persistentEntityResource.map(newContent));
 				}
 			} else {
-				publisher.publishEvent(new ResultHandleEvent(source));
 				if (supportClientCache)
 					return ResponseEntity.ok().headers(prepareHeaders(persistentEntity, source)).body(resource);
 				else
@@ -201,7 +196,7 @@ public class Response {
 			return ResponseEntity.ok().headers(noCache()).body(resource);
 	}
 
-	private void addLink(PersistentEntityResource<?> resource) {
+	private void itemResourceHandle(PersistentEntityResource<?> resource) {
 		PersistentEntity<?, ?> persistentEntity = resource.getEntity();
 		Object content = resource.getContent();
 
@@ -209,11 +204,10 @@ public class Response {
 			if ((resource.getLinks() == null || resource.getLinks().get(Link.REL_SELF) == null))
 				resource.add(getBaseLinkBuilder(ResourceUtil.getRepositoryBasePathName(persistentEntity.getType())).withSelfRel());
 		} else {
-			publisher.publishEvent(new SelfRelEvent(content, resource));
-			if (resource.getLinks() == null || resource.getLinks().get(Link.REL_SELF) == null) {
+			publisher.publishEvent(new ItemResourceEvent(content, resource));
+			if (!persistentEntity.getType().isAnnotationPresent(DisableSelfRel.class) && (resource.getLinks() == null) || resource.getLinks().get(Link.REL_SELF) == null) {
 				resource.add(getBaseLinkBuilder(ResourceUtil.getRepositoryBasePathName(persistentEntity.getType())).slash(getId(persistentEntity, content)).withSelfRel());
 			}
-			publisher.publishEvent(new AddLinkEvent(content, resource));
 		}
 	}
 
@@ -307,15 +301,10 @@ public class Response {
 			}
 
 			PersistentEntityResource<Object> resource = new PersistentEntityResource<>(source, persistentEntity);
-			if (!persistentEntity.getType().isAnnotationPresent(DisableSelfRel.class)) {
-				publisher.publishEvent(new SelfRelEvent(source, resource));
-				if (resource.getLinks() == null) {
-					Link link = baseLinkBuilder.slash(getId(persistentEntity, source)).withSelfRel();
-					resource.add(link);
-				}
+			publisher.publishEvent(new ItemResourceEvent(source, resource));
+			if (!persistentEntity.getType().isAnnotationPresent(DisableSelfRel.class) && (resource.getLinks() == null) || resource.getLinks().get(Link.REL_SELF) == null) {
+				resource.add(baseLinkBuilder.slash(getId(persistentEntity, source)).withSelfRel());
 			}
-			publisher.publishEvent(new ResultHandleEvent(source));
-			publisher.publishEvent(new AddLinkEvent(source, resource));
 			return resource;
 		}
 
