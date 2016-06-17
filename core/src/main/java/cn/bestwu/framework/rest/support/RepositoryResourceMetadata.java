@@ -92,7 +92,9 @@ public class RepositoryResourceMetadata {
 				collectionMethods.add(HttpMethod.DELETE);
 			}
 
-			supportedHttpMethods.put(ResourceType.COLLECTION, Collections.unmodifiableSet(collectionMethods));
+			if (!collectionMethods.isEmpty()) {
+				supportedHttpMethods.put(ResourceType.COLLECTION, Collections.unmodifiableSet(collectionMethods));
+			}
 
 			//ResourceType.ITEM
 			Set<HttpMethod> itemMethods = new HashSet<>();
@@ -108,11 +110,13 @@ public class RepositoryResourceMetadata {
 				itemMethods.add(HttpMethod.DELETE);
 			}
 
-			supportedHttpMethods.put(ResourceType.ITEM, Collections.unmodifiableSet(itemMethods));
+			if (!itemMethods.isEmpty()) {
+				supportedHttpMethods.put(ResourceType.ITEM, Collections.unmodifiableSet(itemMethods));
+			}
 
 			this.supportedHttpMethods = Collections.unmodifiableMap(supportedHttpMethods);
 
-			if (this.supportedHttpMethods.size() == 0) {
+			if (supportedHttpMethods.isEmpty()) {
 				this.exported = false;
 			}
 		}
