@@ -17,8 +17,7 @@ buildscript {
 subprojects {
 
     group 'cn.bestwu'
-    version '1.0.0-SNAPSHOT'
-
+    version '1.0.0.M1'
 
     apply plugin: 'java'
     apply plugin: 'idea'

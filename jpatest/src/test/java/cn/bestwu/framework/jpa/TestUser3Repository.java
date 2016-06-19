@@ -6,6 +6,7 @@ import cn.bestwu.framework.jpa.model.TestUser3;
 /**
  * @author Peter Wu
  */
+@RepositoryRestResource
 public interface TestUser3Repository extends QCrudRepository<TestUser3, Long> {
 
 	@RepositoryRestResource(RepositoryRestResource.POST)
