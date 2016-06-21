@@ -19,6 +19,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -167,7 +168,7 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 			if (errorAttributes.containsKey(KEY_MESSAGE))
 				message = (String) errorAttributes.get(KEY_MESSAGE);
 		} else {
-			message = getAttribute(requestAttributes, "javax.servlet.error.message");
+			message = getAttribute(requestAttributes, WebUtils.ERROR_MESSAGE_ATTRIBUTE);
 		}
 
 		message = StringUtils.isEmpty(message) ? "No message available" : message;
@@ -204,17 +205,17 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 	@Override public Throwable getError(RequestAttributes requestAttributes) {
 		Throwable exception = getAttribute(requestAttributes, ERROR_ATTRIBUTE);
 		if (exception == null) {
-			exception = getAttribute(requestAttributes, "javax.servlet.error.exception");
+			exception = getAttribute(requestAttributes, WebUtils.ERROR_EXCEPTION_ATTRIBUTE);
 		}
 		return exception;
 	}
 
 	private void setStatus(RequestAttributes requestAttributes, Object statusCode) {
-		requestAttributes.setAttribute("javax.servlet.error.status_code", statusCode, RequestAttributes.SCOPE_REQUEST);
+		requestAttributes.setAttribute(WebUtils.ERROR_STATUS_CODE_ATTRIBUTE, statusCode, RequestAttributes.SCOPE_REQUEST);
 	}
 
 	private HttpStatus getStatus(RequestAttributes requestAttributes) {
-		Integer statusCode = getAttribute(requestAttributes, "javax.servlet.error.status_code");
+		Integer statusCode = getAttribute(requestAttributes, WebUtils.ERROR_STATUS_CODE_ATTRIBUTE);
 		if (statusCode != null) {
 			try {
 				return HttpStatus.valueOf(statusCode);
