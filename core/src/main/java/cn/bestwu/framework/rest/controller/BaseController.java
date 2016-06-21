@@ -5,7 +5,6 @@ import cn.bestwu.framework.rest.resolver.ModelMethodArgumentResolver;
 import cn.bestwu.framework.rest.support.Response;
 import cn.bestwu.framework.util.ParameterUtil;
 import cn.bestwu.framework.util.ResourceUtil;
-import cn.bestwu.framework.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +19,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -84,7 +84,12 @@ public abstract class BaseController extends Response {
 	}
 
 	public String getUserAgent() {
-		return StringUtil.valueOf(request.getHeaders("user-agent"));
+		Enumeration<String> headers = request.getHeaders("user-agent");
+		if (headers.hasMoreElements()) {
+			return headers.nextElement();
+		} else {
+			return null;
+		}
 	}
 
 	protected String getDeviceInfo() {
