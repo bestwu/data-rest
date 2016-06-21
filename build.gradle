@@ -13,7 +13,7 @@ buildscript {
 subprojects {
 
     group 'cn.bestwu'
-    version '1.0.0.M3'
+    version '1.0.0-SNAPSHOT'
 
     apply plugin: 'java'
     apply plugin: 'idea'
@@ -49,6 +49,8 @@ subprojects {
 
             dependency 'org.atteo:evo-inflector:1.2.1'
             dependency 'com.belerweb:pinyin4j:2.5.1'
+
+            dependency 'cn.bestwu:api-sign:1.0.0'
         }
     }
 }
