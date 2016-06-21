@@ -17,6 +17,7 @@ import org.springframework.data.repository.support.Repositories;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -109,11 +110,18 @@ public class Response {
 	 */
 	protected ResponseEntity created(PersistentEntityResource<?> entityResource) {
 		itemResourceHandle(entityResource);
+		ResponseEntity.BodyBuilder created;
+		if (noSelfRel(entityResource)) {
+			created = ResponseEntity.status(HttpStatus.CREATED);
+		} else {
+			created = ResponseEntity.created(URI.create(entityResource.getLinks().get(Link.REL_SELF)));
+		}
+
 		if (supportClientCache)
-			return ResponseEntity.created(URI.create(entityResource.getLinks().get(Link.REL_SELF))).headers(prepareHeaders(entityResource.getEntity(), entityResource.getContent()))
+			return created.headers(prepareHeaders(entityResource.getEntity(), entityResource.getContent()))
 					.body(entityResource);
 		else
-			return ResponseEntity.created(URI.create(entityResource.getLinks().get(Link.REL_SELF))).headers(noCache()).body(entityResource);
+			return created.headers(noCache()).body(entityResource);
 	}
 
 	/**
@@ -124,11 +132,15 @@ public class Response {
 	 */
 	protected ResponseEntity updated(PersistentEntityResource<?> entityResource) {
 		itemResourceHandle(entityResource);
+		ResponseEntity.BodyBuilder location = ResponseEntity.ok();
+		if (!noSelfRel(entityResource)) {
+			location.location(URI.create(entityResource.getLinks().get(Link.REL_SELF)));
+		}
 		if (supportClientCache)
-			return ResponseEntity.ok().location(URI.create(entityResource.getLinks().get(Link.REL_SELF))).headers(prepareHeaders(entityResource.getEntity(), entityResource.getContent()))
+			return location.headers(prepareHeaders(entityResource.getEntity(), entityResource.getContent()))
 					.body(entityResource);
 		else
-			return ResponseEntity.ok().location(URI.create(entityResource.getLinks().get(Link.REL_SELF))).headers(noCache()).body(entityResource);
+			return location.headers(noCache()).body(entityResource);
 	}
 
 	/**
@@ -201,14 +213,18 @@ public class Response {
 		Object content = resource.getContent();
 
 		if (content instanceof Iterable<?>) {
-			if ((resource.getLinks() == null || resource.getLinks().get(Link.REL_SELF) == null))
+			if (noSelfRel(resource))
 				resource.add(getBaseLinkBuilder(ResourceUtil.getRepositoryBasePathName(persistentEntity.getType())).withSelfRel());
 		} else {
 			publisher.publishEvent(new ItemResourceEvent(content, resource));
-			if (!persistentEntity.getType().isAnnotationPresent(DisableSelfRel.class) && (resource.getLinks() == null) || resource.getLinks().get(Link.REL_SELF) == null) {
+			if (!persistentEntity.getType().isAnnotationPresent(DisableSelfRel.class) && noSelfRel(resource)) {
 				resource.add(getBaseLinkBuilder(ResourceUtil.getRepositoryBasePathName(persistentEntity.getType())).slash(getId(persistentEntity, content)).withSelfRel());
 			}
 		}
+	}
+
+	private boolean noSelfRel(PersistentEntityResource<?> resource) {
+		return resource.getLinks() == null || resource.getLinks().get(Link.REL_SELF) == null;
 	}
 
 	protected Link getEntitySelfLink(Object content) {
@@ -302,7 +318,7 @@ public class Response {
 
 			PersistentEntityResource<Object> resource = new PersistentEntityResource<>(source, persistentEntity);
 			publisher.publishEvent(new ItemResourceEvent(source, resource));
-			if (!persistentEntity.getType().isAnnotationPresent(DisableSelfRel.class) && (resource.getLinks() == null) || resource.getLinks().get(Link.REL_SELF) == null) {
+			if (!persistentEntity.getType().isAnnotationPresent(DisableSelfRel.class) && noSelfRel(resource)) {
 				resource.add(baseLinkBuilder.slash(getId(persistentEntity, source)).withSelfRel());
 			}
 			return resource;
