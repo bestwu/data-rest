@@ -1,5 +1,6 @@
 package cn.bestwu.framework.jpa.model;
 
+import cn.bestwu.framework.data.annotation.DisableSelfRel;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
@@ -14,6 +15,7 @@ import javax.persistence.Id;
  */
 @Indexed
 @Entity
+@DisableSelfRel
 public class TestUser {
 
 	@Id

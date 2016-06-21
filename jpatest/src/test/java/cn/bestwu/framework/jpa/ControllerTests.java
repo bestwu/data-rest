@@ -23,7 +23,7 @@ import java.util.Map;
  * @author Peter Wu
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = JpaRepositoryConfig.class,value = "server.context-path=/tv", webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = JpaRepositoryConfig.class, value = "server.context-path=/tv", webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ControllerTests {
 	@LocalServerPort
 	private int port;
@@ -51,6 +51,9 @@ public class ControllerTests {
 		Map testUser2Result = restTemplate.postForObject(getBaseUrl() + "/testUsers", testUser2, HashMap.class);
 		Assert.assertEquals("peter2", testUser2Result.get("firstName"));
 		Assert.assertEquals("wu2", testUser2Result.get("lastName"));
+		Map testUser3Result = restTemplate.postForObject(getBaseUrl() + "/testUser3s", testUser2, HashMap.class);
+		Assert.assertEquals("peter2", testUser3Result.get("firstName"));
+		Assert.assertEquals("wu2", testUser3Result.get("lastName"));
 
 		//update
 		//		TestUser testUser1ForUpdate = new TestUser();
@@ -64,12 +67,16 @@ public class ControllerTests {
 		Assert.assertEquals("wu2_modify", testUser2UpdateResult.get("lastName"));
 
 		//get
-		Map getResult = restTemplate.getForObject(getBaseUrl() + "/testUsers/" + testUser2Result.get("id"), HashMap.class);
-		Assert.assertEquals("wu2_modify", getResult.get("lastName"));
+		ResponseEntity<HashMap> entity1 = restTemplate.getForEntity(getBaseUrl() + "/testUsers/" + testUser2Result.get("id"), HashMap.class);
+		Assert.assertEquals(HttpStatus.METHOD_NOT_ALLOWED, entity1.getStatusCode());
+		Map getResult = restTemplate.getForObject(getBaseUrl() + "/testUser3s/" + testUser3Result.get("id"), HashMap.class);
+		Assert.assertEquals("wu2", getResult.get("lastName"));
 
 		//index
 		Map page = restTemplate.getForObject(getBaseUrl() + "/testUsers", HashMap.class);
 		Assert.assertEquals(2, page.get("totalElements"));
+		page = restTemplate.getForObject(getBaseUrl() + "/testUser3s", HashMap.class);
+		Assert.assertEquals(1, page.get("totalElements"));
 
 		//search
 		ResponseEntity<HashMap> entity = restTemplate.getForEntity(getBaseUrl() + "/testUsers/search/fulltext?keyword=wu2_modify", HashMap.class);
