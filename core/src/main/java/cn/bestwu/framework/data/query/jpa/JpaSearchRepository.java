@@ -90,7 +90,7 @@ public class JpaSearchRepository implements SearchRepository {
 			if (!noCriterionEntries) {
 				jpaQuery.setCriteriaQuery(criteria);
 			}
-			jpaQuery.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
+			jpaQuery.setFirstResult(pageable.getOffset());
 			jpaQuery.setMaxResults(pageable.getPageSize());
 
 			org.springframework.data.domain.Sort sort = pageable.getSort();
