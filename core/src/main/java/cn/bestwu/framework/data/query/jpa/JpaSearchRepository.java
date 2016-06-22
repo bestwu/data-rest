@@ -9,14 +9,21 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.Criteria;
+import org.hibernate.QueryTimeoutException;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.exception.EmptyQueryException;
+import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.TermMatchingContext;
+import org.hibernate.search.query.engine.spi.EntityInfo;
+import org.hibernate.search.query.engine.spi.HSQuery;
+import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -73,6 +81,7 @@ public class JpaSearchRepository implements SearchRepository {
 		return highLightFields;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override public <T> Page search(Class<T> modelType, String keyword, Pageable pageable, ResultHandler resultHandler) {
 		try {
 			FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
@@ -82,35 +91,73 @@ public class JpaSearchRepository implements SearchRepository {
 			TermMatchingContext termMatchingContext = queryBuilder.keyword().onFields(getSearchFields(modelType));
 
 			Query luceneQuery = termMatchingContext.matching(keyword).createQuery();
-			org.hibernate.search.jpa.FullTextQuery jpaQuery = fullTextEntityManager.createFullTextQuery(luceneQuery, modelType);
 
 			Criteria criteria = EntityManagerUtil.getSession(entityManager).createCriteria(modelType);
 			publisher.publishEvent(new BeforeSearchEvent(criteria, modelType));
 			boolean noCriterionEntries = criteria.toString().contains("[][]");
-			if (!noCriterionEntries) {
-				jpaQuery.setCriteriaQuery(criteria);
-			}
-			jpaQuery.setFirstResult(pageable.getOffset());
-			jpaQuery.setMaxResults(pageable.getPageSize());
+
+			List<T> result;
+			long totalSize;
 
 			org.springframework.data.domain.Sort sort = pageable.getSort();
-			if (sort != null) {
-				List<SortField> sortFields = new ArrayList<>();
-				sort.forEach(order -> new SortField(order.getProperty(), SortField.Type.SCORE, org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection())));
-				jpaQuery.setSort(new Sort(sortFields.toArray(new SortField[sortFields.size()])));
-			}
 
-			@SuppressWarnings("unchecked")
-			List<T> result = jpaQuery.getResultList();
+			if (noCriterionEntries) {
+				org.hibernate.search.jpa.FullTextQuery jpaQuery = fullTextEntityManager.createFullTextQuery(luceneQuery, modelType);
 
-			long totalSize;
-			if (result.size() == 0) {
-				totalSize = 0;
-			} else if (noCriterionEntries) {
-				totalSize = jpaQuery.getResultSize();
+				if (sort != null) {
+					List<SortField> sortFields = new ArrayList<>();
+					sort.forEach(order -> sortFields.add(new SortField(order.getProperty(), SortField.Type.SCORE, org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection()))));
+					jpaQuery.setSort(new Sort(sortFields.toArray(new SortField[sortFields.size()])));
+				}
+
+				jpaQuery.setFirstResult(pageable.getOffset());
+				jpaQuery.setMaxResults(pageable.getPageSize());
+				result = jpaQuery.getResultList();
+				if (result.size() == 0) {
+					totalSize = 0;
+				} else {
+					totalSize = jpaQuery.getResultSize();
+				}
 			} else {
-				criteria.setProjection(Projections.count("id"));
-				totalSize = (long) criteria.list().get(0);
+				SessionImplementor sessionImplementor = (SessionImplementor) EntityManagerUtil.getSession(entityManager);
+
+				HSQuery hSearchQuery = ContextHelper.getSearchintegratorBySessionImplementor(sessionImplementor).createHSQuery();
+				hSearchQuery
+						.luceneQuery(luceneQuery)
+						.timeoutExceptionFactory(exceptionFactory)
+						.tenantIdentifier(sessionImplementor.getTenantIdentifier())
+						.targetedEntities(Arrays.asList(new Class[] { modelType }));
+
+				List<EntityInfo> entityInfos = hSearchQuery.queryEntityInfos();
+				List<Serializable> ids = new ArrayList<>(entityInfos.size());
+				String idName = null;
+				for (EntityInfo entityInfo : entityInfos) {
+					if (idName == null) {
+						idName = entityInfo.getIdName();
+					}
+					ids.add(entityInfo.getId());
+				}
+
+				if (sort != null) {
+					sort.forEach(order -> {
+						if (org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection())) {
+							criteria.addOrder(org.hibernate.criterion.Order.desc(order.getProperty()));
+						} else {
+							criteria.addOrder(org.hibernate.criterion.Order.asc(order.getProperty()));
+						}
+					});
+				}
+
+				criteria.add(Restrictions.in(idName, ids));
+				criteria.setFirstResult(pageable.getOffset());
+				criteria.setMaxResults(pageable.getPageSize());
+				result = criteria.list();
+				if (result.size() == 0) {
+					totalSize = 0;
+				} else {
+					criteria.setProjection(Projections.count("id"));
+					totalSize = (long) criteria.list().get(0);
+				}
 			}
 
 			//处理搜索结果
@@ -132,4 +179,5 @@ public class JpaSearchRepository implements SearchRepository {
 		}
 	}
 
+	private static final TimeoutExceptionFactory exceptionFactory = (message, queryDescription) -> new QueryTimeoutException(message, null, queryDescription);
 }
