@@ -129,34 +129,39 @@ public class JpaSearchRepository implements SearchRepository {
 						.targetedEntities(Arrays.asList(new Class[] { modelType }));
 
 				List<EntityInfo> entityInfos = hSearchQuery.queryEntityInfos();
-				List<Serializable> ids = new ArrayList<>(entityInfos.size());
-				String idName = null;
-				for (EntityInfo entityInfo : entityInfos) {
-					if (idName == null) {
-						idName = entityInfo.getIdName();
-					}
-					ids.add(entityInfo.getId());
-				}
-
-				if (sort != null) {
-					sort.forEach(order -> {
-						if (org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection())) {
-							criteria.addOrder(org.hibernate.criterion.Order.desc(order.getProperty()));
-						} else {
-							criteria.addOrder(org.hibernate.criterion.Order.asc(order.getProperty()));
+				if (entityInfos.size() != 0) {
+					List<Serializable> ids = new ArrayList<>(entityInfos.size());
+					String idName = null;
+					for (EntityInfo entityInfo : entityInfos) {
+						if (idName == null) {
+							idName = entityInfo.getIdName();
 						}
-					});
-				}
+						ids.add(entityInfo.getId());
+					}
+					criteria.add(Restrictions.in(idName, ids));
 
-				criteria.add(Restrictions.in(idName, ids));
-				criteria.setFirstResult(pageable.getOffset());
-				criteria.setMaxResults(pageable.getPageSize());
-				result = criteria.list();
-				if (result.size() == 0) {
-					totalSize = 0;
+					if (sort != null) {
+						sort.forEach(order -> {
+							if (org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection())) {
+								criteria.addOrder(org.hibernate.criterion.Order.desc(order.getProperty()));
+							} else {
+								criteria.addOrder(org.hibernate.criterion.Order.asc(order.getProperty()));
+							}
+						});
+					}
+
+					criteria.setFirstResult(pageable.getOffset());
+					criteria.setMaxResults(pageable.getPageSize());
+					result = criteria.list();
+					if (result.size() == 0) {
+						totalSize = 0;
+					} else {
+						criteria.setProjection(Projections.count("id"));
+						totalSize = (long) criteria.list().get(0);
+					}
 				} else {
-					criteria.setProjection(Projections.count("id"));
-					totalSize = (long) criteria.list().get(0);
+					totalSize = 0;
+					result = Collections.emptyList();
 				}
 			}
 
