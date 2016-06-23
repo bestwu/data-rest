@@ -82,6 +82,9 @@ public class ControllerTests {
 		ResponseEntity<HashMap> entity = restTemplate.getForEntity(getBaseUrl() + "/testUsers/search/fulltext?keyword=wu2_modify", HashMap.class);
 		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
 		Assert.assertEquals(1, entity.getBody().get("totalElements"));
+		entity = restTemplate.getForEntity(getBaseUrl() + "/testUsers/search/fulltext?keyword=xxxx", HashMap.class);
+		Assert.assertEquals(HttpStatus.OK, entity.getStatusCode());
+		Assert.assertEquals(0, entity.getBody().get("totalElements"));
 		entity = restTemplate.getForEntity(getBaseUrl() + "/testUser2s/search/fulltext?keyword=wu2_modify", HashMap.class);
 		Assert.assertEquals(HttpStatus.NOT_FOUND, entity.getStatusCode());
 
