@@ -143,6 +143,9 @@ public class FixQuerydslPredicateBuilder {
 		}
 
 		resolvedPath = reifyPath(path, null);
+		if (resolvedPath == null) {
+			return null;
+		}
 		paths.put(path, resolvedPath);
 
 		return resolvedPath;
@@ -160,6 +163,9 @@ public class FixQuerydslPredicateBuilder {
 		Path<?> entityPath = base != null ? base : resolver.createPath(path.getOwningType().getType());
 
 		Field field = ReflectionUtils.findField(entityPath.getClass(), path.getSegment());
+		if (field == null) {
+			return null;
+		}
 		Object value = ReflectionUtils.getField(field, entityPath);
 
 		if (path.hasNext()) {
