@@ -21,10 +21,22 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
+/**
+ * 日志拦截器
+ *
+ * @author Peter Wu
+ */
 @Aspect
 @Slf4j
 public class LogAspect {
+	/**
+	 * put方法请求参数request暂存参数名
+	 */
 	private final String PUT_PARAMETER_MAP = "PUT_PARAMETER_MAP";
+
+	/**
+	 * 请求方名称request暂存参数名
+	 */
 	private final String PRINCIPAL_NAME = "PRINCIPAL_NAME";
 
 	protected ApplicationEventPublisher publisher;
@@ -52,6 +64,11 @@ public class LogAspect {
 	@Autowired(required = false)
 	private RequestJsonViewResponseBodyAdvice requestJsonViewResponseBodyAdvice;
 
+	/**
+	 * 记录日志
+	 *
+	 * @param result 操作结果
+	 */
 	@SuppressWarnings("unchecked")
 	@AfterReturning(value = "@annotation(org.springframework.web.bind.annotation.RequestMapping)", returning = "result")
 	public void log(Object result) {

@@ -41,6 +41,13 @@ public class RepositoryResourceMetadata {
 	private boolean contained = false;
 	//--------------------------------------------
 
+	/**
+	 * 创建资源元数据
+	 *
+	 * @param entity              持久实体
+	 * @param repositoryInterface 仓库接口
+	 * @param crudMethods         增删改查方法
+	 */
 	public RepositoryResourceMetadata(PersistentEntity<?, ?> entity, Class<?> repositoryInterface, CrudMethods crudMethods) {
 		this.entity = entity;
 		this.enableAllDataInOnePage = repositoryInterface.isAnnotationPresent(EnableAllDataInOnePage.class);
@@ -122,6 +129,11 @@ public class RepositoryResourceMetadata {
 		}
 	}
 
+	/**
+	 * @param method     仓库方法
+	 * @param httpMethod 请求方法
+	 * @return 是否支持请求访求
+	 */
 	private boolean exposesMethod(Method method, HttpMethod httpMethod) {
 		if (method == null) {
 			return false;
@@ -146,6 +158,9 @@ public class RepositoryResourceMetadata {
 		return entity;
 	}
 
+	/**
+	 * @return 持久化实体是否展开到控制层
+	 */
 	public boolean isExported() {
 		return exported;
 	}
@@ -159,6 +174,13 @@ public class RepositoryResourceMetadata {
 		return entity.getType();
 	}
 
+	/**
+	 * 是否支持请求方法
+	 *
+	 * @param requestHttpMethod 请求方法
+	 * @param resourceType      资源类型
+	 * @throws HttpRequestMethodNotSupportedException 如果不支持抛出此异常
+	 */
 	public void verifySupportedMethod(HttpMethod requestHttpMethod, ResourceType resourceType) throws HttpRequestMethodNotSupportedException {
 		if (HttpMethod.OPTIONS.equals(requestHttpMethod)) {
 			return;
@@ -175,14 +197,25 @@ public class RepositoryResourceMetadata {
 		}
 	}
 
+	/**
+	 * @param resourceType 资源类型
+	 * @return 支持的请求方法
+	 */
 	public Set<HttpMethod> getSupportedHttpMethods(ResourceType resourceType) {
 		return supportedHttpMethods.get(resourceType);
 	}
 
+	/**
+	 * @return 是否支持全部结果一页响应
+	 */
 	public boolean enableAllDataInOnePage() {
 		return enableAllDataInOnePage;
 	}
 
+	/**
+	 * @param search search名
+	 * @return 对应方法
+	 */
 	public Method getSearchMethod(String search) {
 		if (CollectionUtils.isEmpty(searchMethods)) {
 			return null;

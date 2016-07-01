@@ -130,8 +130,12 @@ public class StringUtil {
 		return String.valueOf(object);
 	}
 
-	/*
+	/**
 	 * 截取一定长度的字符
+	 *
+	 * @param str    字符串
+	 * @param length 长度
+	 * @return 截取后的字符串
 	 */
 	public static String subString(String str, int length) {
 		if (str == null) {
@@ -145,8 +149,12 @@ public class StringUtil {
 		}
 	}
 
-	/*
-	 * 截取一定长度的字符
+	/**
+	 * 截取一定长度的字符，结果以...结尾
+	 *
+	 * @param str    字符串
+	 * @param length 长度
+	 * @return 截取后的字符串
 	 */
 	public static String subStringWithEllipsis(String str, int length) {
 		if (str == null) {
@@ -154,7 +162,7 @@ public class StringUtil {
 		}
 		int l = str.length();
 		if (l > length) {
-			return str.substring(0, length) + "...";
+			return str.substring(0, length - 3) + "...";
 		} else {
 			return str;
 		}

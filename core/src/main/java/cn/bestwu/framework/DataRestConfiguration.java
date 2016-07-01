@@ -71,6 +71,9 @@ public class DataRestConfiguration {
 		return new AnnotatedEventHandlerInvoker();
 	}
 
+	/**
+	 * jpa 全文搜索
+	 */
 	@Configuration
 	@ConditionalOnMissingBean(SearchRepository.class)
 	@ConditionalOnClass(Search.class)
@@ -87,6 +90,9 @@ public class DataRestConfiguration {
 		}
 	}
 
+	/**
+	 * Mongodb全文搜索
+	 */
 	@Configuration
 	@ConditionalOnMissingBean(SearchRepository.class)
 	@ConditionalOnClass(TextCriteria.class)

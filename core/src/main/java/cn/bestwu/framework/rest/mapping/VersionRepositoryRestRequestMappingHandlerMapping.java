@@ -30,13 +30,31 @@ import java.util.stream.Collectors;
  */
 public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
 
+	/**
+	 * handler_method request 属性参数
+	 */
 	public static final String REQUEST_HANDLER_METHOD = "request_handler_method";
+	/**
+	 * repository_base_path_name request 属性参数
+	 */
 	public static final String REQUEST_REPOSITORY_BASE_PATH_NAME = "request_repository_base_path_name";
+	/**
+	 * repository_search_name request 属性参数
+	 */
 	public static final String REQUEST_REPOSITORY_SEARCH_NAME = "request_repository_search_name";
+	/**
+	 * repository_resource_metadata  request 属性参数
+	 */
 	public static final String REQUEST_REPOSITORY_RESOURCE_METADATA = "request_repository_resource_metadata";
 
+	/**
+	 * collection 类 regex
+	 */
 	public static final String COLLECTION_LOOKUP_PATH_REGEX = "^/[^/]+/?$";
 
+	/**
+	 * 忽略的lookupPath
+	 */
 	private final String[] IGNORED_LOOKUP_PATH = { "/oauth/authorize", "/oauth/token", "/oauth/check_token", "/oauth/confirm_access", "/oauth/error" };
 
 	private final RepositoryResourceMappings repositoryResourceMappings;
@@ -49,8 +67,13 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		this.proxyPathMapper = proxyPathMapper;
 	}
 
-	/*
+	/**
 	 * 查找映射方法
+	 *
+	 * @param lookupPath lookupPath
+	 * @param request    request
+	 * @return HandlerMethod
+	 * @throws Exception Exception
 	 */
 	@Override protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
 
@@ -113,16 +136,33 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		}
 	}
 
+	/**
+	 * @param lookupPath lookupPath
+	 * @return BasePathName
+	 */
 	public static String getBasePathName(String lookupPath) {
 		int secondSlashIndex = lookupPath.indexOf('/', lookupPath.startsWith("/") ? 1 : 0);
 		boolean noSecondSlashIndex = secondSlashIndex == -1;
 		return noSecondSlashIndex ? lookupPath.substring(1) : lookupPath.substring(1, secondSlashIndex);
 	}
 
+	/**
+	 * 处理无HandlerMethod时
+	 *
+	 * @param requestMappingInfos requestMappingInfos
+	 * @param lookupPath          lookupPath
+	 * @param request             request
+	 * @return null
+	 * @throws ServletException ServletException
+	 */
 	@Override protected HandlerMethod handleNoMatch(Set<RequestMappingInfo> requestMappingInfos, String lookupPath, HttpServletRequest request) throws ServletException {
 		return null;
 	}
 
+	/**
+	 * @param request request
+	 * @return Comparator
+	 */
 	@Override protected Comparator<RequestMappingInfo> getMappingComparator(HttpServletRequest request) {
 		return (info1, info2) -> {
 			int result = versionCompareTo(getVersions(info1.getProducesCondition().getProducibleMediaTypes()), getVersions(info2.getProducesCondition().getProducibleMediaTypes()), request);//版本比较
@@ -133,12 +173,21 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		};
 	}
 
+	/**
+	 * @param mediaTypes request请求mediaTypes
+	 * @return 版本号
+	 */
 	private List<String> getVersions(Set<MediaType> mediaTypes) {
 		return mediaTypes.stream().map(mediaType -> mediaType.getParameter(Version.VERSION_PARAM_NAME)).filter(StringUtils::hasText).collect(Collectors.toList());
 	}
 
-	/*
-	 * ProducesCondition CompareTo
+	/**
+	 * 比较版本号
+	 *
+	 * @param me      me
+	 * @param other   other
+	 * @param request request
+	 * @return int
 	 */
 	private int versionCompareTo(List<String> me, List<String> other, HttpServletRequest request) {
 		if (me.isEmpty()) {
@@ -170,6 +219,15 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		return 0;
 	}
 
+	/**
+	 * 比较MediaTypes对应版本
+	 *
+	 * @param versions1 versions1
+	 * @param index1    index1
+	 * @param versions2 versions2
+	 * @param index2    index2
+	 * @return int
+	 */
 	private int compareMatchingMediaTypes(List<String> versions1, int index1, List<String> versions2, int index2) {
 
 		int result = 0;
@@ -184,16 +242,30 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		return result;
 	}
 
-	private int equalVersion(List<String> versions, String accepteVersion) {
+	/**
+	 * 版本相等
+	 *
+	 * @param versions        versions
+	 * @param acceptedVersion acceptedVersion
+	 * @return int
+	 */
+	private int equalVersion(List<String> versions, String acceptedVersion) {
 		for (int i = 0; i < versions.size(); i++) {
 			String currentVersion = versions.get(i);
-			if (Version.equals(accepteVersion, currentVersion)) {
+			if (Version.equals(acceptedVersion, currentVersion)) {
 				return i;
 			}
 		}
 		return -1;
 	}
 
+	/**
+	 * 版本包含
+	 *
+	 * @param versions        versions
+	 * @param acceptedVersion acceptedVersion
+	 * @return int
+	 */
 	private int includedVersion(List<String> versions, String acceptedVersion) {
 		for (int i = 0; i < versions.size(); i++) {
 			String currentVersion = versions.get(i);

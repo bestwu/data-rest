@@ -37,10 +37,29 @@ public class MailClient {
 		this.alias = properties.getProperties().get("alias");
 	}
 
+	/**
+	 * 发送邮件
+	 *
+	 * @param subject 标题
+	 * @param content 内容
+	 * @param mailTo  对象
+	 * @throws UnsupportedEncodingException UnsupportedEncodingException
+	 * @throws MessagingException MessagingException
+	 */
 	public void send(String subject, String content, String... mailTo) throws UnsupportedEncodingException, MessagingException {
 		send(subject, content, null, mailTo);
 	}
 
+	/**
+	 * 发送邮件
+	 *
+	 * @param subject     标题
+	 * @param content     内容
+	 * @param inlineFiles 内容附件（图片等）
+	 * @param mailTo      对象
+	 * @throws MessagingException MessagingException
+	 * @throws UnsupportedEncodingException UnsupportedEncodingException
+	 */
 	public void send(String subject, String content, Map<String, String> inlineFiles, String... mailTo) throws MessagingException, UnsupportedEncodingException {
 		if (log.isDebugEnabled())
 			log.debug("正在给" + StringUtil.valueOf(mailTo) + "发送邮件");

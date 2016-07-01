@@ -7,7 +7,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /**
- * Created by Peter wu on 2015/3/6.
+ * {@code TrimNotBlank} 验证器
  *
  * @author Peter wu
  */

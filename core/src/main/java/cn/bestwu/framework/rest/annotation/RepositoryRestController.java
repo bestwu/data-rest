@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.lang.annotation.*;
 
 /**
- * 仓库类型的RestController
+ * 仓库类型（CRUD）的RestController
  *
  * @author Peter Wu
  */

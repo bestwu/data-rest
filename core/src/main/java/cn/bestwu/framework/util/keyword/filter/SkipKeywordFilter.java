@@ -98,6 +98,11 @@ public class SkipKeywordFilter extends SimpleKeywordFilter {
 		}
 	}
 
+	/**
+	 * 增加过滤字符
+	 *
+	 * @param chars 过滤的字符
+	 */
 	public void addSkipChar(Collection<Character> chars) {
 		if (null != chars && !chars.isEmpty()) {
 			this.skipChars.addAll(chars);

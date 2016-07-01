@@ -6,10 +6,15 @@ import org.hibernate.search.exception.SearchException;
 import javax.persistence.EntityManager;
 
 /**
+ * EntityManager工具类
+ *
  * @author Peter Wu
  */
 public class EntityManagerUtil {
-
+	/**
+	 * @param entityManager entityManager
+	 * @return Session
+	 */
 	public static Session getSession(EntityManager entityManager) {
 		Object delegate = entityManager.getDelegate();
 		if (delegate == null) {

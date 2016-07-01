@@ -3,6 +3,8 @@ package cn.bestwu.framework.rest.support;
 import org.springframework.context.ApplicationEvent;
 
 /**
+ * 客户端用户名事件
+ *
  * @author Peter Wu
  */
 public class PrincipalNamePutEvent extends ApplicationEvent {

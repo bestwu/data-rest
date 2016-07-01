@@ -21,6 +21,11 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+/**
+ * 自定义Log4j2 日志HtmlLayout
+ *
+ * @author Peter Wu
+ */
 @Plugin(name = "WHtmlLayout", category = Node.CATEGORY, elementType = Layout.ELEMENT_TYPE, printObject = true)
 public final class HtmlLayout extends AbstractStringLayout {
 

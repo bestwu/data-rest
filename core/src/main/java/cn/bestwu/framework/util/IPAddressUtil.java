@@ -9,6 +9,8 @@ import java.io.LineNumberReader;
 
 /**
  * IP工具
+ *
+ * @author Peter Wu
  */
 public class IPAddressUtil {
 	/**

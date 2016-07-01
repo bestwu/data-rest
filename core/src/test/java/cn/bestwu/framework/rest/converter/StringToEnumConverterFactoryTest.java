@@ -5,6 +5,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
+ * 测试字符串转枚举
+ *
  * @author Peter Wu
  */
 public class StringToEnumConverterFactoryTest {

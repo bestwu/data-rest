@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * 处理搜索结果的函数接口
+ * 高亮查询结果
+ *
+ * @author Peter Wu
  */
 @Slf4j
 public class HighlightResultHandler implements ResultHandler {
@@ -87,6 +89,18 @@ public class HighlightResultHandler implements ResultHandler {
 		}
 	}
 
+	/**
+	 * 高亮某个字段
+	 *
+	 * @param analyzer    analyzer
+	 * @param modelType   modelType
+	 * @param highlighter highlighter
+	 * @param t           t
+	 * @param fieldName   fieldName
+	 * @throws NoSuchFieldException
+	 * @throws IOException
+	 * @throws InvalidTokenOffsetsException
+	 */
 	private void hightLightField(Analyzer analyzer, Class<?> modelType, Highlighter highlighter, Object t, String fieldName) throws NoSuchFieldException, IOException, InvalidTokenOffsetsException {
 		if (fieldName.contains(".")) {
 			String[] split = fieldName.split("\\.");

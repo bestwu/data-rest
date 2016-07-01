@@ -9,9 +9,13 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+/**
+ * 建立Hibernate Search 索引
+ *
+ * @author Peter Wu
+ */
 @Slf4j
 public class BuildSearchIndex implements ApplicationListener<ContextRefreshedEvent> {
-
 
 	@PersistenceContext
 	private EntityManager entityManager;

@@ -7,6 +7,8 @@ import java.lang.annotation.*;
 /**
  * 注解在repositoryInterface上表示所有接口都可用，
  * repositoryInterface上未注解，根据方法上的cn.bestwu.framework.data.annotation.SupportedHttpMethods注解映射可用接口
+ *
+ * @author Peter Wu
  */
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)

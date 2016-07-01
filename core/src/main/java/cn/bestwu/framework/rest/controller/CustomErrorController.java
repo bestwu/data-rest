@@ -20,6 +20,11 @@ import java.util.Map;
 
 import static cn.bestwu.framework.rest.support.Response.noCache;
 
+/**
+ * 自定义错误处理
+ *
+ * @author Peter Wu
+ */
 @Controller
 @ConditionalOnWebApplication
 @RequestMapping("${server.error.path:${error.path:/error}}")
@@ -49,6 +54,11 @@ public class CustomErrorController extends AbstractErrorController {
 		return this.serverProperties.getError();
 	}
 
+	/**
+	 * @param request  request
+	 * @param produces 请求类型
+	 * @return 是否包含错误StackTrace
+	 */
 	protected boolean isIncludeStackTrace(HttpServletRequest request, MediaType... produces) {
 		ErrorProperties.IncludeStacktrace include = getErrorProperties().getIncludeStacktrace();
 		if (include == ErrorProperties.IncludeStacktrace.ALWAYS) {
@@ -60,6 +70,13 @@ public class CustomErrorController extends AbstractErrorController {
 		return false;
 	}
 
+	/**
+	 * "text/plain", "text/html"的请求
+	 *
+	 * @param request request
+	 * @return 响应
+	 * @throws JsonProcessingException JsonProcessingException
+	 */
 	@RequestMapping(produces = { "text/plain", "text/html" })
 	@ResponseBody
 	public ResponseEntity<Object> errorPlain(HttpServletRequest request) throws JsonProcessingException {
@@ -68,6 +85,13 @@ public class CustomErrorController extends AbstractErrorController {
 		return ResponseEntity.status(status).headers(noCache()).body(getString(body));
 	}
 
+	/**
+	 * 其他请求
+	 *
+	 * @param request request
+	 * @return 响应
+	 * @throws JsonProcessingException JsonProcessingException
+	 */
 	@RequestMapping
 	@ResponseBody
 	public ResponseEntity<Object> error(HttpServletRequest request) throws JsonProcessingException {

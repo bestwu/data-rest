@@ -11,6 +11,10 @@ public class BeforeSearchEvent extends RepositoryEvent {
 
 	private static final long serialVersionUID = -4178548774162112340L;
 
+	/**
+	 * @param criteria  条件
+	 * @param modelType 实体类型
+	 */
 	public BeforeSearchEvent(Criteria criteria, Class<?> modelType) {
 		super(criteria, modelType);
 	}

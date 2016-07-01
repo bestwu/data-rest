@@ -17,13 +17,30 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 事件注解处理执行类
+ *
+ * @author Peter Wu
+ */
 public class AnnotatedEventHandlerInvoker implements ApplicationListener<RepositoryEvent>, BeanPostProcessor {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AnnotatedEventHandlerInvoker.class);
+
+	/**
+	 * 事件处理方法丢失参数错误信息
+	 */
 	private static final String PARAMETER_MISSING = "Invalid event handler method %s! At least a single argument is required to determine the domain type for which you are interested in events.";
 
+	/**
+	 * 持有事件处理方法
+	 */
 	private final MultiValueMap<Class<?>, EventHandlerMethod> handlerMethods = new LinkedMultiValueMap<>();
 
+	/**
+	 * 事件触发
+	 *
+	 * @param event 事件
+	 */
 	@Override
 	public void onApplicationEvent(RepositoryEvent event) {
 		Class<?> modelType = event.getModelType();
@@ -55,11 +72,28 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 		}
 	}
 
+	/**
+	 * bean 初始化前 skip
+	 *
+	 * @param bean     bean
+	 * @param beanName bean name
+	 * @return bean
+	 * @throws BeansException BeansException
+	 */
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
 		return bean;
 	}
 
+	/**
+	 * bean 初始化后
+	 * 如果是{@code RestEventHandler}注解的bean 将其处理事件注解注解的方法加入{@code handlerMethods}持有事件处理方法
+	 *
+	 * @param bean     bean
+	 * @param beanName bean name
+	 * @return bean
+	 * @throws BeansException BeansException
+	 */
 	@Override
 	public Object postProcessAfterInitialization(final Object bean, String beanName) throws BeansException {
 
@@ -92,6 +126,15 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 		return bean;
 	}
 
+	/**
+	 * 方法检查
+	 *
+	 * @param handler        RestEventHandler 注解的bean
+	 * @param method         方法
+	 * @param annotationType 注解
+	 * @param eventType      事件类型
+	 * @param <T>            <T>
+	 */
 	private <T extends Annotation> void inspect(Object handler, Method method, Class<T> annotationType, Class<? extends RepositoryEvent> eventType) {
 
 		T annotation = AnnotationUtils.findAnnotation(method, annotationType);
@@ -121,6 +164,9 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 		handlerMethods.add(modelType, handlerMethod);
 	}
 
+	/**
+	 * 事件 Handler方法
+	 */
 	static class EventHandlerMethod {
 
 		final Class<? extends RepositoryEvent> eventType;
@@ -142,6 +188,9 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 		}
 	}
 
+	/**
+	 * 用户定义的方法，排除反射代理生成的方法
+	 */
 	public static final ReflectionUtils.MethodFilter USER_METHODS = method -> !method.isSynthetic() && //
 			!method.isBridge() && //
 			!ReflectionUtils.isObjectMethod(method) && //

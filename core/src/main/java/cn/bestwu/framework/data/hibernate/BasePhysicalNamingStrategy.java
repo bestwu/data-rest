@@ -4,6 +4,11 @@ import org.hibernate.boot.model.naming.Identifier;
 import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy;
 
+/**
+ * hibernate 5+ 基础PhysicalNamingStrategy
+ *
+ * @author Peter Wu
+ */
 public class BasePhysicalNamingStrategy extends SpringPhysicalNamingStrategy {
 
 	/**
@@ -11,6 +16,9 @@ public class BasePhysicalNamingStrategy extends SpringPhysicalNamingStrategy {
 	 */
 	private final String tableNamePrefix;
 
+	/**
+	 * @param tableNamePrefix 前缀,一般定义为项目代码
+	 */
 	public BasePhysicalNamingStrategy(String tableNamePrefix) {
 		this.tableNamePrefix = tableNamePrefix;
 	}

@@ -74,6 +74,9 @@ public class Response {
 		return cacheControl(headers);
 	}
 
+	/**
+	 * @return 不支持客户端缓存，不支持客户端保存数据的响应头
+	 */
 	public static HttpHeaders noCache() {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setCacheControl("no-cache, no-store, max-age=0, must-revalidate");
@@ -82,6 +85,10 @@ public class Response {
 		return headers;
 	}
 
+	/**
+	 * @param headers 响应头
+	 * @return 不支持支持客户端缓存，支持客户端保存数据的响应头，即支持必须revalidate的缓存
+	 */
 	public static HttpHeaders cacheControl(HttpHeaders headers) {
 		if (headers == null) {
 			headers = new HttpHeaders();
@@ -144,6 +151,8 @@ public class Response {
 	}
 
 	/**
+	 * 不支持客户端缓存
+	 *
 	 * @param object object
 	 * @return 200 ResponseEntity
 	 */
@@ -152,6 +161,8 @@ public class Response {
 	}
 
 	/**
+	 * 支持客户端缓存
+	 *
 	 * @param object object
 	 * @return 200 ResponseEntity
 	 */
@@ -208,6 +219,9 @@ public class Response {
 			return ResponseEntity.ok().headers(noCache()).body(resource);
 	}
 
+	/**
+	 * @param resource 待处理的资源
+	 */
 	private void itemResourceHandle(PersistentEntityResource<?> resource) {
 		PersistentEntity<?, ?> persistentEntity = resource.getEntity();
 		Object content = resource.getContent();
@@ -223,10 +237,18 @@ public class Response {
 		}
 	}
 
+	/**
+	 * @param resource 资源
+	 * @return 是否没有自身REL
+	 */
 	private boolean noSelfRel(PersistentEntityResource<?> resource) {
 		return resource.getLinks() == null || resource.getLinks().get(Link.REL_SELF) == null;
 	}
 
+	/**
+	 * @param content 资源内容
+	 * @return 自身链接
+	 */
 	protected Link getEntitySelfLink(Object content) {
 		Class<?> sourceClass = content.getClass();
 		if (ClassUtils.isCglibProxy(content)) {
@@ -258,10 +280,20 @@ public class Response {
 		return ControllerLinkBuilder.linkTo(RepositoryEntityController.class, resourceName);
 	}
 
+	/**
+	 * @param persistentEntity persistentEntity
+	 * @param entity           entity
+	 * @return 实体ID
+	 */
 	protected Object getId(PersistentEntity<?, ?> persistentEntity, Object entity) {
 		return persistentEntity.getIdentifierAccessor(entity).getIdentifier();
 	}
 
+	/**
+	 * 响应空白内容
+	 *
+	 * @return 204
+	 */
 	protected ResponseEntity noContent() {
 		return ResponseEntity.noContent().build();
 	}
@@ -324,6 +356,9 @@ public class Response {
 			return resource;
 		}
 
+		/**
+		 * @return BodyBuilder
+		 */
 		public ResponseEntity.BodyBuilder getBodyBuilder() {
 			if (supportClientCache) {
 				HttpHeaders headers = new HttpHeaders();

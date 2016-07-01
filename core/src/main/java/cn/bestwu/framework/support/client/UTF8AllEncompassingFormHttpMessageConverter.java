@@ -12,6 +12,11 @@ import org.springframework.util.ClassUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 支持在有字节码参数时的中文 UTF-8字符
+ *
+ * @author Peter Wu
+ */
 public class UTF8AllEncompassingFormHttpMessageConverter extends FormHttpMessageConverter {
 	private static final boolean jaxb2Present =
 			ClassUtils.isPresent("javax.xml.bind.Binder", AllEncompassingFormHttpMessageConverter.class.getClassLoader());

@@ -49,6 +49,9 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 	private final List<AbstractJackson2HttpMessageConverter> messageConverters;
 	private final RepositoryInvokerFactory invokerFactory;
 	private final String idParameterName = new UriTemplate(BaseController.ID_URI).getVariableNames().get(0);
+	/**
+	 * 修改前的实体 request 属性名
+	 */
 	public static final String OLD_MODEL = "OLD_MODEL";
 
 	public ModelMethodArgumentResolver(RepositoryInvokerFactory invokerFactory, List<AbstractJackson2HttpMessageConverter> messageConverters) {
@@ -72,6 +75,17 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 		return model;
 	}
 
+	/**
+	 * 获取 Model
+	 *
+	 * @param parameter     parameter
+	 * @param mavContainer  mavContainer
+	 * @param webRequest    webRequest
+	 * @param binderFactory binderFactory
+	 * @param modelClass    modelClass
+	 * @return Object
+	 * @throws Exception Exception
+	 */
 	protected Object resolveModel(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory, Class<?> modelClass)
 			throws Exception {
 		Object content;
@@ -86,6 +100,13 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 		return readObject(parameter, content, mavContainer, webRequest, binderFactory);
 	}
 
+	/**
+	 * @param idParameterName id参数名
+	 * @param webRequest      webRequest
+	 * @param binderFactory   binderFactory
+	 * @return 实体ID
+	 * @throws Exception
+	 */
 	private String getId(String idParameterName, NativeWebRequest webRequest, WebDataBinderFactory binderFactory)
 			throws Exception {
 		Object arg = resolveName(idParameterName, webRequest);
@@ -110,6 +131,13 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 		return (uriTemplateVars != null) ? uriTemplateVars.get(name) : null;
 	}
 
+	/**
+	 * @param modelClass    modelClass
+	 * @param webRequest    webRequest
+	 * @param binderFactory binderFactory
+	 * @return Object 待更新实体
+	 * @throws Exception
+	 */
 	private Object getObjectForUpdate(Class<?> modelClass, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
 		Serializable id = getId(idParameterName, webRequest, binderFactory);
@@ -130,6 +158,17 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 		return objectForUpdate;
 	}
 
+	/**
+	 * 从request 读取参数更新到实体
+	 *
+	 * @param parameter     parameter
+	 * @param modelObject   modelObject
+	 * @param mavContainer  mavContainer
+	 * @param webRequest    webRequest
+	 * @param binderFactory binderFactory
+	 * @return Object
+	 * @throws Exception
+	 */
 	private Object readObject(MethodParameter parameter, Object modelObject, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 		HttpServletRequest nativeRequest = webRequest.getNativeRequest(HttpServletRequest.class);
 		Class<?> modelType = modelObject.getClass();
@@ -166,6 +205,12 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 		return binder.convertIfNecessary(binder.getTarget(), modelType);
 	}
 
+	/**
+	 * 如果有必要验证参数
+	 *
+	 * @param binder      binder
+	 * @param methodParam methodParam
+	 */
 	protected void validateIfApplicable(WebDataBinder binder, MethodParameter methodParam) {
 		Annotation[] annotations = methodParam.getParameterAnnotations();
 		for (Annotation ann : annotations) {
@@ -179,15 +224,28 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 		}
 	}
 
+	/**
+	 * 绑定请求参数
+	 *
+	 * @param binder  binder
+	 * @param request request
+	 */
 	protected void bindRequestParameters(WebDataBinder binder, NativeWebRequest request) {
 		ServletRequest servletRequest = request.getNativeRequest(ServletRequest.class);
 		ServletRequestDataBinder servletBinder = (ServletRequestDataBinder) binder;
 		servletBinder.bind(servletRequest);
 	}
 
-	/*
-		 * 从spring 源码 修改来的
-		 */
+	/**
+	 * 从spring 源码 修改来的
+	 *
+	 * @param attributeName attributeName
+	 * @param modelClass    modelClass
+	 * @param binderFactory binderFactory
+	 * @param request       request
+	 * @return Object
+	 * @throws Exception Exception
+	 */
 	protected final Object createAttribute(String attributeName, Class<?> modelClass,
 			WebDataBinderFactory binderFactory, NativeWebRequest request) throws Exception {
 
@@ -203,8 +261,12 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 		return BeanUtils.instantiateClass(modelClass);
 	}
 
-	/*
+	/**
 	 * 从spring 源码 修改来的
+	 *
+	 * @param attributeName attributeName
+	 * @param request       request
+	 * @return return
 	 */
 	protected String getRequestValueForAttribute(String attributeName, NativeWebRequest request) {
 		if (StringUtils.hasText(request.getParameter(attributeName))) {
@@ -214,8 +276,16 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 		}
 	}
 
-	/*
+	/**
 	 * 从spring 源码 修改来的
+	 *
+	 * @param sourceValue   sourceValue
+	 * @param attributeName attributeName
+	 * @param modelClass    modelClass
+	 * @param binderFactory binderFactory
+	 * @param request       request
+	 * @return Object
+	 * @throws Exception Exception
 	 */
 	protected Object createAttributeFromRequestValue(String sourceValue, String attributeName,
 			Class<?> modelClass, WebDataBinderFactory binderFactory, NativeWebRequest request)

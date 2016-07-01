@@ -5,6 +5,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
 /**
+ * ResponseEntity MixIn
+ *
  * @author Peter Wu
  */
 public interface ResponseEntityMixIn<T> {

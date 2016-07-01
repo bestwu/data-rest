@@ -13,6 +13,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.Map;
 
 /**
+ * 测试 接口方法不全支持的情况
+ *
  * @author Peter Wu
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -30,6 +32,12 @@ public class ExcludeTest {
 
 	/*
 	 * @RestResource(excludes = CommonAPI.ALL) 测试
+	 */
+
+	/**
+	 * 全不支持
+	 *
+	 * @throws Exception
 	 */
 	@Test
 	public void testExludeAll() throws Exception {
@@ -51,6 +59,12 @@ public class ExcludeTest {
 		 * @RepositoryRestResource(RepositoryRestResource.POST)
 		 * @Override <S extends TestUser3> S save(S entity);
 		 */
+
+	/**
+	 * 不支持更新
+	 *
+	 * @throws Exception
+	 */
 	@Test
 	public void testExludeUpdate() throws Exception {
 		//save
@@ -67,11 +81,25 @@ public class ExcludeTest {
 	 * @RepositoryRestResource(RepositoryRestResource.PUT)
 	 * @Override <S extends TestUser4> S save(S entity);
 	 */
+
+	/**
+	 * 只支持查询列表
+	 *
+	 * @throws Exception
+	 */
 	@Test
 	public void testExlude() throws Exception {
 		ResponseEntity<Map> result = restTemplate.postForEntity(getBaseUrl() + "/testUser4s", null, Map.class);
-		Assert.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+		Assert.assertEquals(HttpStatus.METHOD_NOT_ALLOWED, result.getStatusCode());
 		result = restTemplate.getForEntity(getBaseUrl() + "/testUser4s", Map.class);
+		Assert.assertEquals(HttpStatus.OK, result.getStatusCode());
+		result = restTemplate.getForEntity(getBaseUrl() + "/testUser4s/1", Map.class);
 		Assert.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+		result = restTemplate.putForEntity(getBaseUrl() + "/testUser4s/12", null, Map.class);
+		Assert.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+		result = restTemplate.deleteForEntity(getBaseUrl() + "/testUser4s/11");
+		Assert.assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
+		result = restTemplate.deleteForEntity(getBaseUrl() + "/testUser4s");
+		Assert.assertEquals(HttpStatus.METHOD_NOT_ALLOWED, result.getStatusCode());
 	}
 }

@@ -32,13 +32,18 @@ import java.util.Map;
 
 /**
  * 根路径
+ *
+ * @author Peter Wu
  */
 @RestController
 @ConditionalOnWebApplication
 public class RootController extends BaseController {
 
-	/*
+	/**
 	 * 拼音
+	 *
+	 * @param word word
+	 * @return word对应简拼
 	 */
 	@ApiSign
 	@RequestMapping(value = "/utils/pinyin", method = RequestMethod.GET)
@@ -53,8 +58,13 @@ public class RootController extends BaseController {
 	@Value("${logging.path:}")
 	private String logging_path;
 
-	/*
-	 * 日志
+	/**
+	 * 查看日志
+	 *
+	 * @param index 页码
+	 * @return 日志
+	 * @throws IOException IOException
+	 * @throws ServletException ServletException
 	 */
 	@RequestMapping(value = "/logs/{index}", method = RequestMethod.GET, produces = { "text/html", "text/plain" })
 	public Object showlog(@PathVariable int index) throws IOException, ServletException {
@@ -82,13 +92,20 @@ public class RootController extends BaseController {
 		}
 	}
 
+	/**
+	 * 验证码httpSession参数名
+	 */
 	public static final String CAPTCHA = "CAPTCHA";
 
-	/*
+	/**
 	 * 验证码
+	 *
+	 * @param httpSession httpSession
+	 * @param response    response
+	 * @throws IOException IOException
 	 */
 	@RequestMapping(value = "/utils/captcha", method = RequestMethod.GET)
-	public void vCode(HttpSession httpSession, HttpServletResponse response) throws IOException {
+	public void captcha(HttpSession httpSession, HttpServletResponse response) throws IOException {
 		response.setContentType("image/jpeg");
 		response.setHeader("Pragma", "No-cache");
 		response.setHeader("Cache-Control", "no-cache");

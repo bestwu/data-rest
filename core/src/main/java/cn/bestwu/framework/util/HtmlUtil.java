@@ -8,8 +8,18 @@ import org.apache.lucene.analysis.charfilter.NormalizeCharMap;
 import java.io.IOException;
 import java.io.StringReader;
 
+/**
+ * HTML 工具类
+ */
 public class HtmlUtil {
 
+	/**
+	 * 截取纯文本内容
+	 *
+	 * @param inputString 输入HTML内容
+	 * @param length      截取长度
+	 * @return 纯文本内容
+	 */
 	public static String subParserHtml(String inputString, int length) {
 		if (inputString == null) {
 			return null;
@@ -18,6 +28,10 @@ public class HtmlUtil {
 		return StringUtil.subString(subHtml, length);// 返回文本字符串
 	}
 
+	/**
+	 * @param inputString 输入HTML内容
+	 * @return 纯文本内容
+	 */
 	public static String parserHtml(String inputString) {
 		if (inputString == null) {
 			return null;
@@ -38,6 +52,10 @@ public class HtmlUtil {
 		}
 	}
 
+	/**
+	 * @param inputString 输入HTML内容
+	 * @return 去除空白内容的纯文本内容
+	 */
 	public static String parserHtmlRemoveBlank(String inputString) {
 		if (inputString == null) {
 			return null;

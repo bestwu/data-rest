@@ -23,6 +23,11 @@ public class RepositoryResourceMappings {
 		this.populateCache(repositories);
 	}
 
+	/**
+	 * 根据 repositories 填充映射缓存
+	 *
+	 * @param repositories repositories
+	 */
 	private void populateCache(Repositories repositories) {
 		repositories.forEach(entityClass -> {
 			org.springframework.data.repository.core.RepositoryInformation repositoryInformation = repositories.getRepositoryInformationFor(entityClass);
@@ -37,10 +42,18 @@ public class RepositoryResourceMappings {
 		});
 	}
 
+	/**
+	 * @param basePathName 请求basePathName
+	 * @return 资源元信息
+	 */
 	public RepositoryResourceMetadata getRepositoryResourceMetadata(String basePathName) {
 		return cache.get(basePathName);
 	}
 
+	/**
+	 * @param basePathName 请求basePathName
+	 * @return 是否包含请求的资源元信息
+	 */
 	protected final boolean hasMetadataFor(String basePathName) {
 		return cache.containsKey(basePathName);
 	}

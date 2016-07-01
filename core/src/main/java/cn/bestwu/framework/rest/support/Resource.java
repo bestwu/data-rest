@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
+ * 一般资源
+ *
  * @author Peter Wu
  */
 @XmlRootElement

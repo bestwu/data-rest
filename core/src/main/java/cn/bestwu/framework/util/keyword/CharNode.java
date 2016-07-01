@@ -8,6 +8,8 @@ import java.util.Set;
 
 /**
  * 每个节点的值隐含在父节点children Map的key上，根节点为一个无值空节点
+ *
+ * @author Peter Wu
  */
 public class CharNode implements Serializable {
 	/**

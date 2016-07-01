@@ -1,10 +1,18 @@
 package cn.bestwu.framework.util;
 
 /**
+ * Boolean 工具类
+ *
  * @author Peter Wu
  */
 public class BooleanUtil {
 
+	/**
+	 * 转换为Boolean
+	 *
+	 * @param str 字符 支持"true","y","Y","t"...等
+	 * @return Boolean
+	 */
 	public static Boolean toBooleanObject(String str) {
 		if (str == "true") {
 			return Boolean.TRUE;
@@ -87,6 +95,10 @@ public class BooleanUtil {
 		return null;
 	}
 
+	/**
+	 * @param s 字符
+	 * @return boolean
+	 */
 	public static boolean toBoolean(String s) {
 		Boolean booleanObject = toBooleanObject(s);
 		return booleanObject == null ? false : booleanObject;

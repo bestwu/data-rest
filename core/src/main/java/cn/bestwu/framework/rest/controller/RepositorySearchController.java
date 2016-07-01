@@ -21,6 +21,11 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+/**
+ * 全文搜索
+ *
+ * @author Peter Wu
+ */
 @ApiSign
 @RepositoryRestController
 @ConditionalOnBean(SearchRepository.class)
@@ -31,8 +36,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 	@Autowired(required = false)
 	private ResultHandler resultHandler;
 
-	/*
+	/**
 	 * 全文搜索
+	 *
+	 * @param resourceInformation resourceInformation
+	 * @param keyword             关键字
+	 * @param pageable            pageable
+	 * @param highLight           是否高亮
+	 * @return return
+	 * @throws NoSuchMethodException NoSuchMethodException
 	 */
 	@RequestMapping(value = "/search/fulltext", method = RequestMethod.GET)
 	public Object search(RootResourceInformation resourceInformation, String keyword, Pageable pageable, boolean highLight) throws NoSuchMethodException {

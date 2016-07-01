@@ -1,8 +1,15 @@
 package cn.bestwu.framework.data;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * 地理位置，经纬度
+ *
+ * @author Peter Wu
  */
+@Setter
+@Getter
 public class Location {
 	/**
 	 * 纬度
@@ -22,22 +29,6 @@ public class Location {
 		this.lng = lng;
 	}
 
-	//--------------------------------------------
-	public Double getLng() {
-		return lng;
-	}
-
-	public void setLng(Double lng) {
-		this.lng = lng;
-	}
-
-	public Double getLat() {
-		return lat;
-	}
-
-	public void setLat(Double lat) {
-		this.lat = lat;
-	}
 	//--------------------------------------------
 
 	/**

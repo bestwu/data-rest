@@ -13,6 +13,8 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 
 /**
+ * Mongodb 搜索实现
+ *
  * @author Peter Wu
  */
 @Slf4j
@@ -24,6 +26,14 @@ public class MongodbSearchRepository implements SearchRepository {
 		this.repositories = repositories;
 	}
 
+	/**
+	 * @param modelType     要搜索的类
+	 * @param keyword       关键字
+	 * @param pageable      分页
+	 * @param resultHandler 结果处理
+	 * @param <T>           T
+	 * @return 结果
+	 */
 	@Override public <T> Page search(Class<T> modelType, String keyword, Pageable pageable, ResultHandler resultHandler) {
 		Class<?> repositoryInterface = repositories.getRepositoryInformationFor(modelType).getRepositoryInterface();
 		try {

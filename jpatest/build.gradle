@@ -26,7 +26,7 @@ def taskGroup = 'app'
 //    source querydslSourcesDir
 //}
 //compileJava.dependsOn generateQueryDSL
-
+//生成querydsl
 def testquerydslSourcesDir = file('src/testquerydsl/java')
 task generateTestJPAQueryDSL(type: JavaCompile, group: taskGroup) {
     source = 'src/test/java/cn/bestwu/framework/jpa/model'

@@ -7,11 +7,15 @@ import java.lang.annotation.Target;
 
 /**
  * Resource PathName
+ * 实体对应path名称
  *
  * @author Peter Wu
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface PathName {
+	/**
+	 * @return 名称
+	 */
 	String value();
 }

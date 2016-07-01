@@ -87,12 +87,18 @@ import java.util.*;
 @Import({ MessageSourceConfiguration.class })
 public class RestMvcConfiguration {
 
+	/**
+	 * 默认Controller
+	 */
 	@Configuration
 	@ConditionalOnWebApplication
 	@ComponentScan(basePackageClasses = BaseController.class)
 	protected static class ControllerConfiguration {
 	}
 
+	/**
+	 * @return 默认jackson2 module
+	 */
 	@Bean
 	public Module defaultModule() {
 		SimpleModule module = new SimpleModule();
@@ -101,6 +107,9 @@ public class RestMvcConfiguration {
 		return module;
 	}
 
+	/**
+	 * 日志
+	 */
 	@Configuration
 	@ConditionalOnWebApplication
 	@ConditionalOnClass(SpringProxy.class)
@@ -116,6 +125,9 @@ public class RestMvcConfiguration {
 		}
 	}
 
+	/**
+	 * @return 错误处理
+	 */
 	@Bean
 	@ConditionalOnMissingBean(value = ErrorAttributes.class, search = SearchStrategy.CURRENT)
 	public BaseErrorAttributes errorAttributes() {
@@ -141,6 +153,9 @@ public class RestMvcConfiguration {
 		return standardServletMultipartResolver;
 	}
 
+	/**
+	 * 邮件发送
+	 */
 	@Configuration
 	@ConditionalOnBean({ JavaMailSenderImpl.class, MailProperties.class })
 	@ConditionalOnMissingBean(MailClient.class)
@@ -157,6 +172,9 @@ public class RestMvcConfiguration {
 		}
 	}
 
+	/**
+	 * WebMvc
+	 */
 	@Configuration
 	@ConditionalOnWebApplication
 	@Import(EnableWebMvcConfiguration.class)
@@ -176,6 +194,9 @@ public class RestMvcConfiguration {
 		@Autowired
 		private HttpMessageConverters messageConverters;
 
+		/**
+		 * @param converters HttpMessageConverter
+		 */
 		@Override
 		public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 			converters.addAll(this.messageConverters.getConverters());
@@ -334,6 +355,9 @@ public class RestMvcConfiguration {
 		}
 	}
 
+	/**
+	 * EnableWebMvc
+	 */
 	@Configuration
 	@ConditionalOnWebApplication
 	protected static class EnableWebMvcConfiguration extends DelegatingWebMvcConfiguration {

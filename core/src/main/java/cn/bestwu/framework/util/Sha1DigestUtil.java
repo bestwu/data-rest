@@ -3,6 +3,11 @@ package cn.bestwu.framework.util;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Sha1加密工具类
+ *
+ * @author Peter Wu
+ */
 public class Sha1DigestUtil {
 
 	/**

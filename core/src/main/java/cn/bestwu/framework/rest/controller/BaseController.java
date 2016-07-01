@@ -79,10 +79,17 @@ public abstract class BaseController extends Response {
 		return messageSource.getMessage(String.valueOf(code), args, null, request == null ? Locale.CHINA : request.getLocale());
 	}
 
+	/**
+	 * @param path 路径
+	 * @return 真实路径
+	 */
 	public String getRealPath(String path) {
 		return servletContext.getRealPath(path);
 	}
 
+	/**
+	 * @return UserAgent
+	 */
 	public String getUserAgent() {
 		Enumeration<String> headers = request.getHeaders("user-agent");
 		if (headers.hasMoreElements()) {
@@ -92,6 +99,9 @@ public abstract class BaseController extends Response {
 		}
 	}
 
+	/**
+	 * @return 客户端设备类型
+	 */
 	protected String getDeviceInfo() {
 		String user_agent = getUserAgent();
 		if (user_agent.indexOf("Android") > 0 || user_agent.indexOf("Commons-HttpClient") > 0) {
@@ -102,6 +112,11 @@ public abstract class BaseController extends Response {
 		return "WEB";
 	}
 
+	/**
+	 * @param pageable pageable
+	 * @param sort     默认sort
+	 * @return 增加默认sort的pageable
+	 */
 	protected Pageable getDefaultPageable(Pageable pageable, Sort sort) {
 		if (pageable.getSort() == null) {
 			pageable = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort);
@@ -109,6 +124,11 @@ public abstract class BaseController extends Response {
 		return pageable;
 	}
 
+	/**
+	 * @param pageable  pageable
+	 * @param modelType 实体类型
+	 * @return 增加默认sort的pageable
+	 */
 	protected Pageable getDefaultPageable(Pageable pageable, Class<?> modelType) {
 		if (pageable == null) {
 			return null;
@@ -124,15 +144,26 @@ public abstract class BaseController extends Response {
 		return pageable;
 	}
 
+	/**
+	 * @param version 比较的版本
+	 * @return 请求版本是否为version
+	 */
 	protected boolean versionEquals(String version) {
 		return ResourceUtil.equalsVersion(request, version);
 	}
 
+	/**
+	 * @param suffix 后缀
+	 * @return 请求的版本是否以suffix后缀结尾
+	 */
 	protected boolean versionEndsWith(String suffix) {
 		String requestVersion = ResourceUtil.getRequestVersion(request);
 		return requestVersion != null && (requestVersion.endsWith(suffix.toLowerCase()) || requestVersion.endsWith(suffix.toUpperCase()));
 	}
 
+	/**
+	 * @return 更新前的实体
+	 */
 	protected Object getOldModel() {
 		String oldModel = ModelMethodArgumentResolver.OLD_MODEL;
 		return request.getAttribute(oldModel);
@@ -140,12 +171,16 @@ public abstract class BaseController extends Response {
 
 	/**
 	 * @param key 参数名称
-	 * @return 是否存在此参数，此方法在request body方式提交数据时可能无效
+	 * @return 是否存在此参数（非空），此方法在request body方式提交数据时可能无效
 	 */
 	protected boolean hasParameter(String key) {
 		return ParameterUtil.hasParameter(request.getParameterMap(), key);
 	}
 
+	/**
+	 * @param key 参数名称
+	 * @return 是否存在此参数（可为空）
+	 */
 	protected boolean hasParameterKey(String key) {
 		return ParameterUtil.hasParameterKey(request.getParameterMap(), key);
 	}

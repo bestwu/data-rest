@@ -26,18 +26,26 @@ public class ResourceMethodArgumentResolver extends ModelMethodArgumentResolver 
 		this.resourceMetadataResolver = resourceMetadataResolver;
 	}
 
-	/*
+	/**
 	 * 支持的参数类型
 	 *
+	 * @param parameter parameter
+	 * @return 是否支持
 	 */
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		return PersistentEntityResource.class.isAssignableFrom(parameter.getParameterType());
 	}
 
-	/*
+	/**
 	 * 处理参数
 	 *
+	 * @param parameter     parameter
+	 * @param mavContainer  mavContainer
+	 * @param webRequest    webRequest
+	 * @param binderFactory binderFactory
+	 * @return PersistentEntityResource
+	 * @throws Exception Exception
 	 */
 	@Override
 	public PersistentEntityResource<?> resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,

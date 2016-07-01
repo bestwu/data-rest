@@ -26,11 +26,16 @@ import static org.springframework.util.StringUtils.commaDelimitedListToStringArr
 import static org.springframework.util.StringUtils.trimAllWhitespace;
 
 /**
+ * 信息源配置
+ *
  * @author Peter Wu
  */
 @Configuration
 public class MessageSourceConfiguration {
 
+	/**
+	 * properties
+	 */
 	@ConfigurationProperties(prefix = "spring.messages")
 	public static class MessageSourceProperties {
 		public static final String BASEMESSAGES = "basemessages";
@@ -78,6 +83,9 @@ public class MessageSourceConfiguration {
 		}
 	}
 
+	/**
+	 * 加入basemessages及配置的信息源
+	 */
 	@Configuration
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	@EnableConfigurationProperties(MessageSourceConfiguration.MessageSourceProperties.class)

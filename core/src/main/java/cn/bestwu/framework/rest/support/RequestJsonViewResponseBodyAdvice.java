@@ -14,6 +14,11 @@ import org.springframework.web.servlet.mvc.method.annotation.AbstractMappingJack
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * 请求JSON视图时响应结果处理
+ *
+ * @author Peter Wu
+ */
 @Slf4j
 public class RequestJsonViewResponseBodyAdvice extends AbstractMappingJacksonResponseBodyAdvice {
 
@@ -34,6 +39,12 @@ public class RequestJsonViewResponseBodyAdvice extends AbstractMappingJacksonRes
 		beforeBodyWrite(bodyContainer, ((ServletServerHttpRequest) request).getServletRequest());
 	}
 
+	/**
+	 * 写入响应BODY前加入序列化视图
+	 *
+	 * @param bodyContainer bodyContainer
+	 * @param request       request
+	 */
 	public void beforeBodyWrite(MappingJacksonValue bodyContainer, HttpServletRequest request) {
 		Class<?> serializationView = serializationViewMappings.getSerializationView(request);
 		if (log.isDebugEnabled()) {

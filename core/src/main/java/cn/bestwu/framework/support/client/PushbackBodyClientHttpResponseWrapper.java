@@ -10,6 +10,12 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.nio.charset.Charset;
 
+/**
+ * 响应结果包装类
+ * 可反复取响应内容
+ *
+ * @author Peter Wu
+ */
 public class PushbackBodyClientHttpResponseWrapper implements ClientHttpResponse {
 
 	private final ClientHttpResponse response;

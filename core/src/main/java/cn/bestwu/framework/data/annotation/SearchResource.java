@@ -2,6 +2,11 @@ package cn.bestwu.framework.data.annotation;
 
 import java.lang.annotation.*;
 
+/**
+ * 搜索类接口
+ *
+ * @author Peter Wu
+ */
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited

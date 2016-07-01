@@ -4,6 +4,12 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import java.util.List;
 
+/**
+ * Page MixIn
+ *
+ * @param <T> T
+ * @author Peter Wu
+ */
 @com.fasterxml.jackson.annotation.JsonIgnoreProperties({ "last", "first", "numberOfElements", "sort" })
 public interface PageMixIn<T> {
 

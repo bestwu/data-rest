@@ -23,7 +23,7 @@ import java.util.Map;
  * @author Peter Wu
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = MongoDbRepositoryConfig.class,value = "server.context-path=/tv", webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = MongoDbRepositoryConfig.class, value = "server.context-path=/tv", webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ControllerTests {
 	@LocalServerPort
 	private int port;
@@ -33,6 +33,11 @@ public class ControllerTests {
 		return host + ":" + port + "/tv";
 	}
 
+	/**
+	 * 测试基本功能
+	 *
+	 * @throws Exception
+	 */
 	@Test
 	public void testRest() throws Exception {
 		CustomRestTemplate restTemplate = new CustomRestTemplate();

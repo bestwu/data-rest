@@ -34,7 +34,7 @@ dependencies {
     //test
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
-
+//打包发布
 apply plugin: 'com.jfrog.bintray'
 apply plugin: "com.jfrog.artifactory"
 apply plugin: 'maven-publish'
@@ -122,7 +122,7 @@ publishing {
         }
     }
 }
-
+//发布到私有仓库并同步中央仓库及mavenCentral
 bintray {
     user = bintrayUsername
     key = bintrayApiKey
@@ -147,7 +147,7 @@ bintray {
         }
     }
 }
-
+//发布到snapshot
 artifactory {
     contextUrl = 'http://oss.jfrog.org'
     publish {

@@ -10,6 +10,8 @@ import java.util.Collection;
 
 /**
  * 简单实现
+ *
+ * @author Peter Wu
  */
 public class SimpleKeywordFilter implements KeywordFilter {
 	protected final CharNode root = new CharNode();
@@ -99,6 +101,11 @@ public class SimpleKeywordFilter implements KeywordFilter {
 		}
 	}
 
+	/**
+	 * 构建失败节点
+	 *
+	 * @param node 节点
+	 */
 	protected void buildFailNode(CharNode node) {
 		doFailNode(node);
 		Collection<CharNode> childNodes = node.childNodes();
@@ -117,10 +124,20 @@ public class SimpleKeywordFilter implements KeywordFilter {
 		node.setFailNode(parent);
 	}
 
+	/**
+	 * 设置匹配模式
+	 *
+	 * @param matchType matchType
+	 */
 	public void setMatchType(MatchType matchType) {
 		this.matchType = matchType;
 	}
 
+	/**
+	 * 设置替换策略
+	 *
+	 * @param strategy 替换策略
+	 */
 	public void setStrategy(ReplaceStrategy strategy) {
 		this.strategy = strategy;
 	}

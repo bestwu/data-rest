@@ -33,6 +33,11 @@ public class ControllerTests {
 		return host + ":" + port + "/tv";
 	}
 
+	/**
+	 * 测试基础功能
+	 *
+	 * @throws Exception
+	 */
 	@Test
 	public void testRest() throws Exception {
 		CustomRestTemplate restTemplate = new CustomRestTemplate();

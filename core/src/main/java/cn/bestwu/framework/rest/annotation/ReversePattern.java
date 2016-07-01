@@ -11,6 +11,11 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+/**
+ * 与{@code Pattern}相反正则表达式的内容检查注解
+ *
+ * @author Peter Wu
+ */
 @Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
 @Retention(RUNTIME)
 @Documented
@@ -18,7 +23,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ReversePattern {
 
 	/**
-	 * @return the regular expression to match
+	 * 不match 此正则表达式的字符通过检查
+	 *
+	 * @return the regular expression to no match
 	 */
 	String regexp();
 

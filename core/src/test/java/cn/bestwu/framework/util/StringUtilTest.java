@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 测试{@code StringUtil.valueOf}方法
+ *
  * @author Peter Wu
  */
 public class StringUtilTest {

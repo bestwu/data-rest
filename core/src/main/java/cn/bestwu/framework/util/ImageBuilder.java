@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 
+/**
+ * 图像Builder
+ */
 public class ImageBuilder {
 	private BufferedImage bufferedImage;
 	private String formatName;
@@ -34,6 +37,13 @@ public class ImageBuilder {
 		iis.close();
 	}
 
+	/**
+	 * 按宽高缩放
+	 *
+	 * @param width  宽度
+	 * @param height 高度
+	 * @return ImageBuilder
+	 */
 	public ImageBuilder scaleTrim(Integer width, Integer height) {
 		double scale = 1.0;
 		if (width == null) {
@@ -77,6 +87,10 @@ public class ImageBuilder {
 		}
 	}
 
+	/**
+	 * @param scale 缩放比例
+	 * @return ImageBuilder
+	 */
 	public ImageBuilder scale(double scale) {
 		if (scale != 1) {
 			width = (int) Math.ceil(this.width * scale);
@@ -92,10 +106,25 @@ public class ImageBuilder {
 		return this;
 	}
 
+	/**
+	 * 按宽高居中裁剪
+	 *
+	 * @param width  宽度
+	 * @param height 高度
+	 * @return ImageBuilder
+	 */
 	public ImageBuilder sourceRegion(int width, int height) {
 		return sourceRegion(width, height, Origin.CENTER);
 	}
 
+	/**
+	 * 按宽高及区域裁剪
+	 *
+	 * @param width  宽度
+	 * @param height 高度
+	 * @param origin 区域
+	 * @return ImageBuilder
+	 */
 	public ImageBuilder sourceRegion(int width, int height, Origin origin) {
 		if (width > this.width) {
 			width = this.width;
@@ -126,6 +155,15 @@ public class ImageBuilder {
 		return sourceRegion(x, y, width, height);
 	}
 
+	/**
+	 * 按位置裁剪
+	 *
+	 * @param x      起点X
+	 * @param y      起点Y
+	 * @param width  宽度
+	 * @param height 高度
+	 * @return ImageBuilder
+	 */
 	public ImageBuilder sourceRegion(int x, int y, int width, int height) {
 		if (width < this.width) {
 			this.width = width;
@@ -137,18 +175,45 @@ public class ImageBuilder {
 		return this;
 	}
 
+	/**
+	 * 输出到文件
+	 *
+	 * @param fileName 文件名
+	 * @return 文件
+	 * @throws IOException IOException
+	 */
 	public boolean toFile(String fileName) throws IOException {
 		return ImageUtil.writeImage(bufferedImage, formatName, new File(fileName));
 	}
 
+	/**
+	 * 输出到文件
+	 *
+	 * @param file 文件
+	 * @return 文件
+	 * @throws IOException IOException
+	 */
 	public boolean toFile(File file) throws IOException {
 		return ImageUtil.writeImage(bufferedImage, formatName, file);
 	}
 
+	/**
+	 * 输出到流
+	 *
+	 * @param os 输出流
+	 * @return 是否成功
+	 * @throws IOException IOException
+	 */
 	public boolean toOutputStream(OutputStream os) throws IOException {
 		return ImageUtil.writeImage(bufferedImage, formatName, os);
 	}
 
+	/**
+	 * 设置给出格式
+	 *
+	 * @param formatName 格式名
+	 * @return ImageBuilder
+	 */
 	public ImageBuilder outputFormat(String formatName) {
 		if (org.springframework.util.StringUtils.hasText(formatName) && !this.formatName.equalsIgnoreCase(formatName)) {
 			/*
@@ -171,6 +236,13 @@ public class ImageBuilder {
 		return this;
 	}
 
+	/**
+	 * 按格式copy
+	 *
+	 * @param bufferedImage 图像
+	 * @param imageType     图像格式
+	 * @return 新图像
+	 */
 	private BufferedImage copy(BufferedImage bufferedImage, int imageType) {
 		int width = bufferedImage.getWidth();
 		int height = bufferedImage.getHeight();
@@ -191,24 +263,58 @@ public class ImageBuilder {
 		return this.bufferedImage;
 	}
 
+	/**
+	 * @return 宽度
+	 */
 	public int getWidth() {
 		return width;
 	}
 
+	/**
+	 * @return 高度
+	 */
 	public int getHeight() {
 		return height;
 	}
 
+	/**
+	 * @return 格式名
+	 */
 	public String getFormatName() {
 		return formatName;
 	}
 
+	/**
+	 * @return 格式
+	 */
 	public int getType() {
 		return type;
 	}
 
+	/**
+	 * 图像区域
+	 */
 	public enum Origin {
-		LEFT_BOTTOM, LEFT_TOP, RIGHT_BOTTOM, RIGHT_TOP, CENTER
+		/**
+		 * 左下
+		 */
+		LEFT_BOTTOM,
+		/**
+		 * 左上
+		 */
+		LEFT_TOP,
+		/**
+		 * 右下
+		 */
+		RIGHT_BOTTOM,
+		/**
+		 * 左上
+		 */
+		RIGHT_TOP,
+		/**
+		 * 中心
+		 */
+		CENTER
 	}
 
 }

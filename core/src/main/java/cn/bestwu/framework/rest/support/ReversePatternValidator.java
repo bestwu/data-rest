@@ -9,6 +9,11 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 
+/**
+ * {@code ReversePattern} 的验证器
+ *
+ * @author Peter Wu
+ */
 public class ReversePatternValidator implements ConstraintValidator<ReversePattern, CharSequence> {
 
 	private static final Log log = LoggerFactory.make();

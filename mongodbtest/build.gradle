@@ -9,7 +9,7 @@ dependencies {
 }
 
 def taskGroup = 'app'
-
+//生成querydsl
 def testquerydslSourcesDir = file('src/testquerydsl/java')
 task generateTestMongodbQueryDSL(type: JavaCompile, group: taskGroup) {
     source = 'src/test/java/cn/bestwu/framework/mongodb/model'

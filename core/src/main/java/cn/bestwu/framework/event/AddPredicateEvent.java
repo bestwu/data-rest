@@ -12,6 +12,10 @@ public class AddPredicateEvent extends RepositoryEvent {
 
 	private static final long serialVersionUID = 1224057810877643594L;
 
+	/**
+	 * @param predicateResource 持有Predicate 的资源
+	 * @param modelType         实体类型
+	 */
 	public AddPredicateEvent(Resource<Predicate> predicateResource, Class<?> modelType) {
 		super(predicateResource, modelType);
 	}

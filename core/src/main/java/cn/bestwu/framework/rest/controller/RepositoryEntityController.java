@@ -33,6 +33,8 @@ import java.util.*;
 /**
  * Entity 模型 基本控制类
  * 对应资源的CRUD操作API
+ *
+ * @author Peter Wu
  */
 @ApiSign
 @RepositoryRestController
@@ -109,8 +111,15 @@ import java.util.*;
 		return new ResponseEntity<>(headers, HttpStatus.OK);
 	}
 
-	/*
+	/**
 	 * Repository方法搜索
+	 *
+	 * @param resourceInformation resourceInformation
+	 * @param parameters          parameters
+	 * @param search              search
+	 * @param pageable            pageable
+	 * @return return
+	 * @throws NoSuchMethodException NoSuchMethodException
 	 */
 	@RequestMapping(value = "/search/{search}", method = RequestMethod.GET)
 	public Object searchMethod(RootResourceInformation resourceInformation, @RequestParam MultiValueMap<String, Object> parameters, @PathVariable String search, Pageable pageable)
@@ -151,8 +160,13 @@ import java.util.*;
 		return ok(new PersistentEntityResource<>(o, resourceInformation.getEntity(), selfLink));
 	}
 
-	/*
+	/**
 	 * 查看资源列表
+	 *
+	 * @param resourceInformation resourceInformation
+	 * @param pageable            分页参数
+	 * @param all                 是否返回所有结果
+	 * @return return
 	 */
 	@RequestMapping(method = RequestMethod.GET)
 	public Object index(RootResourceInformation resourceInformation, Pageable pageable, boolean all) {
@@ -170,8 +184,12 @@ import java.util.*;
 		return ok(new PersistentEntityResource<Object>(results, resourceInformation.getEntity(), getBaseLinkBuilder(resourceInformation.getPathName()).withSelfRel()));
 	}
 
-	/*
+	/**
 	 * 查看单个资源
+	 *
+	 * @param resourceInformation resourceInformation
+	 * @param id                  id
+	 * @return return
 	 */
 	@RequestMapping(value = ID_URI, method = RequestMethod.GET)
 	public Object show(RootResourceInformation resourceInformation, @PathVariable String id) {
@@ -182,6 +200,11 @@ import java.util.*;
 		return ok(new PersistentEntityResource<>(content, resourceInformation.getEntity()));
 	}
 
+	/**
+	 * @param resourceInformation resourceInformation
+	 * @param id                  id
+	 * @return 单个资源
+	 */
 	private Object getItemResource(RootResourceInformation resourceInformation, @PathVariable String id) {
 		RepositoryInvoker invoker = resourceInformation.getInvoker();
 
@@ -194,8 +217,12 @@ import java.util.*;
 		return content;
 	}
 
-	/*
+	/**
 	 * 创建资源
+	 *
+	 * @param resourceInformation resourceInformation
+	 * @param resource            要创建的资源
+	 * @return return
 	 */
 	@RequestMapping(method = RequestMethod.POST)
 	public Object create(RootResourceInformation resourceInformation, @Valid PersistentEntityResource resource) {
@@ -210,8 +237,14 @@ import java.util.*;
 		return created(resource);
 	}
 
-	/*
+	/**
 	 * 修改资源
+	 *
+	 * @param resourceInformation resourceInformation
+	 * @param resource            resource
+	 * @param id                  id
+	 * @param eTag                eTag
+	 * @return return
 	 */
 	@RequestMapping(value = ID_URI, method = RequestMethod.PUT)
 	public Object update(RootResourceInformation resourceInformation, @Valid PersistentEntityResource resource, @PathVariable String id, ETag eTag) {
@@ -230,8 +263,12 @@ import java.util.*;
 		return updated(resource);
 	}
 
-	/*
+	/**
 	 * 删除资源
+	 *
+	 * @param resourceInformation resourceInformation
+	 * @param id                  id
+	 * @return return
 	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = ID_URI, method = RequestMethod.DELETE)
@@ -250,9 +287,14 @@ import java.util.*;
 		return noContent();
 	}
 
-	/*
+	/**
 	 * 删除多个资源
 	 *
+	 * @param resourceInformation resourceInformation
+	 * @param id                  id
+	 * @return return
+	 * @throws IllegalAccessException IllegalAccessException
+	 * @throws InstantiationException InstantiationException
 	 */
 	@RequestMapping(method = RequestMethod.DELETE)
 	public Object batchDestroy(RootResourceInformation resourceInformation, String... id) throws IllegalAccessException, InstantiationException {

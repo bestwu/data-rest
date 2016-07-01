@@ -9,9 +9,16 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * 验证码工具类
+ *
+ * @author Peter Wu
+ */
 public class CaptchaUtil {
 
-	// 使用到Algerian字体，系统里没有的话需要安装字体，字体只显示大写，去掉了1,0,i,o几个容易混淆的字符
+	/**
+	 * 使用到Algerian字体，系统里没有的话需要安装字体，字体只显示大写，去掉了1,0,i,o几个容易混淆的字符
+	 */
 	public static final String CAPTCHA_CODES = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 	private static final Random random = new Random();
 
@@ -45,8 +52,14 @@ public class CaptchaUtil {
 		return verifyCode.toString();
 	}
 
-	/*
+	/**
 	 * 输出指定验证码图片流
+	 *
+	 * @param w    宽度
+	 * @param h    高度
+	 * @param os   输出流
+	 * @param code 验证码
+	 * @throws IOException IOException
 	 */
 	public static void generateImage(int w, int h, OutputStream os, String code) throws IOException {
 		int verifySize = code.length();
@@ -109,6 +122,11 @@ public class CaptchaUtil {
 		ImageIO.write(image, "jpg", os);
 	}
 
+	/**
+	 * @param fc 开始色值
+	 * @param bc 结束色值
+	 * @return 随机色
+	 */
 	private static Color getRandColor(int fc, int bc) {
 		if (fc > 255)
 			fc = 255;
@@ -120,6 +138,9 @@ public class CaptchaUtil {
 		return new Color(r, g, b);
 	}
 
+	/**
+	 * @return 随机int色值
+	 */
 	private static int getRandomIntColor() {
 		int[] rgb = getRandomRgb();
 		int color = 0;
@@ -130,6 +151,9 @@ public class CaptchaUtil {
 		return color;
 	}
 
+	/**
+	 * @return 随机Rgb色值
+	 */
 	private static int[] getRandomRgb() {
 		int[] rgb = new int[3];
 		for (int i = 0; i < 3; i++) {
@@ -138,11 +162,27 @@ public class CaptchaUtil {
 		return rgb;
 	}
 
+	/**
+	 * 干扰线
+	 *
+	 * @param g     图像
+	 * @param w1    宽度
+	 * @param h1    高度
+	 * @param color 颜色
+	 */
 	private static void shear(Graphics g, int w1, int h1, Color color) {
 		shearX(g, w1, h1, color);
 		shearY(g, w1, h1, color);
 	}
 
+	/**
+	 * X干扰线
+	 *
+	 * @param g     图像
+	 * @param w1    宽度
+	 * @param h1    高度
+	 * @param color 颜色
+	 */
 	private static void shearX(Graphics g, int w1, int h1, Color color) {
 
 		int period = random.nextInt(2);
@@ -160,6 +200,14 @@ public class CaptchaUtil {
 
 	}
 
+	/**
+	 * Y干扰线
+	 *
+	 * @param g     图像
+	 * @param w1    宽度
+	 * @param h1    高度
+	 * @param color 颜色
+	 */
 	private static void shearY(Graphics g, int w1, int h1, Color color) {
 
 		int period = random.nextInt(40) + 10; // 50;

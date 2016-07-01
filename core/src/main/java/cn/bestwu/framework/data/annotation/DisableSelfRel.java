@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 无SelfRel
+ * 注解的实体无SelfRel，无查看单个资源的接口
  *
  * @author Peter Wu
  */

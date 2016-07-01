@@ -8,6 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
  * @author Peter Wu
  */
 public class MultipartFileHolder {
+	/**
+	 * MultipartFile
+	 */
 	private MultipartFile file;
 
 	public MultipartFile getFile() {

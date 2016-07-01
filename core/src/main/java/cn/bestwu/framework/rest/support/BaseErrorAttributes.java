@@ -192,9 +192,22 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 		return errorAttributes;
 	}
 
+	/**
+	 * 处理异常
+	 *
+	 * @param error           error
+	 * @param errorAttributes errorAttributes
+	 * @param errors          errors
+	 */
 	protected void handlerException(Throwable error, Map<String, Object> errorAttributes, Map<String, String> errors) {
 	}
 
+	/**
+	 * 增加StackTrace
+	 *
+	 * @param errorAttributes errorAttributes
+	 * @param error           error
+	 */
 	private void addStackTrace(Map<String, Object> errorAttributes, Throwable error) {
 		StringWriter stackTrace = new StringWriter();
 		error.printStackTrace(new PrintWriter(stackTrace));

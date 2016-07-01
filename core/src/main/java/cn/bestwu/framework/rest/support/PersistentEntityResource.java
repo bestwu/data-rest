@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 持久化实体资源
+ *
  * @author Peter Wu
  */
 public class PersistentEntityResource<T> extends Resource<T> {
@@ -44,6 +46,9 @@ public class PersistentEntityResource<T> extends Resource<T> {
 		return entity;
 	}
 
+	/**
+	 * @return 链接
+	 */
 	public Map<String, String> getLinks() {
 		return links;
 	}

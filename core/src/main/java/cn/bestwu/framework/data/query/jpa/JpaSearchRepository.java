@@ -35,7 +35,7 @@ import java.io.Serializable;
 import java.util.*;
 
 /**
- * 全文搜索类
+ * Jpa全文搜索的hibernate Search实现
  *
  * @author Peter Wu
  */
@@ -53,6 +53,11 @@ public class JpaSearchRepository implements SearchRepository {
 		this.publisher = publisher;
 	}
 
+	/**
+	 * @param modelType modelType
+	 * @param <T>       <T>
+	 * @return 搜索字段
+	 */
 	private <T> String[] getSearchFields(Class<T> modelType) {
 		String[] fields;
 		if (fieldsCache.containsKey(modelType)) {
@@ -67,6 +72,11 @@ public class JpaSearchRepository implements SearchRepository {
 		return fields;
 	}
 
+	/**
+	 * @param modelType modelType
+	 * @param <T>       <T>
+	 * @return 高亮字段
+	 */
 	private <T> String[] getHighLightFields(Class<T> modelType) {
 		String[] highLightFields;
 		if (highlightFieldsCache.containsKey(modelType)) {
@@ -81,6 +91,14 @@ public class JpaSearchRepository implements SearchRepository {
 		return highLightFields;
 	}
 
+	/**
+	 * @param modelType     要搜索的类
+	 * @param keyword       关键字
+	 * @param pageable      分页
+	 * @param resultHandler 结果处理
+	 * @param <T>           T
+	 * @return 结果
+	 */
 	@SuppressWarnings("unchecked")
 	@Override public <T> Page search(Class<T> modelType, String keyword, Pageable pageable, ResultHandler resultHandler) {
 		try {

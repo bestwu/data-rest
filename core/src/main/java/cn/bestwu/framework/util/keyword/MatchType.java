@@ -2,6 +2,8 @@ package cn.bestwu.framework.util.keyword;
 
 /**
  * 匹配方式
+ *
+ * @author Peter Wu
  */
 public enum MatchType {
 	/**

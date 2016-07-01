@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * 文件工具类
+ *
+ * @author Peter Wu
+ */
 public class FileUtil {
 
 	//-----------------------------------------------------------------------
@@ -19,6 +24,11 @@ public class FileUtil {
 
 	//-----------------------------------------------------------------------
 
+	/**
+	 * @param file file
+	 * @return FileInputStream
+	 * @throws IOException IOException
+	 */
 	public static FileInputStream openInputStream(File file) throws IOException {
 		if (file.exists()) {
 			if (file.isDirectory()) {

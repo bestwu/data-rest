@@ -8,12 +8,19 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * jpa搜索字段工具类
+ *
  * @author Peter Wu
  */
 public class JpaSearchFieldUtil {
 
-	/*
-	 * 默认搜索字段
+	/**
+	 * modelType类上注解了AnnotationType 的字段
+	 *
+	 * @param modelType      modelType
+	 * @param AnnotationType AnnotationType
+	 * @param <T>            T
+	 * @return 字段名
 	 */
 	public static <T> String[] getAnnotationedFields(Class<T> modelType, Class<? extends Annotation> AnnotationType) {
 		Set<String> fields = new HashSet<>();

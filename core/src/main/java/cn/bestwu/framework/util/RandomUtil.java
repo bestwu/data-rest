@@ -6,6 +6,8 @@ import java.util.Random;
 
 /**
  * 随机工具类
+ *
+ * @author Peter Wu
  */
 public class RandomUtil {
 	private static final Random RANDOM = new Random();
@@ -48,8 +50,17 @@ public class RandomUtil {
 		return random(count, 0, chars.length, false, false, chars, RANDOM);
 	}
 
-	/*
+	/**
 	 * 随机字符串
+	 *
+	 * @param count   字符串长度
+	 * @param start   起始索引
+	 * @param end     结束索引
+	 * @param letters 是否包含字母
+	 * @param numbers 是否包含数字
+	 * @param chars   随机字符范围
+	 * @param random  随机
+	 * @return 随机字符串
 	 */
 	public static String random(int count, int start, int end, boolean letters,
 			boolean numbers, char[] chars, Random random) {
@@ -115,32 +126,41 @@ public class RandomUtil {
 		return new String(buffer);
 	}
 
-	/*
+	/**
 	 * 随机数字
 	 *
+	 * @param num 长度
+	 * @return 随机数字
 	 */
 	public static int randomNum(int num) {
 		return Integer.parseInt(getRandomNum(num));
 	}
 
-	/*
+	/**
 	 * 随机首字大写字符串
 	 *
+	 * @param num 长度
+	 * @return 随机首字大写字符串
 	 */
 	public static String getCapitalizeString(int num) {
 		return StringUtils.capitalize(getRandomString(num));
 	}
 
-	/*
+	/**
 	 * 随机字符串
 	 *
+	 * @param num 长度
+	 * @return 随机字符串
 	 */
 	public static String getRandomString(int num) {
 		return random(num, "abcdefghigklmnopqrstuvwxyz");
 	}
 
-	/*
+	/**
 	 * 随机字符串
+	 *
+	 * @param num 长度
+	 * @return 随机字符串
 	 */
 	public static String getRandomString2(int num) {
 		return random(num, "abcdefghigklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ0123456789");

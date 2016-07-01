@@ -26,6 +26,9 @@ public class SerializationViewMappings {
 	 */
 	private final Map<String, List<VersionedSerializationView>> cache = new HashMap<>();
 
+	/**
+	 * 填充序列化视图缓存
+	 */
 	private void populateCache() {
 		if (serializationViewsClass == null) {
 			return;
@@ -55,6 +58,10 @@ public class SerializationViewMappings {
 		cache.values().forEach(Collections::sort);
 	}
 
+	/**
+	 * @param request 请求
+	 * @return 对应序列化视图
+	 */
 	public Class<?> getSerializationView(HttpServletRequest request) {
 		if (serializationViewsClass == null) {
 			return null;
