@@ -195,9 +195,9 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 	/**
 	 * 处理异常
 	 *
-	 * @param error           error
-	 * @param errorAttributes errorAttributes
-	 * @param errors          errors
+	 * @param error           异常
+	 * @param errorAttributes 错误信息容器
+	 * @param errors          详细错误信息
 	 */
 	protected void handlerException(Throwable error, Map<String, Object> errorAttributes, Map<String, String> errors) {
 	}
