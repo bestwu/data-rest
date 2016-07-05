@@ -17,6 +17,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.WebUtils;
@@ -156,6 +157,9 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 				httpStatusCode = HttpStatus.BAD_REQUEST.value();
 			} else if (e instanceof org.springframework.data.mapping.PropertyReferenceException) {
 				httpStatusCode = HttpStatus.BAD_REQUEST.value();
+			} else if (e instanceof MultipartException) {
+				httpStatusCode = HttpStatus.UNPROCESSABLE_ENTITY.value();
+				message = "上传失败，文件太大/网速太慢";
 			}
 			handlerException(e, errorAttributes, errors);
 			if (errorAttributes.containsKey(KEY_STATUS)) {
