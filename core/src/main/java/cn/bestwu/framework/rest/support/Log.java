@@ -45,4 +45,6 @@ public class Log implements Serializable {
 	 */
 	private String parameters;
 
+	private Long createdDate = System.currentTimeMillis();
+
 }
