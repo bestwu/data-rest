@@ -44,7 +44,13 @@ public class Log implements Serializable {
 	 * 请求参数，不含二进制流
 	 */
 	private String parameters;
-
+	/**
+	 * 创建时间
+	 */
 	private Long createdDate = System.currentTimeMillis();
+	/**
+	 * 设备信息
+	 */
+	private String device;
 
 }

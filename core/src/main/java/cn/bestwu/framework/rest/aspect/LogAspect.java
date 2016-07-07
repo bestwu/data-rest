@@ -19,6 +19,7 @@ import org.springframework.http.server.ServletServerHttpRequest;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 import java.util.Map;
 
 /**
@@ -137,10 +138,19 @@ public class LogAspect {
 				log.setServletPath(servletPath);
 				log.setRequestHeaders(StringUtil.valueOf(headers, true));
 				log.setPrincipalName(principalName);
+				log.setDevice(getUserAgent());
 
 				publisher.publishEvent(new LogEvent(log));
 			}
 		}
 	}
 
+	public String getUserAgent() {
+		Enumeration<String> headers = request.getHeaders("user-agent");
+		if (headers.hasMoreElements()) {
+			return headers.nextElement();
+		} else {
+			return null;
+		}
+	}
 }
