@@ -41,6 +41,10 @@ public class Log implements Serializable {
 	 */
 	private String requestHeaders;
 	/**
+	 * 响应内容，如果成功，则只记录响应码，失败则记录详细信息
+	 */
+	private String response;
+	/**
 	 * 请求参数，不含二进制流
 	 */
 	private String parameters;

@@ -14,6 +14,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.http.server.ServletServerHttpRequest;
 
@@ -139,6 +141,17 @@ public class LogAspect {
 				log.setRequestHeaders(StringUtil.valueOf(headers, true));
 				log.setPrincipalName(principalName);
 				log.setDevice(getUserAgent());
+				if (result instanceof ResponseEntity) {
+					ResponseEntity responseEntity = (ResponseEntity) result;
+					HttpStatus statusCode = responseEntity.getStatusCode();
+					if (statusCode.is2xxSuccessful() || statusCode.is3xxRedirection()) {
+						log.setResponse(statusCode.toString() + " " + statusCode.getReasonPhrase());
+					} else {
+						log.setResponse("Error:\n" + StringUtil.valueOf(result, true));
+					}
+				} else {
+					log.setResponse(StringUtil.subString((String) result, 100));
+				}
 
 				publisher.publishEvent(new LogEvent(log));
 			}
