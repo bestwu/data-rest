@@ -2,7 +2,6 @@ package cn.bestwu.framework.rest.support;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -13,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author Peter Wu
  */
-@Configuration
 public class AutowireHelper implements ApplicationContextAware {
 
 	private static ApplicationContext applicationContext;
