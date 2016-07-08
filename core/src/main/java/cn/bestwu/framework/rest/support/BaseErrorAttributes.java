@@ -159,7 +159,7 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 				httpStatusCode = HttpStatus.BAD_REQUEST.value();
 			} else if (e instanceof MultipartException) {
 				httpStatusCode = HttpStatus.UNPROCESSABLE_ENTITY.value();
-				message = "上传失败，文件太大/网速太慢";
+				message = getText("upload.fail");
 			}
 			handlerException(e, errorAttributes, errors);
 			if (errorAttributes.containsKey(KEY_STATUS)) {

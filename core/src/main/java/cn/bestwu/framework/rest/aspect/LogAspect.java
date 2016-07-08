@@ -145,6 +145,9 @@ public class LogAspect {
 		}
 	}
 
+	/**
+	 * @return 客户端user-agent
+	 */
 	public String getUserAgent() {
 		Enumeration<String> headers = request.getHeaders("user-agent");
 		if (headers.hasMoreElements()) {
