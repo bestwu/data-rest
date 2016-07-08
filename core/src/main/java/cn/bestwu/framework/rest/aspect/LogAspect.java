@@ -3,7 +3,6 @@ package cn.bestwu.framework.rest.aspect;
 import cn.bestwu.framework.event.LogEvent;
 import cn.bestwu.framework.rest.support.Log;
 import cn.bestwu.framework.rest.support.PrincipalNamePutEvent;
-import cn.bestwu.framework.rest.support.RequestJsonViewResponseBodyAdvice;
 import cn.bestwu.framework.rest.support.Resource;
 import cn.bestwu.framework.util.ResourceUtil;
 import cn.bestwu.framework.util.StringUtil;
@@ -16,7 +15,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.http.server.ServletServerHttpRequest;
 
 import javax.servlet.RequestDispatcher;
@@ -64,9 +62,6 @@ public class LogAspect {
 			request.setAttribute(PUT_PARAMETER_MAP, request.getParameterMap());
 	}
 
-	@Autowired(required = false)
-	private RequestJsonViewResponseBodyAdvice requestJsonViewResponseBodyAdvice;
-
 	/**
 	 * 记录日志
 	 *
@@ -113,20 +108,18 @@ public class LogAspect {
 			String requestSignature = ResourceUtil.getRequestSignature(request);
 
 			String resultStr;
-			if ("get_logs_index".equals(requestSignature)) {
-				resultStr = servletPath;
-			} else {
-				if (log.isDebugEnabled()) {
-					if (requestJsonViewResponseBodyAdvice != null) {
-						MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
-						requestJsonViewResponseBodyAdvice.beforeBodyWrite(mappingJacksonValue, request);
-						result = mappingJacksonValue;
-					}
-					resultStr = StringUtil.valueOf(result, true);
+			if (result instanceof ResponseEntity) {
+				ResponseEntity responseEntity = (ResponseEntity) result;
+				HttpStatus statusCode = responseEntity.getStatusCode();
+				if (statusCode.is2xxSuccessful() || statusCode.is3xxRedirection()) {
+					resultStr = statusCode.toString() + " " + statusCode.getReasonPhrase();
 				} else {
-					resultStr = StringUtil.subString(String.valueOf(result), 100);
+					resultStr = "Error:\n" + StringUtil.valueOf(result, true);
 				}
+			} else {
+				resultStr = StringUtil.subString(String.valueOf(result), 100);
 			}
+
 			log.info(MSG_CODE, ipAddress, principalName, requestMethod,
 					servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true),
 					resultStr);
@@ -141,17 +134,7 @@ public class LogAspect {
 				log.setRequestHeaders(StringUtil.valueOf(headers, true));
 				log.setPrincipalName(principalName);
 				log.setDevice(getUserAgent());
-				if (result instanceof ResponseEntity) {
-					ResponseEntity responseEntity = (ResponseEntity) result;
-					HttpStatus statusCode = responseEntity.getStatusCode();
-					if (statusCode.is2xxSuccessful() || statusCode.is3xxRedirection()) {
-						log.setResponse(statusCode.toString() + " " + statusCode.getReasonPhrase());
-					} else {
-						log.setResponse("Error:\n" + StringUtil.valueOf(result, true));
-					}
-				} else {
-					log.setResponse(StringUtil.subString((String) result, 100));
-				}
+				log.setResponse(resultStr);
 
 				publisher.publishEvent(new LogEvent(log));
 			}
