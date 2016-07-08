@@ -132,8 +132,8 @@ public class LogAspect {
 				log.setRequestSignature(requestSignature);
 				log.setServletPath(servletPath);
 				log.setRequestHeaders(StringUtil.valueOf(headers, true));
-				log.setPrincipalName(principalName);
-				log.setDevice(getUserAgent());
+				log.setPrincipalName(StringUtil.subString(principalName, 220));
+				log.setDevice(StringUtil.subString(getUserAgent(), 220));
 				log.setResponse(resultStr);
 
 				publisher.publishEvent(new LogEvent(log));
