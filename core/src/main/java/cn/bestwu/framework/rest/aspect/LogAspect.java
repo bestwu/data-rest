@@ -109,25 +109,25 @@ public class LogAspect {
 
 			principalName = principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName;
 			String requestSignature = ResourceUtil.getRequestSignature(request);
-			if (log.isDebugEnabled()) {
-				String resultStr;
-				if ("get_logs_index".equals(requestSignature)) {
-					resultStr = StringUtil.subString(result.toString(), 100);
-				} else {
+
+			String resultStr;
+			if ("get_logs_index".equals(requestSignature)) {
+				resultStr = servletPath;
+			} else {
+				if (log.isDebugEnabled()) {
 					if (requestJsonViewResponseBodyAdvice != null) {
 						MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(result);
 						requestJsonViewResponseBodyAdvice.beforeBodyWrite(mappingJacksonValue, request);
 						result = mappingJacksonValue;
 					}
 					resultStr = StringUtil.valueOf(result, true);
+				} else {
+					resultStr = StringUtil.subString(String.valueOf(result), 100);
 				}
-				log.info(MSG_CODE, ipAddress, principalName, requestMethod,
-						servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true),
-						resultStr);
-			} else
-				log.info(MSG_CODE, ipAddress, principalName, requestMethod,
-						servletPath, StringUtil.valueOf(headers, true), StringUtil.subString(StringUtil.valueOf(parameterMap), 100),
-						StringUtil.subString(String.valueOf(result), 100));
+			}
+			log.info(MSG_CODE, ipAddress, principalName, requestMethod,
+					servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true),
+					resultStr);
 
 			{
 				Log log = new Log();
