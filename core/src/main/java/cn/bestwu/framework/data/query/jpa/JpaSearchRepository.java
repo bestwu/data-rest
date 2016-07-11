@@ -121,21 +121,23 @@ public class JpaSearchRepository implements SearchRepository {
 
 			if (noCriterionEntries) {
 				org.hibernate.search.jpa.FullTextQuery jpaQuery = fullTextEntityManager.createFullTextQuery(luceneQuery, modelType);
+				totalSize = jpaQuery.getResultSize();
 
-				if (sort != null) {
-					List<SortField> sortFields = new ArrayList<>();
-					sort.forEach(order -> sortFields.add(new SortField(order.getProperty(), SortField.Type.SCORE, org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection()))));
-					jpaQuery.setSort(new Sort(sortFields.toArray(new SortField[sortFields.size()])));
-				}
+				if (totalSize > 0) {
+					if (sort != null) {
+						List<SortField> sortFields = new ArrayList<>();
+						sort.forEach(
+								order -> sortFields.add(new SortField(order.getProperty(), SortField.Type.SCORE, org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection()))));
+						jpaQuery.setSort(new Sort(sortFields.toArray(new SortField[sortFields.size()])));
+					}
 
-				jpaQuery.setFirstResult(pageable.getOffset());
-				jpaQuery.setMaxResults(pageable.getPageSize());
-				result = jpaQuery.getResultList();
-				if (result.size() == 0) {
-					totalSize = 0;
+					jpaQuery.setFirstResult(pageable.getOffset());
+					jpaQuery.setMaxResults(pageable.getPageSize());
+					result = jpaQuery.getResultList();
 				} else {
-					totalSize = jpaQuery.getResultSize();
+					result = Collections.emptyList();
 				}
+
 			} else {
 				SessionImplementor sessionImplementor = (SessionImplementor) EntityManagerUtil.getSession(entityManager);
 
@@ -158,25 +160,29 @@ public class JpaSearchRepository implements SearchRepository {
 					}
 					criteria.add(Restrictions.in(idName, ids));
 
-					if (sort != null) {
-						sort.forEach(order -> {
-							if (org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection())) {
-								criteria.addOrder(org.hibernate.criterion.Order.desc(order.getProperty()));
-							} else {
-								criteria.addOrder(org.hibernate.criterion.Order.asc(order.getProperty()));
-							}
-						});
+					criteria.setProjection(Projections.count("id"));
+					totalSize = (long) criteria.list().get(0);
+
+					if (totalSize > 0) {
+						criteria.setProjection(null);
+
+						if (sort != null) {
+							sort.forEach(order -> {
+								if (org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection())) {
+									criteria.addOrder(org.hibernate.criterion.Order.desc(order.getProperty()));
+								} else {
+									criteria.addOrder(org.hibernate.criterion.Order.asc(order.getProperty()));
+								}
+							});
+						}
+
+						criteria.setFirstResult(pageable.getOffset());
+						criteria.setMaxResults(pageable.getPageSize());
+						result = criteria.list();
+					} else {
+						result = Collections.emptyList();
 					}
 
-					criteria.setFirstResult(pageable.getOffset());
-					criteria.setMaxResults(pageable.getPageSize());
-					result = criteria.list();
-					if (result.size() == 0) {
-						totalSize = 0;
-					} else {
-						criteria.setProjection(Projections.count("id"));
-						totalSize = (long) criteria.list().get(0);
-					}
 				} else {
 					totalSize = 0;
 					result = Collections.emptyList();
