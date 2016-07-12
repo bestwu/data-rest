@@ -21,7 +21,7 @@ public class DateUtil {
 	 * @return 格式化后的字符
 	 */
 	public static String format(Long millis, String pattern) {
-		return format(millis, ZoneOffset.of("+8"), DateTimeFormatter.ofPattern(pattern));
+		return format(millis, DateTimeFormatter.ofPattern(pattern));
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class DateUtil {
 	 * @return 格式化后的字符
 	 */
 	public static String format(Long millis, DateTimeFormatter formatter) {
-		return LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneOffset.of("+8")).format(formatter);
+		return format(millis, ZoneOffset.of("+8"), formatter);
 	}
 
 	/**
