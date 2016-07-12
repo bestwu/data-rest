@@ -108,7 +108,9 @@ public class HighlightResultHandler implements ResultHandler {
 			Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, pfieldName).getReadMethod(), t);
 			Class<?> fieldType = modelType.getDeclaredField(pfieldName).getType();
 			String propertyName = split[1];
-			hightLightField(analyzer, fieldType, highlighter, fieldValue, propertyName);
+			if (fieldValue != null) {
+				hightLightField(analyzer, fieldType, highlighter, fieldValue, propertyName);
+			}
 		} else {
 			Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getReadMethod(), t);
 			String text = String.valueOf(fieldValue);
