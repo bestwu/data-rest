@@ -1,4 +1,4 @@
-package cn.bestwu.framework.rest.support;
+package cn.bestwu.framework.util;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

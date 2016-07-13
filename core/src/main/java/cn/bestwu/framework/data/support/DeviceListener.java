@@ -1,5 +1,7 @@
-package cn.bestwu.framework.rest.support;
+package cn.bestwu.framework.data.support;
 
+import cn.bestwu.framework.data.annotation.Device;
+import cn.bestwu.framework.util.AutowireHelper;
 import cn.bestwu.framework.util.StringUtil;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.PersistentProperty;
@@ -7,7 +9,6 @@ import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.data.repository.support.Repositories;
 
 import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -22,7 +23,7 @@ public class DeviceListener {
 	 * @param object entity
 	 */
 	@PrePersist
-	@PreUpdate
+	//	@PreUpdate
 	public void setDevice(Object object) {
 		Repositories repositories = AutowireHelper.getBean(Repositories.class);
 		PersistentEntity<?, ?> persistentEntity = repositories.getPersistentEntity(object.getClass());

@@ -10,6 +10,7 @@ import cn.bestwu.framework.rest.mapping.SerializationViewMappings;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
 import cn.bestwu.framework.rest.resolver.*;
 import cn.bestwu.framework.rest.support.*;
+import cn.bestwu.framework.util.AutowireHelper;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;

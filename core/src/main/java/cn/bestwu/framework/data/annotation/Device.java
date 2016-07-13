@@ -1,4 +1,4 @@
-package cn.bestwu.framework.rest.support;
+package cn.bestwu.framework.data.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
