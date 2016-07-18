@@ -108,6 +108,7 @@ public class LogAspect {
 			String requestSignature = ResourceUtil.getRequestSignature(request);
 
 			String resultStr;
+			boolean error = false;
 			if (result instanceof ResponseEntity) {
 				ResponseEntity responseEntity = (ResponseEntity) result;
 				HttpStatus statusCode = responseEntity.getStatusCode();
@@ -116,13 +117,19 @@ public class LogAspect {
 				} else {
 					resultStr = "Error:\n" + StringUtil.valueOf(result, true);
 				}
+				error = statusCode.is5xxServerError();
 			} else {
 				resultStr = StringUtil.subString(String.valueOf(result), 100);
 			}
 
-			log.info(MSG_CODE, ipAddress, principalName, requestMethod,
-					servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true),
-					resultStr);
+			if (error)
+				log.error(MSG_CODE, ipAddress, principalName, requestMethod,
+						servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true),
+						resultStr);
+			else
+				log.info(MSG_CODE, ipAddress, principalName, requestMethod,
+						servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true),
+						resultStr);
 
 			{
 				Log log = new Log();
