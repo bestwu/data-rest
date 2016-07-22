@@ -4,6 +4,7 @@ import cn.bestwu.framework.data.annotation.PathName;
 import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
 import cn.bestwu.framework.rest.support.Version;
+import lombok.extern.slf4j.Slf4j;
 import org.atteo.evo.inflector.English;
 import org.springframework.hateoas.core.AnnotationMappingDiscoverer;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import java.util.Enumeration;
  *
  * @author Peter Wu
  */
+@Slf4j
 public class ResourceUtil {
 
 	public static final String SEPARATOR = ",";
@@ -60,6 +62,9 @@ public class ResourceUtil {
 		}
 
 		apiSignature = apiSignature.replaceAll("[{}]", "").replace("/", "_");
+		if (log.isDebugEnabled()) {
+			log.debug("请求签名：" + apiSignature);
+		}
 		return apiSignature;
 	}
 
