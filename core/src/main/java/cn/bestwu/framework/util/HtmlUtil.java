@@ -29,6 +29,21 @@ public class HtmlUtil {
 	}
 
 	/**
+	 * 截取纯文本内容
+	 *
+	 * @param inputString 输入HTML内容
+	 * @param length      截取长度
+	 * @return 纯文本内容
+	 */
+	public static String subParserHtmlWithEllipsis(String inputString, int length) {
+		if (inputString == null) {
+			return null;
+		}
+		String subHtml = parserHtmlRemoveBlank(inputString);
+		return StringUtil.subStringWithEllipsis(subHtml, length);// 返回文本字符串
+	}
+
+	/**
 	 * @param inputString 输入HTML内容
 	 * @return 纯文本内容
 	 */
