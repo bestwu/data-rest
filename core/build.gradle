@@ -32,6 +32,7 @@ dependencies {
     optional 'org.springframework.boot:spring-boot-starter-mail'
     optional 'com.belerweb:pinyin4j'
     //test
+    testCompile 'org.apache.commons:commons-lang3:3.4'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
 //打包发布

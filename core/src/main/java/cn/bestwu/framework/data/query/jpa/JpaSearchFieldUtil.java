@@ -1,5 +1,6 @@
 package cn.bestwu.framework.data.query.jpa;
 
+import cn.bestwu.framework.util.StringUtil;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 import java.lang.annotation.Annotation;
@@ -36,9 +37,11 @@ public class JpaSearchFieldUtil {
 		if (field.isAnnotationPresent(annotationType)) {
 			fields.add(fieldName);
 		} else if (field.isAnnotationPresent(IndexedEmbedded.class)) {
-			for (java.lang.reflect.Field fieldField : field.getType().getDeclaredFields()) {
-				addAnnotationedFields(fields, fieldField, annotationType, fieldName);
-			}
+			IndexedEmbedded annotation = field.getAnnotation(IndexedEmbedded.class);
+			if (annotation.depth() > StringUtil.countSubString(fieldName, "."))
+				for (java.lang.reflect.Field fieldField : field.getType().getDeclaredFields()) {
+					addAnnotationedFields(fields, fieldField, annotationType, fieldName);
+				}
 		}
 	}
 }

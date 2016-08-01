@@ -14,7 +14,9 @@ import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -168,4 +170,112 @@ public class StringUtil {
 		}
 	}
 
+	/**
+	 * 计算字符串包含子字符串的个数
+	 *
+	 * @param str 字符串
+	 * @param sub 子字符串
+	 * @return 个数
+	 */
+	public static int countSubString(String str, String sub) {
+		if (str.contains(sub)) {
+			return splitWorker(str, sub, -1, false).length - 1;
+		} else {
+			return 0;
+		}
+	}
+
+	/**
+	 * 分割字符串
+	 *
+	 * @param str               字符串
+	 * @param separatorChars    分隔符
+	 * @param max               最大数量
+	 * @param preserveAllTokens preserveAllTokens
+	 * @return 分割后数组
+	 */
+	private static String[] splitWorker(final String str, final String separatorChars, final int max, final boolean preserveAllTokens) {
+		// Performance tuned for 2.0 (JDK1.4)
+		// Direct code is quicker than StringTokenizer.
+		// Also, StringTokenizer uses isSpace() not isWhitespace()
+
+		if (str == null) {
+			return null;
+		}
+		final int len = str.length();
+		if (len == 0) {
+			return new String[0];
+		}
+		final List<String> list = new ArrayList<>();
+		int sizePlus1 = 1;
+		int i = 0, start = 0;
+		boolean match = false;
+		boolean lastMatch = false;
+		if (separatorChars == null) {
+			// Null separator means use whitespace
+			while (i < len) {
+				if (Character.isWhitespace(str.charAt(i))) {
+					if (match || preserveAllTokens) {
+						lastMatch = true;
+						if (sizePlus1++ == max) {
+							i = len;
+							lastMatch = false;
+						}
+						list.add(str.substring(start, i));
+						match = false;
+					}
+					start = ++i;
+					continue;
+				}
+				lastMatch = false;
+				match = true;
+				i++;
+			}
+		} else if (separatorChars.length() == 1) {
+			// Optimise 1 character case
+			final char sep = separatorChars.charAt(0);
+			while (i < len) {
+				if (str.charAt(i) == sep) {
+					if (match || preserveAllTokens) {
+						lastMatch = true;
+						if (sizePlus1++ == max) {
+							i = len;
+							lastMatch = false;
+						}
+						list.add(str.substring(start, i));
+						match = false;
+					}
+					start = ++i;
+					continue;
+				}
+				lastMatch = false;
+				match = true;
+				i++;
+			}
+		} else {
+			// standard case
+			while (i < len) {
+				if (separatorChars.indexOf(str.charAt(i)) >= 0) {
+					if (match || preserveAllTokens) {
+						lastMatch = true;
+						if (sizePlus1++ == max) {
+							i = len;
+							lastMatch = false;
+						}
+						list.add(str.substring(start, i));
+						match = false;
+					}
+					start = ++i;
+					continue;
+				}
+				lastMatch = false;
+				match = true;
+				i++;
+			}
+		}
+		if (match || preserveAllTokens && lastMatch) {
+			list.add(str.substring(start, i));
+		}
+		return list.toArray(new String[list.size()]);
+	}
 }

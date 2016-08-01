@@ -21,4 +21,11 @@ public class StringUtilTest {
 
 		Assert.assertEquals("{\"firstName\":\"peter\",\"lastName\":\"wu\"}", StringUtil.valueOf(testUser));
 	}
+
+	@Test
+	public void countSubString() throws Exception {
+		Assert.assertEquals(1, StringUtil.countSubString("a.b", "."));
+		Assert.assertEquals(0, StringUtil.countSubString("ab", "."));
+	}
+
 }
