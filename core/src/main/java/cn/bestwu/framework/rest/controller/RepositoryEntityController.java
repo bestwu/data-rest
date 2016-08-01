@@ -258,8 +258,6 @@ import java.util.*;
 		invoker.invokeSave(content);
 		publisher.publishEvent(new AfterSaveEvent(content));
 
-		publisher.publishEvent(new AfterLinkSaveEvent(content, getOldModel()));
-
 		return updated(resource);
 	}
 

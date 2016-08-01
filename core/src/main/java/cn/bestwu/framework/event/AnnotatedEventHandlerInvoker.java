@@ -110,12 +110,8 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 			inspect(bean, method, HandleBeforeSave.class, BeforeSaveEvent.class);
 			inspect(bean, method, HandleBeforeShow.class, BeforeShowEvent.class);
 			inspect(bean, method, HandleAfterSave.class, AfterSaveEvent.class);
-			inspect(bean, method, HandleBeforeLinkSave.class, BeforeLinkSaveEvent.class);
-			inspect(bean, method, HandleAfterLinkSave.class, AfterLinkSaveEvent.class);
 			inspect(bean, method, HandleBeforeDelete.class, BeforeDeleteEvent.class);
 			inspect(bean, method, HandleAfterDelete.class, AfterDeleteEvent.class);
-			inspect(bean, method, HandleBeforeLinkDelete.class, BeforeLinkDeleteEvent.class);
-			inspect(bean, method, HandleAfterLinkDelete.class, AfterLinkDeleteEvent.class);
 			inspect(bean, method, HandleItemResource.class, ItemResourceEvent.class);
 			inspect(bean, method, HandleDefaultSort.class, DefaultSortEvent.class);
 			inspect(bean, method, HandleDefaultPredicate.class, DefaultPredicateEvent.class);
