@@ -10,7 +10,6 @@ import cn.bestwu.framework.rest.mapping.SerializationViewMappings;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
 import cn.bestwu.framework.rest.resolver.*;
 import cn.bestwu.framework.rest.support.*;
-import cn.bestwu.framework.util.AutowireHelper;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import lombok.extern.slf4j.Slf4j;
@@ -87,16 +86,6 @@ import java.util.*;
 @ConditionalOnWebApplication
 @Import({ MessageSourceConfiguration.class })
 public class RestMvcConfiguration {
-
-	/**
-	 * 初始化bean工具类
-	 *
-	 * @return bean工具类
-	 */
-	@Bean
-	public AutowireHelper autowireHelper() {
-		return new AutowireHelper();
-	}
 
 	/**
 	 * 默认Controller

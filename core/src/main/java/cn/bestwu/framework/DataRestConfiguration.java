@@ -5,6 +5,7 @@ import cn.bestwu.framework.data.query.SearchRepository;
 import cn.bestwu.framework.data.query.jpa.JpaSearchRepository;
 import cn.bestwu.framework.event.AnnotatedEventHandlerInvoker;
 import cn.bestwu.framework.rest.config.RestMvcConfiguration;
+import cn.bestwu.framework.util.AutowireHelper;
 import org.hibernate.search.jpa.Search;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,16 @@ public class DataRestConfiguration {
 
 	@Autowired
 	private ApplicationContext applicationContext;
+
+	/**
+	 * 初始化bean工具类
+	 *
+	 * @return bean工具类
+	 */
+	@Bean
+	public AutowireHelper autowireHelper() {
+		return new AutowireHelper();
+	}
 
 	@Bean
 	@ConditionalOnMissingBean(Repositories.class)
