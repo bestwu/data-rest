@@ -1,10 +1,6 @@
 package cn.bestwu.framework.rest.resolver;
 
-import cn.bestwu.framework.event.AddPredicateEvent;
-import cn.bestwu.framework.event.DefaultPredicateEvent;
-import cn.bestwu.framework.rest.support.Resource;
 import com.querydsl.core.types.Predicate;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.querydsl.binding.*;
 import org.springframework.data.util.ClassTypeInformation;
@@ -28,12 +24,10 @@ public class QuerydslPredicateArgumentResolver implements HandlerMethodArgumentR
 
 	private final QuerydslBindingsFactory bindingsFactory;
 	private final FixQuerydslPredicateBuilder predicateBuilder;
-	private final ApplicationEventPublisher publisher;
 
-	public QuerydslPredicateArgumentResolver(QuerydslBindingsFactory bindingsFactory, FixQuerydslPredicateBuilder predicateBuilder, ApplicationEventPublisher publisher) {
+	public QuerydslPredicateArgumentResolver(QuerydslBindingsFactory bindingsFactory, FixQuerydslPredicateBuilder predicateBuilder) {
 		this.bindingsFactory = bindingsFactory;
 		this.predicateBuilder = predicateBuilder;
-		this.publisher = publisher;
 	}
 
 	@Override
@@ -69,17 +63,7 @@ public class QuerydslPredicateArgumentResolver implements HandlerMethodArgumentR
 				? null : annotation.bindings());
 		QuerydslBindings bindings = bindingsFactory.createBindingsFor(customizer, typeInformation);
 
-		Class<?> modelType = typeInformation.getType();
-		{//设置默认条件
-			publisher.publishEvent(new DefaultPredicateEvent(parameters, modelType));
-		}
-		Predicate predicate = predicateBuilder.getPredicate(typeInformation, parameters, bindings);
-		{//添加条件
-			Resource<Predicate> predicateResource = new Resource<>(predicate);
-			publisher.publishEvent(new AddPredicateEvent(predicateResource, modelType));
-			predicate = predicateResource.getContent();
-		}
-		return predicate;
+		return predicateBuilder.getPredicate(typeInformation, parameters, bindings);
 	}
 
 	static TypeInformation<?> extractTypeInfo(MethodParameter parameter) {

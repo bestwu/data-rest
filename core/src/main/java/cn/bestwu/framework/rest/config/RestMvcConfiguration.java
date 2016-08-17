@@ -438,7 +438,7 @@ public class RestMvcConfiguration {
 			argumentResolvers
 					.add(new ResourceMethodArgumentResolver(repositoryResourceMetadataHandlerMethodArgumentResolver(), repositoryInvokerFactory(), messageConverters()));
 			if (QueryDslUtils.QUERY_DSL_PRESENT)
-				argumentResolvers.add(0, new QuerydslPredicateArgumentResolver(querydslBindingsFactory(), querydslPredicateBuilder(), publisher));
+				argumentResolvers.add(0, new QuerydslPredicateArgumentResolver(querydslBindingsFactory(), querydslPredicateBuilder()));
 			argumentResolvers.add(new ETagArgumentResolver());
 		}
 

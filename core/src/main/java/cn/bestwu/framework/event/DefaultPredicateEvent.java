@@ -1,9 +1,10 @@
 package cn.bestwu.framework.event;
 
-import org.springframework.util.MultiValueMap;
+import cn.bestwu.framework.rest.support.Resource;
+import com.querydsl.core.types.Predicate;
 
 /**
- * 事件：默认QueryDsl Predicate
+ * 给Predicate 附加条件
  *
  * @author Peter Wu
  */
@@ -12,10 +13,10 @@ public class DefaultPredicateEvent extends RepositoryEvent {
 	private static final long serialVersionUID = 1224057810877643594L;
 
 	/**
-	 * @param multiValueMap 请求参数
-	 * @param modelType     实体类型
+	 * @param predicateResource 持有Predicate 的资源
+	 * @param modelType         实体类型
 	 */
-	public DefaultPredicateEvent(MultiValueMap<String, String> multiValueMap, Class<?> modelType) {
-		super(multiValueMap, modelType);
+	public DefaultPredicateEvent(Resource<Predicate> predicateResource, Class<?> modelType) {
+		super(predicateResource, modelType);
 	}
 }

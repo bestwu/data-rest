@@ -115,7 +115,6 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 			inspect(bean, method, HandleItemResource.class, ItemResourceEvent.class);
 			inspect(bean, method, HandleDefaultSort.class, DefaultSortEvent.class);
 			inspect(bean, method, HandleDefaultPredicate.class, DefaultPredicateEvent.class);
-			inspect(bean, method, HandleAddPredicate.class, AddPredicateEvent.class);
 			inspect(bean, method, HandleBeforeSearch.class, BeforeSearchEvent.class);
 		}, USER_METHODS);
 
@@ -148,8 +147,6 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 			modelType = ((HandleDefaultSort) annotation).value();
 		} else if (annotationType.equals(HandleDefaultPredicate.class)) {
 			modelType = ((HandleDefaultPredicate) annotation).value();
-		} else if (annotationType.equals(HandleAddPredicate.class)) {
-			modelType = ((HandleAddPredicate) annotation).value();
 		} else if (annotationType.equals(HandleBeforeSearch.class)) {
 			modelType = ((HandleBeforeSearch) annotation).value();
 		} else {
