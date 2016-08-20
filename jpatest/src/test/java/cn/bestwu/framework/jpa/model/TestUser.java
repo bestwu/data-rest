@@ -7,6 +7,7 @@ import org.hibernate.search.annotations.Indexed;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * 测试用
@@ -16,8 +17,9 @@ import javax.persistence.Id;
 @Indexed
 @Entity
 @DisableSelfRel
-public class TestUser {
+public class TestUser implements Serializable{
 
+	private static final long serialVersionUID = -5307014753508599553L;
 	@Id
 	@GeneratedValue
 	private Long id;

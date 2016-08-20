@@ -2,25 +2,30 @@ package cn.bestwu.framework.rest.support;
 
 import cn.bestwu.framework.rest.exception.ETagDoesntMatchException;
 import cn.bestwu.framework.util.Sha1DigestUtil;
+import org.springframework.core.serializer.DefaultSerializer;
+import org.springframework.core.serializer.Serializer;
+import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
+import java.io.ByteArrayOutputStream;
+
 import static org.springframework.util.StringUtils.trimLeadingCharacter;
 import static org.springframework.util.StringUtils.trimTrailingCharacter;
 
 /**
  * A value object to represent ETags.
- *
- *
  */
 public final class ETag {
 
 	public static final ETag NO_ETAG = new ETag(null);
 
 	private final String value;
+
+	private static final Serializer<Object> serializer = new DefaultSerializer();
 
 	private ETag(String value) {
 		this.value = trimTrailingCharacter(trimLeadingCharacter(value, '"'), '"');
@@ -30,50 +35,44 @@ public final class ETag {
 		return value == null ? NO_ETAG : new ETag(value);
 	}
 
-	public static ETag from(PersistentEntity<?, ?> entity, Object bean) {
-		return from(getETagValue(entity, bean));
+	public static ETag from(PersistentEntity<?, ?> entity, Object bean, boolean exact) {
+		return from(getETagValue(entity, bean, exact));
 	}
 
-	public static String getETagValue(PersistentEntity<?, ?> entity, Object bean) {
+	public static String getETagValue(PersistentEntity<?, ?> entity, Object bean, boolean exact) {
 		Assert.notNull(entity, "PersistentEntity must not be null!");
 		Assert.notNull(bean, "Target bean must not be null!");
 
-		if (!entity.hasVersionProperty()) {
-			return null;
+		if (exact) {
+			ByteArrayOutputStream byteStream = new ByteArrayOutputStream(1024);
+			try {
+				serializer.serialize(bean, byteStream);
+				return Sha1DigestUtil.shaHex(new String(byteStream.toByteArray()));
+			} catch (Throwable ex) {
+				throw new SerializationFailedException("Failed to serialize object using " + serializer.getClass().getSimpleName(), ex);
+			}
+		} else {
+			if (!entity.hasVersionProperty()) {
+				return null;
+			}
+
+			PersistentPropertyAccessor accessor = entity.getPropertyAccessor(bean);
+			String versionInfo = String.valueOf(accessor.getProperty(entity.getVersionProperty()));
+			String idInfo = String.valueOf(accessor.getProperty(entity.getIdProperty()));
+			return idInfo + ':' + versionInfo;
 		}
 
-		PersistentPropertyAccessor accessor = entity.getPropertyAccessor(bean);
-		String versionInfo = String.valueOf(accessor.getProperty(entity.getVersionProperty()));
-		String idInfo = String.valueOf(accessor.getProperty(entity.getIdProperty()));
-		return idInfo + ':' + versionInfo;
 	}
 
-	public void verify(PersistentEntity<?, ?> entity, Object target) {
+	public void verify(PersistentEntity<?, ?> entity, Object target, boolean exact) {
 
 		if (this == NO_ETAG || target == null) {
 			return;
 		}
 
-		if (!this.equals(from(entity, target))) {
+		if (!this.equals(from(entity, target, exact))) {
 			throw new ETagDoesntMatchException(target, this);
 		}
-	}
-
-	/**
-	 * Returns whether the ETag matches the given {@link PersistentEntity} and target. A more dissenting way of
-	 * checking matches as it does not match if the ETag is {@link #NO_ETAG}.
-	 *
-	 * @param entity must not be {@literal null}.
-	 * @param target can be {@literal null}.
-	 * @return 是否匹配
-	 */
-	public boolean matches(PersistentEntity<?, ?> entity, Object target) {
-
-		if (this == NO_ETAG || target == null) {
-			return false;
-		}
-
-		return this.equals(from(entity, target));
 	}
 
 	/**

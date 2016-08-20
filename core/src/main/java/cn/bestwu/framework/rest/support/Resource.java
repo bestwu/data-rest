@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
  * 一般资源
@@ -14,8 +15,9 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 @JsonRootName("xml")
-public class Resource<T> {
+public class Resource<T> implements Serializable {
 
+	private static final long serialVersionUID = 7824159918137870439L;
 	@JsonUnwrapped
 	@XmlAnyElement
 	@JsonView(Object.class)

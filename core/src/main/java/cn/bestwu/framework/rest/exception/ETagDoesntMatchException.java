@@ -6,7 +6,7 @@ import org.springframework.util.Assert;
 /**
  * An exception being thrown in case the {@link ETag} calculated for a particular object does not match an expected one.
  * 
- * @see ETag#verify(org.springframework.data.mapping.PersistentEntity, Object)
+ * @see ETag#verify(org.springframework.data.mapping.PersistentEntity, Object,boolean)
  */
 public class ETagDoesntMatchException extends RuntimeException {
 

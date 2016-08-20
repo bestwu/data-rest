@@ -252,7 +252,7 @@ import java.util.*;
 
 		Object content = resource.getContent();
 
-		eTag.verify(resourceInformation.getEntity(), resourceInformation.getModelType());
+		eTag.verify(resourceInformation.getEntity(), resourceInformation.getModelType(), exact);
 
 		publisher.publishEvent(new BeforeSaveEvent(content));
 		invoker.invokeSave(content);

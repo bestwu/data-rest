@@ -4,14 +4,17 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
+
 /**
  * 测试用
  *
  * @author Peter Wu
  */
 @Document
-public class TestUser {
+public class TestUser implements Serializable {
 
+	private static final long serialVersionUID = -4452630632601963240L;
 	@Id
 	//	@GeneratedValue
 	private String id;

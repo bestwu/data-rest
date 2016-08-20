@@ -15,6 +15,7 @@ import java.util.Map;
  */
 public class SimpleResource<T> extends Resource<T> {
 
+	private static final long serialVersionUID = 1498416512071480218L;
 	@JsonView(Object.class)
 	private Map<String, String> links;
 

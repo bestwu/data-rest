@@ -14,6 +14,7 @@ import java.util.Map;
  */
 public class PersistentEntityResource<T> extends SimpleResource<T> {
 
+	private static final long serialVersionUID = 1009307069857374549L;
 	@JsonIgnore
 	private final PersistentEntity<?, ?> entity;
 

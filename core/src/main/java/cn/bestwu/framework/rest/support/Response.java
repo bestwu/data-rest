@@ -35,6 +35,8 @@ public class Response {
 
 	@Value("${server.client-cache:true}")
 	private boolean supportClientCache;
+	@Value("${server.exact:false}")
+	protected boolean exact;
 	@Autowired
 	private AuditableBeanWrapperFactory auditableBeanWrapperFactory;
 	@Autowired
@@ -57,7 +59,7 @@ public class Response {
 	protected HttpHeaders prepareHeaders(PersistentEntity<?, ?> entity, Object value) {
 
 		// Add ETag
-		HttpHeaders headers = ETag.from(entity, value).addTo(new HttpHeaders());
+		HttpHeaders headers = ETag.from(entity, value, exact).addTo(new HttpHeaders());
 
 		// Add Last-Modified
 		AuditableBeanWrapper wrapper = getAuditableBeanWrapper(value);
@@ -324,7 +326,7 @@ public class Response {
 		@Override public PersistentEntityResource<?> convert(Object source) {
 			if (supportClientCache) {
 				if (hasEtag) {
-					String eTagValue = ETag.getETagValue(persistentEntity, source);
+					String eTagValue = ETag.getETagValue(persistentEntity, source, exact);
 					if (eTagValue == null) {
 						hasEtag = false;
 					} else {

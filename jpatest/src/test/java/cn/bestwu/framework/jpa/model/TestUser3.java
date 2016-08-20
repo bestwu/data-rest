@@ -3,14 +3,16 @@ package cn.bestwu.framework.jpa.model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * 测试用
  * @author Peter Wu
  */
 @Entity
-public class TestUser3 {
+public class TestUser3 implements Serializable {
 
+	private static final long serialVersionUID = 1189386593289454050L;
 	@Id
 	@GeneratedValue
 	private Long id;

@@ -36,7 +36,7 @@ public class ControllerTests {
 	/**
 	 * 测试基础功能
 	 *
-	 * @throws Exception
+	 * @throws Exception Exception
 	 */
 	@Test
 	public void testRest() throws Exception {
