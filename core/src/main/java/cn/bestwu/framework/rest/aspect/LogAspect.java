@@ -1,7 +1,5 @@
 package cn.bestwu.framework.rest.aspect;
 
-import cn.bestwu.framework.event.LogEvent;
-import cn.bestwu.framework.rest.support.Log;
 import cn.bestwu.framework.rest.support.PrincipalNamePutEvent;
 import cn.bestwu.framework.rest.support.Resource;
 import cn.bestwu.framework.util.ResourceUtil;
@@ -102,7 +100,7 @@ public class LogAspect {
 
 			ServletServerHttpRequest servletServerHttpRequest = new ServletServerHttpRequest(request);
 			HttpHeaders headers = servletServerHttpRequest.getHeaders();
-			String MSG_CODE = "{} 的 [{}] {} {} \nrequest headers:\n{} \nrequest parameters:\n{} \nresponse:\n{}";
+			String MSG_CODE = "{} [{}] [{}] {} {} {} HEADERS[{}]HEADERSEND PARAMETERS[{}]PARAMETERSEND {}";
 
 			principalName = principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName;
 			String requestSignature = ResourceUtil.getRequestSignature(request);
@@ -121,30 +119,19 @@ public class LogAspect {
 			} else {
 				resultStr = StringUtil.subString(String.valueOf(result), 100);
 			}
-
-			if (error)
-				log.error(MSG_CODE, ipAddress, principalName, requestMethod,
-						servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true),
-						resultStr);
-			else
-				log.info(MSG_CODE, ipAddress, principalName, requestMethod,
-						servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true),
-						resultStr);
-
-			{
-				Log log = new Log();
-				log.setIpAddress(ipAddress);
-				log.setParameters(StringUtil.valueOf(parameterMap, true));
-				log.setRequestMethod(requestMethod);
-				log.setRequestSignature(requestSignature);
-				log.setServletPath(servletPath);
-				log.setRequestHeaders(StringUtil.valueOf(headers, true));
-				log.setPrincipalName(StringUtil.subString(principalName, 220));
-				log.setDevice(StringUtil.subString(getUserAgent(), 220));
-				log.setResponse(resultStr);
-
-				publisher.publishEvent(new LogEvent(log));
+			if (log.isDebugEnabled())
+				log.info("{} [{}] [{}] {} {} {} headers\n{}\nparameters\n{}\n{}", ipAddress, StringUtil.subString(getUserAgent(), 220), principalName, requestMethod,
+						requestSignature,
+						servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true), resultStr);
+			else {
+				if (error)
+					log.error(MSG_CODE, ipAddress, StringUtil.subString(getUserAgent(), 220), principalName, requestMethod, requestSignature,
+							servletPath, StringUtil.valueOf(headers), StringUtil.valueOf(parameterMap), resultStr);
+				else
+					log.info(MSG_CODE, ipAddress, StringUtil.subString(getUserAgent(), 220), principalName, requestMethod, requestSignature,
+							servletPath, StringUtil.valueOf(headers), StringUtil.valueOf(parameterMap), resultStr);
 			}
+
 		}
 	}
 
