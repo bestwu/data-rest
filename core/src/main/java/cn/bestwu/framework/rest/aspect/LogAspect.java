@@ -120,7 +120,7 @@ public class LogAspect {
 				resultStr = StringUtil.subString(String.valueOf(result), 100);
 			}
 			if (log.isDebugEnabled())
-				log.info("{} [{}] [{}] {} {} {} headers\n{}\nparameters\n{}\n{}", ipAddress, StringUtil.subString(getUserAgent(), 220), principalName, requestMethod,
+				log.info("{} [{}] [{}] {} {} {}\nheaders\n{}\nparameters\n{}\n{}", ipAddress, StringUtil.subString(getUserAgent(), 220), principalName, requestMethod,
 						requestSignature,
 						servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true), resultStr);
 			else {
