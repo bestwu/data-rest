@@ -160,7 +160,7 @@ public class JpaSearchRepository implements SearchRepository {
 					}
 					criteria.add(Restrictions.in(idName, ids));
 
-					criteria.setProjection(Projections.count("id"));
+					criteria.setProjection(Projections.count(idName));
 					totalSize = (long) criteria.list().get(0);
 
 					if (totalSize > 0) {
