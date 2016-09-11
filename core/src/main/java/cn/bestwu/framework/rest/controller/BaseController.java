@@ -149,7 +149,7 @@ public abstract class BaseController extends Response {
 	 * @return 请求版本是否为version
 	 */
 	protected boolean versionEquals(String version) {
-		return ResourceUtil.equalsVersion(request, version);
+		return ResourceUtil.equalsVersion(version);
 	}
 
 	/**
@@ -157,7 +157,7 @@ public abstract class BaseController extends Response {
 	 * @return 请求的版本是否以suffix后缀结尾
 	 */
 	protected boolean versionEndsWith(String suffix) {
-		String requestVersion = ResourceUtil.getRequestVersion(request);
+		String requestVersion = ResourceUtil.REQUEST_VERSION.get();
 		return requestVersion != null && (requestVersion.endsWith(suffix.toLowerCase()) || requestVersion.endsWith(suffix.toUpperCase()));
 	}
 

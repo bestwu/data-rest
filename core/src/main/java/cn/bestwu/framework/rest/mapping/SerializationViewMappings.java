@@ -66,7 +66,7 @@ public class SerializationViewMappings {
 		if (serializationViewsClass == null) {
 			return null;
 		}
-		String requestSignature = ResourceUtil.getRequestSignature(request);
+		String requestSignature = ResourceUtil.API_SIGNATURE.get();
 		if (requestSignature == null) {
 			return null;
 		}
@@ -74,7 +74,7 @@ public class SerializationViewMappings {
 		if (jsonViews == null || jsonViews.isEmpty()) {
 			return null;
 		}
-		String requestVersion = ResourceUtil.getRequestVersion(request);
+		String requestVersion = ResourceUtil.REQUEST_VERSION.get();
 		for (VersionedSerializationView jsonView : jsonViews) {
 			if (Version.equals(jsonView.getVersion(), requestVersion)) {
 				return jsonView.getSerializationView();

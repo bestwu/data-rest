@@ -1,6 +1,7 @@
 package cn.bestwu.framework.rest.mapping;
 
 import cn.bestwu.framework.rest.annotation.RepositoryRestController;
+import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.rest.support.ProxyPathMapper;
 import cn.bestwu.framework.rest.support.RepositoryResourceMetadata;
@@ -8,10 +9,12 @@ import cn.bestwu.framework.rest.support.ResourceType;
 import cn.bestwu.framework.rest.support.Version;
 import cn.bestwu.framework.util.ArrayUtil;
 import cn.bestwu.framework.util.ResourceUtil;
+import org.springframework.hateoas.core.AnnotationMappingDiscoverer;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
@@ -19,9 +22,14 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static cn.bestwu.framework.util.ResourceUtil.API_SIGNATURE;
+import static cn.bestwu.framework.util.ResourceUtil.REQUEST_VERSION;
+import static org.hibernate.search.util.AnalyzerUtils.log;
 
 /**
  * 支持Rest @RequestMapping produces MediaType 参数 version的RequestMappingHandlerMapping
@@ -30,10 +38,6 @@ import java.util.stream.Collectors;
  */
 public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMappingHandlerMapping {
 
-	/**
-	 * handler_method request 属性参数
-	 */
-	public static final String REQUEST_HANDLER_METHOD = "request_handler_method";
 	/**
 	 * repository_base_path_name request 属性参数
 	 */
@@ -60,6 +64,8 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 	private final RepositoryResourceMappings repositoryResourceMappings;
 	private final ProxyPathMapper proxyPathMapper;
 
+	private static AnnotationMappingDiscoverer DISCOVERER = new AnnotationMappingDiscoverer(RequestMapping.class);
+
 	public VersionRepositoryRestRequestMappingHandlerMapping(RepositoryResourceMappings repositoryResourceMappings,
 			ProxyPathMapper proxyPathMapper) {
 		Assert.notNull(repositoryResourceMappings);
@@ -82,7 +88,29 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		}
 
 		if (ArrayUtil.contains(IGNORED_LOOKUP_PATH, lookupPath)) {
+			API_SIGNATURE.set(lookupPath);
 			return null;
+		}
+
+		{
+			String version = null;
+			Enumeration<String> accept = request.getHeaders("Accept");
+			while (accept.hasMoreElements()) {
+				String element = accept.nextElement();
+				String[] split = element.split(",");
+				for (String s : split) {
+					version = MediaType.valueOf(s).getParameter(Version.VERSION_PARAM_NAME);
+					if (StringUtils.hasText(version)) {
+						break;
+					}
+				}
+			}
+			if (!StringUtils.hasText(version))
+				version = request.getParameter("_" + Version.VERSION_PARAM_NAME);
+			if (!StringUtils.hasText(version))
+				version = Version.DEFAULT_VERSION;
+
+			REQUEST_VERSION.set(version);
 		}
 
 		HandlerMethod handlerMethod = super.lookupHandlerMethod(lookupPath, request);
@@ -91,7 +119,25 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 			return null;
 		}
 
-		request.setAttribute(REQUEST_HANDLER_METHOD, handlerMethod);
+		{
+			String apiSignature = request.getMethod().toLowerCase() + DISCOVERER.getMapping(handlerMethod.getMethod());
+
+			String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
+			if (repositoryBasePathName != null) {
+				apiSignature = apiSignature.replace(BaseController.BASE_NAME, repositoryBasePathName);
+			}
+			String searchName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME);
+			if (searchName != null) {
+				apiSignature = apiSignature.replace("{search}", searchName);
+			}
+
+			apiSignature = apiSignature.replaceAll("[{}]", "").replace("/", "_");
+			if (log.isDebugEnabled()) {
+				log.debug("请求签名：" + apiSignature);
+			}
+
+			API_SIGNATURE.set(apiSignature);
+		}
 
 		//不是data-rest controller
 		Class<?> beanType = handlerMethod.getBeanType();
@@ -200,7 +246,7 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		me.sort(comparator);
 		other.sort(comparator);
 
-		String acceptedVersion = ResourceUtil.getRequestVersion(request);
+		String acceptedVersion = ResourceUtil.REQUEST_VERSION.get();
 		int thisIndex, otherIndex, result;
 
 		thisIndex = equalVersion(me, acceptedVersion);

@@ -103,7 +103,7 @@ public class LogAspect {
 			String MSG_CODE = "{} [{}] [{}] {} {} {} HEADERS[{}]HEADERSEND PARAMETERS[{}]PARAMETERSEND {}";
 
 			principalName = principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName;
-			String requestSignature = ResourceUtil.getRequestSignature(request);
+			String requestSignature = ResourceUtil.API_SIGNATURE.get();
 
 			String resultStr;
 			boolean error = false;
