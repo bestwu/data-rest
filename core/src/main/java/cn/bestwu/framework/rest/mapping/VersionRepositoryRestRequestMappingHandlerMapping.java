@@ -82,46 +82,50 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 	 */
 	@Override protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
 		{
-			String version = null;
-			Enumeration<String> accept = request.getHeaders("Accept");
-			while (accept.hasMoreElements()) {
-				String element = accept.nextElement();
-				String[] split = element.split(",");
-				for (String s : split) {
-					version = MediaType.valueOf(s).getParameter(Version.VERSION_PARAM_NAME);
-					if (StringUtils.hasText(version)) {
-						break;
+			if (REQUEST_VERSION.get() == null) {
+				String version = null;
+				Enumeration<String> accept = request.getHeaders("Accept");
+				while (accept.hasMoreElements()) {
+					String element = accept.nextElement();
+					String[] split = element.split(",");
+					for (String s : split) {
+						version = MediaType.valueOf(s).getParameter(Version.VERSION_PARAM_NAME);
+						if (StringUtils.hasText(version)) {
+							break;
+						}
 					}
 				}
-			}
-			if (!StringUtils.hasText(version))
-				version = request.getParameter("_" + Version.VERSION_PARAM_NAME);
-			if (!StringUtils.hasText(version))
-				version = Version.DEFAULT_VERSION;
+				if (!StringUtils.hasText(version))
+					version = request.getParameter("_" + Version.VERSION_PARAM_NAME);
+				if (!StringUtils.hasText(version))
+					version = Version.DEFAULT_VERSION;
 
-			REQUEST_VERSION.set(version);
+				REQUEST_VERSION.set(version);
+			}
 		}
 		HandlerMethod handlerMethod = getHandlerMethod(lookupPath, request);
 		{
-			if (handlerMethod == null) {
-				API_SIGNATURE.set(lookupPath);
-			} else {
-				String apiSignature = request.getMethod().toLowerCase() + DISCOVERER.getMapping(handlerMethod.getMethod());
+			if (API_SIGNATURE.get() == null) {
+				String apiSignature;
+				if (handlerMethod == null) {
+					apiSignature = lookupPath;
+				} else {
+					apiSignature = DISCOVERER.getMapping(handlerMethod.getMethod());
 
-				String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
-				if (repositoryBasePathName != null) {
-					apiSignature = apiSignature.replace(BaseController.BASE_NAME, repositoryBasePathName);
+					String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
+					if (repositoryBasePathName != null) {
+						apiSignature = apiSignature.replace(BaseController.BASE_NAME, repositoryBasePathName);
+					}
+					String searchName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME);
+					if (searchName != null) {
+						apiSignature = apiSignature.replace("{search}", searchName);
+					}
 				}
-				String searchName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME);
-				if (searchName != null) {
-					apiSignature = apiSignature.replace("{search}", searchName);
-				}
-
 				apiSignature = apiSignature.replaceAll("[{}]", "").replace("/", "_");
 				if (logger.isDebugEnabled()) {
 					logger.debug("请求签名：" + apiSignature);
 				}
-				API_SIGNATURE.set(apiSignature);
+				API_SIGNATURE.set(request.getMethod().toLowerCase() + apiSignature);
 			}
 		}
 		return handlerMethod;
