@@ -105,7 +105,7 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 	 * @param webRequest      webRequest
 	 * @param binderFactory   binderFactory
 	 * @return 实体ID
-	 * @throws Exception
+	 * @throws Exception Exception
 	 */
 	private String getId(String idParameterName, NativeWebRequest webRequest, WebDataBinderFactory binderFactory)
 			throws Exception {
@@ -136,7 +136,7 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 	 * @param webRequest    webRequest
 	 * @param binderFactory binderFactory
 	 * @return Object 待更新实体
-	 * @throws Exception
+	 * @throws Exception Exception
 	 */
 	private Object getObjectForUpdate(Class<?> modelClass, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 
@@ -167,7 +167,7 @@ public class ModelMethodArgumentResolver implements HandlerMethodArgumentResolve
 	 * @param webRequest    webRequest
 	 * @param binderFactory binderFactory
 	 * @return Object
-	 * @throws Exception
+	 * @throws Exception Exception
 	 */
 	private Object readObject(MethodParameter parameter, Object modelObject, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 		HttpServletRequest nativeRequest = webRequest.getNativeRequest(HttpServletRequest.class);
