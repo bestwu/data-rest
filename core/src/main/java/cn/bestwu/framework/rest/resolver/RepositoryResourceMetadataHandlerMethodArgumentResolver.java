@@ -56,10 +56,6 @@ public class RepositoryResourceMetadataHandlerMethodArgumentResolver implements 
 
 		RepositoryResourceMetadata repositoryResourceMetadata = (RepositoryResourceMetadata) nativeRequest.getAttribute(requestRepositoryResourceMetadataKey);
 		String repositoryBasePathName = (String) nativeRequest.getAttribute(requestRepositoryBasePathNameKey);
-		if (repositoryBasePathName == null) {
-			repositoryBasePathName = VersionRepositoryRestRequestMappingHandlerMapping.getBasePathName(nativeRequest.getServletPath());
-			nativeRequest.setAttribute(requestRepositoryBasePathNameKey, repositoryBasePathName);
-		}
 		if (repositoryResourceMetadata == null) {
 			repositoryResourceMetadata = repositoryResourceMappings.getRepositoryResourceMetadata(repositoryBasePathName);
 		}

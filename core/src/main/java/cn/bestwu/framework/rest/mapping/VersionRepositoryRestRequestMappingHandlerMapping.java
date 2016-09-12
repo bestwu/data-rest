@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 import static cn.bestwu.framework.util.ResourceUtil.API_SIGNATURE;
 import static cn.bestwu.framework.util.ResourceUtil.REQUEST_VERSION;
-import static org.hibernate.search.util.AnalyzerUtils.log;
 
 /**
  * 支持Rest @RequestMapping produces MediaType 参数 version的RequestMappingHandlerMapping
@@ -82,16 +81,6 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 	 * @throws Exception Exception
 	 */
 	@Override protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
-
-		if (proxyPathMapper != null) {
-			lookupPath = proxyPathMapper.getProxyPath(lookupPath);
-		}
-
-		if (ArrayUtil.contains(IGNORED_LOOKUP_PATH, lookupPath)) {
-			API_SIGNATURE.set(lookupPath);
-			return null;
-		}
-
 		{
 			String version = null;
 			Enumeration<String> accept = request.getHeaders("Accept");
@@ -112,6 +101,40 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 
 			REQUEST_VERSION.set(version);
 		}
+		HandlerMethod handlerMethod = getHandlerMethod(lookupPath, request);
+		{
+			if (handlerMethod == null) {
+				API_SIGNATURE.set(lookupPath);
+			} else {
+				String apiSignature = request.getMethod().toLowerCase() + DISCOVERER.getMapping(handlerMethod.getMethod());
+
+				String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
+				if (repositoryBasePathName != null) {
+					apiSignature = apiSignature.replace(BaseController.BASE_NAME, repositoryBasePathName);
+				}
+				String searchName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME);
+				if (searchName != null) {
+					apiSignature = apiSignature.replace("{search}", searchName);
+				}
+
+				apiSignature = apiSignature.replaceAll("[{}]", "").replace("/", "_");
+				if (logger.isDebugEnabled()) {
+					logger.debug("请求签名：" + apiSignature);
+				}
+				API_SIGNATURE.set(apiSignature);
+			}
+		}
+		return handlerMethod;
+	}
+
+	private HandlerMethod getHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
+		if (proxyPathMapper != null) {
+			lookupPath = proxyPathMapper.getProxyPath(lookupPath);
+		}
+
+		if (ArrayUtil.contains(IGNORED_LOOKUP_PATH, lookupPath)) {
+			return null;
+		}
 
 		HandlerMethod handlerMethod = super.lookupHandlerMethod(lookupPath, request);
 
@@ -119,25 +142,13 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 			return null;
 		}
 
-		{
-			String apiSignature = request.getMethod().toLowerCase() + DISCOVERER.getMapping(handlerMethod.getMethod());
+		String basePathName = getBasePathName(lookupPath);
 
-			String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
-			if (repositoryBasePathName != null) {
-				apiSignature = apiSignature.replace(BaseController.BASE_NAME, repositoryBasePathName);
-			}
-			String searchName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME);
-			if (searchName != null) {
-				apiSignature = apiSignature.replace("{search}", searchName);
-			}
-
-			apiSignature = apiSignature.replaceAll("[{}]", "").replace("/", "_");
-			if (log.isDebugEnabled()) {
-				log.debug("请求签名：" + apiSignature);
-			}
-
-			API_SIGNATURE.set(apiSignature);
+		//ROOT 请求
+		if (!StringUtils.hasText(basePathName)) {
+			return handlerMethod;
 		}
+		request.setAttribute(REQUEST_REPOSITORY_BASE_PATH_NAME, basePathName);
 
 		//不是data-rest controller
 		Class<?> beanType = handlerMethod.getBeanType();
@@ -147,20 +158,13 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 
 		//是data-rest controller
 		{
-			String basePathName = getBasePathName(lookupPath);
-
-			//ROOT 请求
-			if (!StringUtils.hasText(basePathName)) {
-				return handlerMethod;
-			}
-
-			request.setAttribute(REQUEST_REPOSITORY_BASE_PATH_NAME, basePathName);
-
 			RepositoryResourceMetadata repositoryResourceMetadata = repositoryResourceMappings.getRepositoryResourceMetadata(basePathName);
 			request.setAttribute(REQUEST_REPOSITORY_RESOURCE_METADATA, repositoryResourceMetadata);
 			if (repositoryResourceMetadata != null) {
-				String SEARCH_LOOKUP_PATH_REGEX = "^/[^/]+/search(/[^/]+)?/?$";
+				String SEARCH_LOOKUP_PATH_REGEX = "^/[^/]+/search(/([^/]+))?/?$";
 				if (lookupPath.matches(SEARCH_LOOKUP_PATH_REGEX)) {//search 请求
+					String search = lookupPath.replaceAll(SEARCH_LOOKUP_PATH_REGEX, "$2");
+					request.setAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME, search);
 					return handlerMethod;
 				}
 				if (repositoryResourceMetadata.isExported()) {

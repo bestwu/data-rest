@@ -4,7 +4,6 @@ import cn.bestwu.api.sign.ApiSign;
 import cn.bestwu.framework.event.*;
 import cn.bestwu.framework.rest.annotation.RepositoryRestController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
-import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
 import cn.bestwu.framework.rest.support.ETag;
 import cn.bestwu.framework.rest.support.PersistentEntityResource;
 import cn.bestwu.framework.rest.support.ResourceType;
@@ -128,8 +127,6 @@ import java.util.*;
 		if (searchMethod == null) {
 			throw new ResourceNotFoundException();
 		}
-		request.setAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME, search);
-
 		RepositoryInvoker invoker = resourceInformation.getInvoker();
 
 		MultiValueMap<String, Object> result = new LinkedMultiValueMap<>(parameters);
