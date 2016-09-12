@@ -105,27 +105,23 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		}
 		HandlerMethod handlerMethod = getHandlerMethod(lookupPath, request);
 		{
-			if (API_SIGNATURE.get() == null) {
-				String apiSignature;
-				if (handlerMethod == null) {
-					apiSignature = lookupPath;
-				} else {
-					apiSignature = DISCOVERER.getMapping(handlerMethod.getMethod());
+			if (API_SIGNATURE.get() == null && handlerMethod != null) {
+				String apiSignature = DISCOVERER.getMapping(handlerMethod.getMethod());
 
-					String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
-					if (repositoryBasePathName != null) {
-						apiSignature = apiSignature.replace(BaseController.BASE_NAME, repositoryBasePathName);
-					}
-					String searchName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME);
-					if (searchName != null) {
-						apiSignature = apiSignature.replace("{search}", searchName);
-					}
+				String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
+				if (repositoryBasePathName != null) {
+					apiSignature = apiSignature.replace(BaseController.BASE_NAME, repositoryBasePathName);
 				}
-				apiSignature = apiSignature.replaceAll("[{}]", "").replace("/", "_");
+				String searchName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME);
+				if (searchName != null) {
+					apiSignature = apiSignature.replace("{search}", searchName);
+				}
+
+				apiSignature = request.getMethod().toLowerCase() + apiSignature.replaceAll("[{}]", "").replace("/", "_");
 				if (logger.isDebugEnabled()) {
 					logger.debug("请求签名：" + apiSignature);
 				}
-				API_SIGNATURE.set(request.getMethod().toLowerCase() + apiSignature);
+				API_SIGNATURE.set(apiSignature);
 			}
 		}
 		return handlerMethod;

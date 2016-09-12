@@ -5,6 +5,7 @@ import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.converter.DefaultElementMixIn;
 import cn.bestwu.framework.rest.converter.PageMixIn;
 import cn.bestwu.framework.rest.filter.OrderedHttpPutFormContentFilter;
+import cn.bestwu.framework.rest.filter.ThreadLocalCleanFilter;
 import cn.bestwu.framework.rest.mapping.RepositoryResourceMappings;
 import cn.bestwu.framework.rest.mapping.SerializationViewMappings;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
@@ -141,6 +142,16 @@ public class RestMvcConfiguration {
 	@ConditionalOnMissingBean(HttpPutFormContentFilter.class)
 	public OrderedHttpPutFormContentFilter httpFormContentFilterRegistration() {
 		return new OrderedHttpPutFormContentFilter();
+	}
+
+	/**
+	 * 清理 ThreadLocal 防止线程重用时数据出错
+	 *
+	 * @return ThreadLocalCleanFilter
+	 */
+	@Bean
+	public ThreadLocalCleanFilter threadLocalCleanFilter() {
+		return new ThreadLocalCleanFilter();
 	}
 
 	/*
