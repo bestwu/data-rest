@@ -113,7 +113,10 @@ public class LogAspect {
 				if (statusCode.is2xxSuccessful() || statusCode.is3xxRedirection()) {
 					resultStr = statusCode.toString() + " " + statusCode.getReasonPhrase();
 				} else {
-					resultStr = "Error:\n" + StringUtil.valueOf(result, true);
+					if (log.isDebugEnabled())
+						resultStr = "Error:\n" + StringUtil.valueOf(result, true);
+					else
+						resultStr = "Error:" + StringUtil.valueOf(result);
 				}
 				error = statusCode.is5xxServerError();
 			} else {
