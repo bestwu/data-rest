@@ -38,6 +38,10 @@ public class ResourceUtil {
 	 * 请求签名
 	 */
 	public static ThreadLocal<String> API_SIGNATURE = new ThreadLocal<>();
+	/**
+	 * 请求方法
+	 */
+	public static ThreadLocal<String> REQUEST_METHOD = new ThreadLocal<>();
 
 	/**
 	 * @param verion 比较的版本号，不能为null

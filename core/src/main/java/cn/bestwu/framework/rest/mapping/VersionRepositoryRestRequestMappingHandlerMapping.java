@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static cn.bestwu.framework.util.ResourceUtil.API_SIGNATURE;
+import static cn.bestwu.framework.util.ResourceUtil.REQUEST_METHOD;
 import static cn.bestwu.framework.util.ResourceUtil.REQUEST_VERSION;
 
 /**
@@ -105,23 +106,27 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		}
 		HandlerMethod handlerMethod = getHandlerMethod(lookupPath, request);
 		{
-			if (API_SIGNATURE.get() == null && handlerMethod != null) {
-				String apiSignature = DISCOVERER.getMapping(handlerMethod.getMethod());
+			if (handlerMethod != null) {
+				REQUEST_METHOD.set(request.getMethod());
 
-				String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
-				if (repositoryBasePathName != null) {
-					apiSignature = apiSignature.replace(BaseController.BASE_NAME, repositoryBasePathName);
-				}
-				String searchName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME);
-				if (searchName != null) {
-					apiSignature = apiSignature.replace("{search}", searchName);
-				}
+				if (API_SIGNATURE.get() == null) {
+					String apiSignature = DISCOVERER.getMapping(handlerMethod.getMethod());
 
-				apiSignature = request.getMethod().toLowerCase() + apiSignature.replaceAll("[{}]", "").replace("/", "_");
-				if (logger.isDebugEnabled()) {
-					logger.debug("请求签名：" + apiSignature);
+					String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
+					if (repositoryBasePathName != null) {
+						apiSignature = apiSignature.replace(BaseController.BASE_NAME, repositoryBasePathName);
+					}
+					String searchName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME);
+					if (searchName != null) {
+						apiSignature = apiSignature.replace("{search}", searchName);
+					}
+
+					apiSignature = request.getMethod().toLowerCase() + apiSignature.replaceAll("[{}]", "").replace("/", "_");
+					if (logger.isDebugEnabled()) {
+						logger.debug("请求签名：" + apiSignature);
+					}
+					API_SIGNATURE.set(apiSignature);
 				}
-				API_SIGNATURE.set(apiSignature);
 			}
 		}
 		return handlerMethod;
