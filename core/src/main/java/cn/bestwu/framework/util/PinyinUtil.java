@@ -1,16 +1,24 @@
 package cn.bestwu.framework.util;
 
+import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
+import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+import org.springframework.util.StringUtils;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 拼音处理的工具类
  *
  * @author Peter Wu
  */
+@Slf4j
 public class PinyinUtil {
 	public enum Case {
 		UPPERCASE, LOWERCASE, CAPITALIZE
@@ -23,55 +31,76 @@ public class PinyinUtil {
 	 * <p>
 	 * 返回汉字的拼音
 	 *
-	 * @param str  汉字(李莲英)
-	 * @param caze 大小写
+	 * @param str 汉字(李莲英)
 	 * @return 拼音 (LiLianYing)
 	 */
-	public static String getPinYin(String str, Case caze) {
-		if (!org.springframework.util.StringUtils.hasText(str)) {
-			return "";
+	public static String getPinYin(String str) {
+		if (!StringUtils.hasText(str)) {
+			return null;
 		}
-		// 拼音输出格式
-		HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
-		// 全部小写
-		format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-		// 设置声调格式:不要声调
-		format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-		// 设置特殊拼音ü的显示格式:用V (比如：绿)
-		format.setVCharType(HanyuPinyinVCharType.WITH_V);
-
-		StringBuilder pinyin = new StringBuilder();
 		try {
-			char[] chars = str.trim().toCharArray();
-			for (char c : chars) {
-				// 返回数组, 是因为可能是多音字, 比如"干" gan gang
-				String[] array = PinyinHelper.toHanyuPinyinStringArray(c,
-						format);
-				if (array != null) {// 代表是汉字
-					String string = array[0];
-					if (caze == null) {
-						caze = Case.CAPITALIZE;
+			// 拼音输出格式
+			HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
+			// 全部小写
+			format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+			// 设置声调格式:不要声调
+			format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+			// 设置特殊拼音ü的显示格式:用V (比如：绿)
+			format.setVCharType(HanyuPinyinVCharType.WITH_V);
+
+			char[] chs = str.toCharArray();
+
+			StringBuilder result = new StringBuilder();
+
+			for (int i = 0; i < chs.length; i++) {
+				String[] arr = chineseToPinYin(chs[i]);
+				if (arr == null) {
+					result.append("");
+				} else if (arr.length == 1) {
+					result.append(arr[0]);
+				} else if (arr[0].equals(arr[1])) {
+					result.append(arr[0]);
+				} else {
+					String prim = str.substring(i, i + 1);
+
+					String lst = null, rst = null;
+
+					if (i <= str.length() - 2) {
+						rst = str.substring(i, i + 2);
 					}
-					switch (caze) {
-					case UPPERCASE:
-						string = string.toUpperCase();
-						break;
-					case LOWERCASE:
-						string = string.toLowerCase();
-						break;
-					default:
-						string = org.springframework.util.StringUtils.capitalize(string);
-						break;
+					if (i >= 1 && i + 1 <= str.length()) {
+						lst = str.substring(i - 1, i + 1);
 					}
-					pinyin.append(string);
-				} else {// 代表不是汉字, 其他字符
-					pinyin.append(c);
+
+					String answer = null;
+					for (String py : arr) {
+
+						if (StringUtils.isEmpty(py)) {
+							continue;
+						}
+
+						if ((lst != null && py.equals(dictionary.get(lst))) ||
+								(rst != null && py.equals(dictionary.get(rst)))) {
+							answer = py;
+							break;
+						}
+
+						if (py.equals(dictionary.get(prim))) {
+							answer = py;
+						}
+					}
+					if (answer != null) {
+						result.append(answer);
+					} else {
+						log.warn("no answer ch=" + chs[i]);
+					}
 				}
 			}
+
+			return result.toString();
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		return pinyin.toString();
 	}
 
 	/**
@@ -117,18 +146,65 @@ public class PinyinUtil {
 	 * @return 汉字的头部字母 (LLY)
 	 */
 	public static String getPinYinHead(String str) {
-		StringBuilder head = new StringBuilder();
-		for (char c : str.toCharArray()) {
-			// 得到拼音字符串
-			// "干" ---->>> {"gan1", "gan4"}
-			String[] pinyinArray = PinyinHelper.toHanyuPinyinStringArray(c);
-			if (pinyinArray != null) { // 代表是汉字
-				head.append(pinyinArray[0].charAt(0));
-			} else { // 代表不是汉字
-				head.append(c);
+		try {
+			if (StringUtils.isEmpty(str)) {
+				return null;
 			}
+
+			char[] chs = str.toCharArray();
+
+			StringBuilder result = new StringBuilder();
+
+			for (int i = 0; i < chs.length; i++) {
+				String[] arr = chineseToPinYin(chs[i]);
+				if (arr == null) {
+					result.append("");
+				} else if (arr.length == 1) {
+					result.append(arr[0].charAt(0));
+				} else if (arr[0].equals(arr[1])) {
+					result.append(arr[0].charAt(0));
+				} else {
+
+					String prim = str.substring(i, i + 1);
+
+					String lst = null, rst = null;
+
+					if (i <= str.length() - 2) {
+						rst = str.substring(i, i + 2);
+					}
+					if (i >= 1 && i + 1 <= str.length()) {
+						lst = str.substring(i - 1, i + 1);
+					}
+
+					String answer = null;
+					for (String py : arr) {
+
+						if (StringUtils.isEmpty(py)) {
+							continue;
+						}
+
+						if ((lst != null && py.equals(dictionary.get(lst))) ||
+								(rst != null && py.equals(dictionary.get(rst)))) {
+							answer = py;
+							break;
+						}
+
+						if (py.equals(dictionary.get(prim))) {
+							answer = py;
+						}
+					}
+					if (answer != null) {
+						result.append(answer.charAt(0));
+					} else {
+						log.warn("no answer ch=" + chs[i]);
+					}
+				}
+			}
+
+			return result.toString();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		return head.toString().toUpperCase();
 	}
 
 	/**
@@ -164,7 +240,57 @@ public class PinyinUtil {
 	 * @return 1代表 str1 大于 str2; -1代表 str2 大于 str1 ;
 	 */
 	public int compare(String str1, String str2) {// 忽略大小写进行比较
-		return getPinYin(str1, null).compareToIgnoreCase(getPinYin(str2, null));
+		return getPinYin(str1).compareToIgnoreCase(getPinYin(str2));
+	}
+
+	/**
+	 * 多音字词典
+	 */
+	public static Map<String, String> dictionary = new HashMap<>();
+
+	//加载多音字词典
+	static {
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(PinyinUtil.class.getResourceAsStream("/duoyinzi_pinyin.txt"), "UTF-8"));
+			String line;
+			while ((line = br.readLine()) != null) {
+				String[] arr = line.split("#");
+				if (StringUtils.hasText(arr[1])) {
+					String[] sems = arr[1].split(" ");
+					for (String sem : sems) {
+						if (StringUtils.hasText(sem)) {
+							dictionary.put(sem, arr[0]);
+						}
+					}
+				}
+			}
+
+		} catch (IOException e) {
+			log.error(e.getMessage(), e);
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					log.error(e.getMessage(), e);
+				}
+			}
+		}
+
+	}
+
+	private static String[] chineseToPinYin(char chineseCharacter) throws BadHanyuPinyinOutputFormatCombination {
+		HanyuPinyinOutputFormat outputFormat = new HanyuPinyinOutputFormat();
+		outputFormat.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+		outputFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
+		outputFormat.setVCharType(HanyuPinyinVCharType.WITH_V);
+
+		if (chineseCharacter >= 32 && chineseCharacter <= 125) {    //ASCII >=33 ASCII<=125的直接返回 ,ASCII码表：http://www.asciitable.com/
+			return new String[] { String.valueOf(chineseCharacter) };
+		}
+
+		return PinyinHelper.toHanyuPinyinStringArray(chineseCharacter, outputFormat);
 	}
 
 }
