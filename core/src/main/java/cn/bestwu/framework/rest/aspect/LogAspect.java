@@ -36,7 +36,7 @@ public class LogAspect {
 	/**
 	 * 请求方名称request暂存参数名
 	 */
-	private final String PRINCIPAL_NAME = "PRINCIPAL_NAME";
+	public static final String PRINCIPAL_NAME = "PRINCIPAL_NAME";
 
 	protected ApplicationEventPublisher publisher;
 
