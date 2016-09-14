@@ -1,6 +1,9 @@
 package cn.bestwu.framework.data.query.jpa;
 
 import cn.bestwu.framework.util.StringUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.FieldBridge;
 import org.hibernate.search.annotations.IndexedEmbedded;
 
 import java.lang.annotation.Annotation;
@@ -13,6 +16,7 @@ import java.util.Set;
  *
  * @author Peter Wu
  */
+@Slf4j
 public class JpaSearchFieldUtil {
 
 	/**
@@ -24,8 +28,13 @@ public class JpaSearchFieldUtil {
 	 * @return 字段名
 	 */
 	public static <T> String[] getAnnotationedFields(Class<T> modelType, Class<? extends Annotation> AnnotationType) {
+
 		Set<String> fields = new HashSet<>();
 		Arrays.stream(modelType.getDeclaredFields()).forEach(field -> addAnnotationedFields(fields, field, AnnotationType, null));
+
+		if (log.isDebugEnabled()) {
+			log.debug("查找到" + AnnotationType + "注解的字段：" + fields);
+		}
 		return fields.toArray(new String[fields.size()]);
 	}
 
@@ -35,7 +44,15 @@ public class JpaSearchFieldUtil {
 			fieldName = parentFieldName + "." + fieldName;
 		}
 		if (field.isAnnotationPresent(annotationType)) {
-			fields.add(fieldName);
+			if (annotationType.equals(Field.class)) {
+				Field fieldAnnotation = field.getAnnotation(Field.class);
+				FieldBridge bridge = fieldAnnotation.bridge();
+				if (void.class.equals(bridge.impl())) {//默认只查询文本字段
+					fields.add(fieldName);
+				}
+			} else {
+				fields.add(fieldName);
+			}
 		} else if (field.isAnnotationPresent(IndexedEmbedded.class)) {
 			IndexedEmbedded annotation = field.getAnnotation(IndexedEmbedded.class);
 			if (annotation.depth() > StringUtil.countSubString(fieldName, "."))

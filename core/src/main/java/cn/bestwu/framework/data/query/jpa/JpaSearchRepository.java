@@ -1,29 +1,19 @@
 package cn.bestwu.framework.data.query.jpa;
 
 import cn.bestwu.framework.data.annotation.HighLight;
+import cn.bestwu.framework.data.query.QueryCarrier;
 import cn.bestwu.framework.data.query.ResultHandler;
 import cn.bestwu.framework.data.query.SearchRepository;
-import cn.bestwu.framework.data.util.EntityManagerUtil;
-import cn.bestwu.framework.event.BeforeSearchEvent;
+import cn.bestwu.framework.event.QueryBuilderEvent;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.hibernate.Criteria;
-import org.hibernate.QueryTimeoutException;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.exception.EmptyQueryException;
-import org.hibernate.search.hcore.util.impl.ContextHelper;
 import org.hibernate.search.jpa.FullTextEntityManager;
 import org.hibernate.search.jpa.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.dsl.TermMatchingContext;
-import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.query.engine.spi.HSQuery;
-import org.hibernate.search.query.engine.spi.TimeoutExceptionFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -106,87 +95,35 @@ public class JpaSearchRepository implements SearchRepository {
 			SearchFactory searchFactory = fullTextEntityManager.getSearchFactory();
 			QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity(modelType).get();
 
-			TermMatchingContext termMatchingContext = queryBuilder.keyword().onFields(getSearchFields(modelType));
-
-			Query luceneQuery = termMatchingContext.matching(keyword).createQuery();
-
-			Criteria criteria = EntityManagerUtil.getSession(entityManager).createCriteria(modelType);
-			publisher.publishEvent(new BeforeSearchEvent(criteria, modelType));
-			boolean noCriterionEntries = criteria.toString().contains("[][]");
+			Query luceneQuery = queryBuilder.keyword().onFields(getSearchFields(modelType)).matching(keyword).createQuery();
+			{//生成query
+				QueryCarrier queryCarrier = new QueryCarrier(queryBuilder, luceneQuery);
+				publisher.publishEvent(new QueryBuilderEvent(queryCarrier, modelType));
+				Query query = queryCarrier.getQuery();
+				if (query != null) {
+					luceneQuery = query;
+				}
+			}
 
 			List<T> result;
 			long totalSize;
+			org.hibernate.search.jpa.FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery(luceneQuery, modelType);
+			totalSize = fullTextQuery.getResultSize();
 
-			org.springframework.data.domain.Sort sort = pageable.getSort();
-
-			if (noCriterionEntries) {
-				org.hibernate.search.jpa.FullTextQuery jpaQuery = fullTextEntityManager.createFullTextQuery(luceneQuery, modelType);
-				totalSize = jpaQuery.getResultSize();
-
-				if (totalSize > 0) {
-					if (sort != null) {
-						List<SortField> sortFields = new ArrayList<>();
-						sort.forEach(
-								order -> sortFields.add(new SortField(order.getProperty(), SortField.Type.SCORE, org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection()))));
-						jpaQuery.setSort(new Sort(sortFields.toArray(new SortField[sortFields.size()])));
-					}
-
-					jpaQuery.setFirstResult(pageable.getOffset());
-					jpaQuery.setMaxResults(pageable.getPageSize());
-					result = jpaQuery.getResultList();
-				} else {
-					result = Collections.emptyList();
+			if (totalSize > 0) {
+				org.springframework.data.domain.Sort sort = pageable.getSort();
+				if (sort != null) {
+					List<SortField> sortFields = new ArrayList<>();
+					sort.forEach(
+							order -> sortFields.add(new SortField(order.getProperty(), SortField.Type.SCORE, org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection()))));
+					fullTextQuery.setSort(new Sort(sortFields.toArray(new SortField[sortFields.size()])));
 				}
 
+				fullTextQuery.setFirstResult(pageable.getOffset());
+				fullTextQuery.setMaxResults(pageable.getPageSize());
+				result = fullTextQuery.getResultList();
 			} else {
-				SessionImplementor sessionImplementor = (SessionImplementor) EntityManagerUtil.getSession(entityManager);
-
-				HSQuery hSearchQuery = ContextHelper.getSearchintegratorBySessionImplementor(sessionImplementor).createHSQuery();
-				hSearchQuery
-						.luceneQuery(luceneQuery)
-						.timeoutExceptionFactory(exceptionFactory)
-						.tenantIdentifier(sessionImplementor.getTenantIdentifier())
-						.targetedEntities(Arrays.asList(new Class[] { modelType }));
-
-				List<EntityInfo> entityInfos = hSearchQuery.queryEntityInfos();
-				if (entityInfos.size() != 0) {
-					List<Serializable> ids = new ArrayList<>(entityInfos.size());
-					String idName = null;
-					for (EntityInfo entityInfo : entityInfos) {
-						if (idName == null) {
-							idName = entityInfo.getIdName();
-						}
-						ids.add(entityInfo.getId());
-					}
-					criteria.add(Restrictions.in(idName, ids));
-
-					criteria.setProjection(Projections.count(idName));
-					totalSize = (long) criteria.list().get(0);
-
-					if (totalSize > 0) {
-						criteria.setProjection(null);
-
-						if (sort != null) {
-							sort.forEach(order -> {
-								if (org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection())) {
-									criteria.addOrder(org.hibernate.criterion.Order.desc(order.getProperty()));
-								} else {
-									criteria.addOrder(org.hibernate.criterion.Order.asc(order.getProperty()));
-								}
-							});
-						}
-
-						criteria.setFirstResult(pageable.getOffset());
-						criteria.setMaxResults(pageable.getPageSize());
-						result = criteria.list();
-					} else {
-						result = Collections.emptyList();
-					}
-
-				} else {
-					totalSize = 0;
-					result = Collections.emptyList();
-				}
+				result = Collections.emptyList();
 			}
 
 			//处理搜索结果
@@ -208,5 +145,4 @@ public class JpaSearchRepository implements SearchRepository {
 		}
 	}
 
-	private static final TimeoutExceptionFactory exceptionFactory = (message, queryDescription) -> new QueryTimeoutException(message, null, queryDescription);
 }
