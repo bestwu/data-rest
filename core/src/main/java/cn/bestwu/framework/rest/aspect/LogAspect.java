@@ -127,7 +127,7 @@ public class LogAspect {
 				ResponseEntity responseEntity = (ResponseEntity) result;
 				HttpStatus statusCode = responseEntity.getStatusCode();
 				if (statusCode.is2xxSuccessful() || statusCode.is3xxRedirection()) {
-					if (log.isDebugEnabled()) {
+					if (log.isTraceEnabled()) {
 						Object body = responseEntity.getBody();
 						if (requestJsonViewResponseBodyAdvice != null) {
 							MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(body);
