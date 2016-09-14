@@ -1,6 +1,7 @@
 package cn.bestwu.framework.rest.aspect;
 
 import cn.bestwu.framework.rest.support.PrincipalNamePutEvent;
+import cn.bestwu.framework.rest.support.RequestJsonViewResponseBodyAdvice;
 import cn.bestwu.framework.rest.support.Resource;
 import cn.bestwu.framework.util.ResourceUtil;
 import cn.bestwu.framework.util.StringUtil;
@@ -13,6 +14,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.http.server.ServletServerHttpRequest;
 
 import javax.servlet.RequestDispatcher;
@@ -59,6 +61,9 @@ public class LogAspect {
 		if ("PUT".equals(request.getMethod()))
 			request.setAttribute(PUT_PARAMETER_MAP, request.getParameterMap());
 	}
+
+	@Autowired(required = false)
+	private RequestJsonViewResponseBodyAdvice requestJsonViewResponseBodyAdvice;
 
 	/**
 	 * 记录日志
@@ -111,7 +116,16 @@ public class LogAspect {
 				ResponseEntity responseEntity = (ResponseEntity) result;
 				HttpStatus statusCode = responseEntity.getStatusCode();
 				if (statusCode.is2xxSuccessful() || statusCode.is3xxRedirection()) {
-					resultStr = statusCode.toString() + " " + statusCode.getReasonPhrase();
+					if (log.isDebugEnabled()) {
+						Object body = responseEntity.getBody();
+						if (requestJsonViewResponseBodyAdvice != null) {
+							MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(body);
+							requestJsonViewResponseBodyAdvice.beforeBodyWrite(mappingJacksonValue, request);
+							body = mappingJacksonValue;
+						}
+						resultStr = StringUtil.valueOf(body, true);
+					} else
+						resultStr = statusCode.toString() + " " + statusCode.getReasonPhrase();
 				} else {
 					if (log.isDebugEnabled())
 						resultStr = "Error:\n" + StringUtil.valueOf(result, true);
