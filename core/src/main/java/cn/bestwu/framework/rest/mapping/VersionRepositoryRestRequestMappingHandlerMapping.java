@@ -1,6 +1,7 @@
 package cn.bestwu.framework.rest.mapping;
 
 import cn.bestwu.framework.rest.annotation.RepositoryRestController;
+import cn.bestwu.framework.rest.aspect.LogAspect;
 import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.rest.support.ProxyPathMapper;
@@ -19,6 +20,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Comparator;
@@ -27,9 +29,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static cn.bestwu.framework.util.ResourceUtil.API_SIGNATURE;
-import static cn.bestwu.framework.util.ResourceUtil.REQUEST_METHOD;
-import static cn.bestwu.framework.util.ResourceUtil.REQUEST_VERSION;
+import static cn.bestwu.framework.util.ResourceUtil.*;
 
 /**
  * 支持Rest @RequestMapping produces MediaType 参数 version的RequestMappingHandlerMapping
@@ -83,8 +83,8 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 	 */
 	@Override protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
 		{
-			if (REQUEST_VERSION.get() == null) {
-				String version = null;
+			String version = (String) request.getAttribute(LogAspect.REQUEST_VERSION);
+			if (version == null) {
 				Enumeration<String> accept = request.getHeaders("Accept");
 				while (accept.hasMoreElements()) {
 					String element = accept.nextElement();
@@ -100,33 +100,48 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 					version = request.getParameter("_" + Version.VERSION_PARAM_NAME);
 				if (!StringUtils.hasText(version))
 					version = Version.DEFAULT_VERSION;
-
-				REQUEST_VERSION.set(version);
 			}
+			REQUEST_VERSION.set(version);
 		}
 		HandlerMethod handlerMethod = getHandlerMethod(lookupPath, request);
 		{
-			if (handlerMethod != null) {
-				REQUEST_METHOD.set(request.getMethod());
+			String apiSignature = (String) request.getAttribute(LogAspect.API_SIGNATURE);
+			if (apiSignature == null) {
+				if (handlerMethod != null) {
+					REQUEST_METHOD.set(request.getMethod());
 
-				if (API_SIGNATURE.get() == null) {
-					String apiSignature = DISCOVERER.getMapping(handlerMethod.getMethod());
+					apiSignature = DISCOVERER.getMapping(handlerMethod.getMethod());
 
-					String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
-					if (repositoryBasePathName != null) {
-						apiSignature = apiSignature.replace(BaseController.BASE_NAME, repositoryBasePathName);
-					}
-					String searchName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME);
-					if (searchName != null) {
-						apiSignature = apiSignature.replace("{search}", searchName);
+					if ("${server.error.path:${error.path:/error}}".equals(apiSignature)) {
+						apiSignature = (String) request.getAttribute(RequestDispatcher.FORWARD_SERVLET_PATH);
+					} else {
+						String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
+						if (repositoryBasePathName != null) {
+							apiSignature = apiSignature.replace(BaseController.BASE_NAME, repositoryBasePathName);
+						}
+						String searchName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_SEARCH_NAME);
+						if (searchName != null) {
+							apiSignature = apiSignature.replace("{search}", searchName);
+						}
 					}
 
 					apiSignature = request.getMethod().toLowerCase() + apiSignature.replaceAll("[{}]", "").replace("/", "_");
 					if (logger.isDebugEnabled()) {
 						logger.debug("请求签名：" + apiSignature);
 					}
-					API_SIGNATURE.set(apiSignature);
+				} else {
+					if (lookupPath.endsWith("/")) {
+						lookupPath = lookupPath.substring(0, lookupPath.length() - 1);
+					}
+					apiSignature = lookupPath;
+
+					apiSignature = request.getMethod().toLowerCase() + apiSignature.replaceAll("[{}]", "").replace("/", "_");
+					if (logger.isDebugEnabled()) {
+						logger.debug("请求签名：" + apiSignature);
+					}
+					request.setAttribute(LogAspect.API_SIGNATURE, apiSignature);
 				}
+				API_SIGNATURE.set(apiSignature);
 			}
 		}
 		return handlerMethod;

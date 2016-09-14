@@ -34,11 +34,14 @@ public class LogAspect {
 	 * put方法请求参数request暂存参数名
 	 */
 	private final String PUT_PARAMETER_MAP = "PUT_PARAMETER_MAP";
+	private final String REQUEST_METHOD = "REQUEST_METHOD";
+	private final String PRINCIPAL_NAME = "PRINCIPAL_NAME";
 
+	public static final String API_SIGNATURE = "API_SIGNATURE";
 	/**
 	 * 请求方名称request暂存参数名
 	 */
-	public static final String PRINCIPAL_NAME = "PRINCIPAL_NAME";
+	public static final String REQUEST_VERSION = "REQUEST_VERSION";
 
 	protected ApplicationEventPublisher publisher;
 
@@ -57,6 +60,10 @@ public class LogAspect {
 		Resource<String> source = new Resource<>();
 		publisher.publishEvent(new PrincipalNamePutEvent(source));
 		request.setAttribute(PRINCIPAL_NAME, source.getContent());
+
+		request.setAttribute(API_SIGNATURE, ResourceUtil.API_SIGNATURE.get());
+		request.setAttribute(REQUEST_VERSION, ResourceUtil.REQUEST_VERSION.get());
+		request.setAttribute(REQUEST_METHOD, ResourceUtil.REQUEST_METHOD.get());
 
 		if ("PUT".equals(request.getMethod()))
 			request.setAttribute(PUT_PARAMETER_MAP, request.getParameterMap());
@@ -87,7 +94,10 @@ public class LogAspect {
 				principalName = source.getContent();
 			}
 
-			String requestMethod = request.getMethod();
+			String requestMethod = (String) request.getAttribute(REQUEST_METHOD);
+			if (requestMethod == null) {
+				requestMethod = request.getMethod();
+			}
 			Map<String, String[]> parameterMap = null;
 			try {
 				if ("PUT".equals(requestMethod)) {
@@ -108,6 +118,7 @@ public class LogAspect {
 			String MSG_CODE = "{} [{}] [{}] {} {} {} HEADERS[{}]HEADERSEND PARAMETERS[{}]PARAMETERSEND {}";
 
 			principalName = principalName == null ? (request.getRemoteUser() == null ? "anonymousUser" : request.getRemoteUser()) : principalName;
+
 			String requestSignature = ResourceUtil.API_SIGNATURE.get();
 
 			String resultStr;

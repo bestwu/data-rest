@@ -40,6 +40,11 @@ public class ThreadLocalCleanFilter extends OncePerRequestFilter implements Orde
 		ResourceUtil.API_SIGNATURE.remove();
 		ResourceUtil.REQUEST_VERSION.remove();
 		ResourceUtil.REQUEST_METHOD.remove();
+		if (logger.isDebugEnabled()) {
+			logger.debug("remove API_SIGNATURE");
+			logger.debug("remove REQUEST_VERSION");
+			logger.debug("remove REQUEST_METHOD");
+		}
 	}
 
 }
