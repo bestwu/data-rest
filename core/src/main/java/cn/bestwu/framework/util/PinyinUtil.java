@@ -20,9 +20,6 @@ import java.util.Map;
  */
 @Slf4j
 public class PinyinUtil {
-	public enum Case {
-		UPPERCASE, LOWERCASE, CAPITALIZE
-	}
 
 	/**
 	 * unicode编码范围： 汉字：[0x4E00,0x9FA5]（或十进制[19968,40869]）
@@ -39,27 +36,14 @@ public class PinyinUtil {
 			return null;
 		}
 		try {
-			// 拼音输出格式
-			HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
-			// 全部小写
-			format.setCaseType(HanyuPinyinCaseType.LOWERCASE);
-			// 设置声调格式:不要声调
-			format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
-			// 设置特殊拼音ü的显示格式:用V (比如：绿)
-			format.setVCharType(HanyuPinyinVCharType.WITH_V);
-
 			char[] chs = str.toCharArray();
-
 			StringBuilder result = new StringBuilder();
-
 			for (int i = 0; i < chs.length; i++) {
-				String[] arr = chineseToPinYin(chs[i]);
-				if (arr == null) {
+				String[] pinyins = chineseToPinYin(chs[i]);
+				if (pinyins == null) {
 					result.append("");
-				} else if (arr.length == 1) {
-					result.append(arr[0]);
-				} else if (arr[0].equals(arr[1])) {
-					result.append(arr[0]);
+				} else if (pinyins.length == 1) {
+					result.append(StringUtils.capitalize(pinyins[0]));
 				} else {
 					String prim = str.substring(i, i + 1);
 
@@ -73,14 +57,13 @@ public class PinyinUtil {
 					}
 
 					String answer = null;
-					for (String py : arr) {
+					for (String py : pinyins) {
 
 						if (StringUtils.isEmpty(py)) {
 							continue;
 						}
 
-						if ((lst != null && py.equals(dictionary.get(lst))) ||
-								(rst != null && py.equals(dictionary.get(rst)))) {
+						if ((lst != null && py.equals(dictionary.get(lst))) || (rst != null && py.equals(dictionary.get(rst)))) {
 							answer = py;
 							break;
 						}
@@ -89,11 +72,9 @@ public class PinyinUtil {
 							answer = py;
 						}
 					}
-					if (answer != null) {
-						result.append(answer);
-					} else {
-						log.warn("no answer ch=" + chs[i]);
-					}
+					if (answer == null)
+						answer = pinyins[0];
+					result.append(StringUtils.capitalize(answer));
 				}
 			}
 
@@ -109,7 +90,8 @@ public class PinyinUtil {
 	 * @param c 字符
 	 * @return 是否为汉字
 	 */
-	public boolean isCNChar(char c) {
+
+	public static boolean isCNChar(char c) {
 		return Character.toString(c).matches("[\\u4E00-\\u9FA5]+");
 	}
 
@@ -129,7 +111,7 @@ public class PinyinUtil {
 	 * @param str 字符
 	 * @return 是否为汉字字符串
 	 */
-	public boolean isCNStr(String str) {
+	public static boolean hasCNStr(String str) {
 		for (char c : str.toCharArray()) {
 			if (isCNChar(c)) {// 如果有一个为汉字
 				return true;
@@ -143,7 +125,7 @@ public class PinyinUtil {
 	 * 返回汉字拼音的声母
 	 *
 	 * @param str 汉字(李莲英)
-	 * @return 汉字的头部字母 (LLY)
+	 * @return 汉字的头部字母 (lly)
 	 */
 	public static String getPinYinHead(String str) {
 		try {
@@ -156,13 +138,11 @@ public class PinyinUtil {
 			StringBuilder result = new StringBuilder();
 
 			for (int i = 0; i < chs.length; i++) {
-				String[] arr = chineseToPinYin(chs[i]);
-				if (arr == null) {
+				String[] pinyins = chineseToPinYin(chs[i]);
+				if (pinyins == null) {
 					result.append("");
-				} else if (arr.length == 1) {
-					result.append(arr[0].charAt(0));
-				} else if (arr[0].equals(arr[1])) {
-					result.append(arr[0].charAt(0));
+				} else if (pinyins.length == 1) {
+					result.append(pinyins[0].charAt(0));
 				} else {
 
 					String prim = str.substring(i, i + 1);
@@ -177,14 +157,13 @@ public class PinyinUtil {
 					}
 
 					String answer = null;
-					for (String py : arr) {
+					for (String py : pinyins) {
 
 						if (StringUtils.isEmpty(py)) {
 							continue;
 						}
 
-						if ((lst != null && py.equals(dictionary.get(lst))) ||
-								(rst != null && py.equals(dictionary.get(rst)))) {
+						if ((lst != null && py.equals(dictionary.get(lst))) || (rst != null && py.equals(dictionary.get(rst)))) {
 							answer = py;
 							break;
 						}
@@ -193,11 +172,9 @@ public class PinyinUtil {
 							answer = py;
 						}
 					}
-					if (answer != null) {
-						result.append(answer.charAt(0));
-					} else {
-						log.warn("no answer ch=" + chs[i]);
-					}
+					if (answer == null)
+						answer = pinyins[0];
+					result.append(answer.charAt(0));
 				}
 			}
 
@@ -286,11 +263,11 @@ public class PinyinUtil {
 		outputFormat.setCaseType(HanyuPinyinCaseType.LOWERCASE);
 		outputFormat.setVCharType(HanyuPinyinVCharType.WITH_V);
 
-		if (chineseCharacter >= 32 && chineseCharacter <= 125) {    //ASCII >=33 ASCII<=125的直接返回 ,ASCII码表：http://www.asciitable.com/
+		if (isCNChar(chineseCharacter)) {
+			return PinyinHelper.toHanyuPinyinStringArray(chineseCharacter, outputFormat);
+		} else {
 			return new String[] { String.valueOf(chineseCharacter) };
 		}
-
-		return PinyinHelper.toHanyuPinyinStringArray(chineseCharacter, outputFormat);
 	}
 
 }

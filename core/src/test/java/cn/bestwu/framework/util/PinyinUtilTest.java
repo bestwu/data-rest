@@ -9,8 +9,13 @@ import org.junit.Test;
 public class PinyinUtilTest {
 
 	@Test
-	public void test() throws Exception {
-		Assert.assertEquals("chongqing", PinyinUtil.getPinYin("重庆"));
+	public void duoyinzi() throws Exception {
+		Assert.assertEquals("ChongQing", PinyinUtil.getPinYin("重庆"));
 		Assert.assertEquals("cq", PinyinUtil.getPinYinHead("重庆"));
+	}
+
+	@Test
+	public void name() throws Exception {
+		System.err.println(PinyinUtil.getPinYin("崖"));
 	}
 }
