@@ -46,7 +46,7 @@ subprojects {
             dependency 'org.apache.lucene:lucene-highlighter:5.3.1'
 
             dependency 'org.atteo:evo-inflector:1.2.1'
-            dependency 'com.belerweb:pinyin4j:2.5.1'
+            dependency 'com.github.stuxuhai:jpinyin:1.1.7'
 
             dependency 'cn.bestwu:api-sign:1.0.0'
         }

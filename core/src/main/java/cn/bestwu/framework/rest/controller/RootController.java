@@ -4,8 +4,10 @@ package cn.bestwu.framework.rest.controller;
 import cn.bestwu.api.sign.ApiSign;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.util.CaptchaUtil;
-import cn.bestwu.framework.util.PinyinUtil;
 import cn.bestwu.framework.util.Sha1DigestUtil;
+import com.github.stuxuhai.jpinyin.PinyinException;
+import com.github.stuxuhai.jpinyin.PinyinHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.http.HttpHeaders;
@@ -37,6 +39,7 @@ import java.util.Map;
  */
 @RestController
 @ConditionalOnWebApplication
+@Slf4j
 public class RootController extends BaseController {
 
 	/**
@@ -51,7 +54,13 @@ public class RootController extends BaseController {
 		Assert.notEmpty(word, getText("param.notnull", "word"));
 
 		Map<String, String> map = new HashMap<>();
-		Arrays.stream(word).forEach(w -> map.put(w, PinyinUtil.getPinYinHead(w)));
+		Arrays.stream(word).forEach(w -> {
+			try {
+				map.put(w, PinyinHelper.getShortPinyin(w));
+			} catch (PinyinException e) {
+				log.error(e.getMessage(), e);
+			}
+		});
 		return ok(map);
 	}
 
@@ -63,7 +72,7 @@ public class RootController extends BaseController {
 	 *
 	 * @param index 页码
 	 * @return 日志
-	 * @throws IOException IOException
+	 * @throws IOException      IOException
 	 * @throws ServletException ServletException
 	 */
 	@RequestMapping(value = "/logs/{index}", method = RequestMethod.GET, produces = { "text/html", "text/plain" })
