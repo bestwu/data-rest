@@ -145,7 +145,11 @@ public class LogAspect {
 				}
 				error = statusCode.is5xxServerError();
 			} else {
-				resultStr = StringUtil.subString(String.valueOf(result), 100);
+				if (log.isTraceEnabled()) {
+					resultStr = String.valueOf(result);
+				} else {
+					resultStr = StringUtil.subString(String.valueOf(result), 100);
+				}
 			}
 			if (log.isDebugEnabled())
 				log.info("{} [{}] [{}] {} {} {}\nheaders\n{}\nparameters\n{}\n{}", ipAddress, StringUtil.subString(getUserAgent(), 220), principalName, requestMethod,
