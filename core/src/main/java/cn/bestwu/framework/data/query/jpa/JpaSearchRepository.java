@@ -94,8 +94,10 @@ public class JpaSearchRepository implements SearchRepository {
 			FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
 			SearchFactory searchFactory = fullTextEntityManager.getSearchFactory();
 			QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity(modelType).get();
-
-			Query luceneQuery = queryBuilder.keyword().onFields(getSearchFields(modelType)).matching(keyword).createQuery();
+			if (!keyword.contains("?") && !keyword.contains("*")) {
+				keyword = keyword + "*";
+			}
+			Query luceneQuery = queryBuilder.keyword().wildcard().onFields(getSearchFields(modelType)).matching(keyword).createQuery();
 			{//生成query
 				QueryCarrier queryCarrier = new QueryCarrier(queryBuilder, luceneQuery);
 				publisher.publishEvent(new QueryBuilderEvent(queryCarrier, modelType));
