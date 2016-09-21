@@ -150,12 +150,19 @@ bintray {
 }
 //发布到snapshot
 artifactory {
-    contextUrl = 'http://oss.jfrog.org'
+    contextUrl = 'http://192.168.0.110:8081'
+//    contextUrl = 'http://oss.jfrog.org'
     publish {
+//        repository {
+//            repoKey = 'oss-snapshot-local' //The Artifactory repository key to publish to
+//            username = bintrayUsername
+//            password = bintrayApiKey
+//            maven = true
+//        }
         repository {
-            repoKey = 'oss-snapshot-local' //The Artifactory repository key to publish to
-            username = bintrayUsername
-            password = bintrayApiKey
+            repoKey = 'libs-snapshot-local'
+            username = 'admin'
+            password = 'password'
             maven = true
         }
         defaults {
