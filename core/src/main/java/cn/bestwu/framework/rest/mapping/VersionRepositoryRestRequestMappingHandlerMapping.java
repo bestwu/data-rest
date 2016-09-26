@@ -103,12 +103,18 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 			}
 			REQUEST_VERSION.set(version);
 		}
+		{
+			String requestMethod = (String) request.getAttribute(LogAspect.REQUEST_METHOD);
+			if (requestMethod == null) {
+				requestMethod = request.getMethod();
+			}
+			REQUEST_METHOD.set(requestMethod);
+		}
 		HandlerMethod handlerMethod = getHandlerMethod(lookupPath, request);
 		{
 			String apiSignature = (String) request.getAttribute(LogAspect.API_SIGNATURE);
 			if (apiSignature == null) {
 				if (handlerMethod != null) {
-					REQUEST_METHOD.set(request.getMethod());
 
 					apiSignature = DISCOVERER.getMapping(handlerMethod.getMethod());
 
@@ -141,8 +147,8 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 					}
 					request.setAttribute(LogAspect.API_SIGNATURE, apiSignature);
 				}
-				API_SIGNATURE.set(apiSignature);
 			}
+			API_SIGNATURE.set(apiSignature);
 		}
 		return handlerMethod;
 	}

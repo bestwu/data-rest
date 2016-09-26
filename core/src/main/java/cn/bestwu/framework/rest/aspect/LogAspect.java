@@ -34,8 +34,9 @@ public class LogAspect {
 	 * put方法请求参数request暂存参数名
 	 */
 	private final String PUT_PARAMETER_MAP = "PUT_PARAMETER_MAP";
-	private final String REQUEST_METHOD = "REQUEST_METHOD";
 	private final String PRINCIPAL_NAME = "PRINCIPAL_NAME";
+
+	public static final String REQUEST_METHOD = "REQUEST_METHOD";
 
 	public static final String API_SIGNATURE = "API_SIGNATURE";
 	/**
@@ -94,10 +95,7 @@ public class LogAspect {
 				principalName = source.getContent();
 			}
 
-			String requestMethod = (String) request.getAttribute(REQUEST_METHOD);
-			if (requestMethod == null) {
-				requestMethod = request.getMethod();
-			}
+			String requestMethod = ResourceUtil.REQUEST_METHOD.get();
 			Map<String, String[]> parameterMap = null;
 			try {
 				if ("PUT".equals(requestMethod)) {
