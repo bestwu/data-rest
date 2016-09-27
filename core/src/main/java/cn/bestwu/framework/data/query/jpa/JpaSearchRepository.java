@@ -95,7 +95,14 @@ public class JpaSearchRepository implements SearchRepository {
 			SearchFactory searchFactory = fullTextEntityManager.getSearchFactory();
 			QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity(modelType).get();
 
-			Query luceneQuery = queryBuilder.keyword().onFields(getSearchFields(modelType)).matching(keyword).createQuery();
+			Query luceneQuery;
+			if (keyword.length() == 1) {
+				luceneQuery = queryBuilder.keyword().wildcard().onFields(getSearchFields(modelType)).matching(keyword + "*").createQuery();
+			} else if (keyword.contains("*") || keyword.contains("?")) {
+				luceneQuery = queryBuilder.keyword().wildcard().onFields(getSearchFields(modelType)).matching(keyword).createQuery();
+			} else {
+				luceneQuery = queryBuilder.keyword().onFields(getSearchFields(modelType)).matching(keyword).createQuery();
+			}
 			{//生成query
 				QueryCarrier queryCarrier = new QueryCarrier(queryBuilder, luceneQuery);
 				publisher.publishEvent(new QueryBuilderEvent(queryCarrier, modelType));
