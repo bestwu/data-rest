@@ -40,6 +40,15 @@ apply plugin: 'com.jfrog.bintray'
 apply plugin: "com.jfrog.artifactory"
 apply plugin: 'maven-publish'
 
+javadoc {
+    options {
+        encoding 'UTF-8'
+        charSet 'UTF-8'
+        author true
+        version true
+    }
+}
+
 task sourceJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
