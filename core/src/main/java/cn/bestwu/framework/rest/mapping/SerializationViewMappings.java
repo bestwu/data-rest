@@ -1,10 +1,9 @@
 package cn.bestwu.framework.rest.mapping;
 
-import cn.bestwu.framework.util.ResourceUtil;
 import cn.bestwu.framework.rest.support.Version;
 import cn.bestwu.framework.rest.support.VersionedSerializationView;
+import cn.bestwu.framework.util.ResourceUtil;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -59,10 +58,9 @@ public class SerializationViewMappings {
 	}
 
 	/**
-	 * @param request 请求
 	 * @return 对应序列化视图
 	 */
-	public Class<?> getSerializationView(HttpServletRequest request) {
+	public Class<?> getSerializationView() {
 		if (serializationViewsClass == null) {
 			return null;
 		}
@@ -72,6 +70,11 @@ public class SerializationViewMappings {
 		}
 		List<VersionedSerializationView> jsonViews = cache.get(requestSignature);
 		if (jsonViews == null || jsonViews.isEmpty()) {
+			//			if ("HEAD".equals(ResourceUtil.REQUEST_METHOD.get())) {
+			//				jsonViews = cache.get(requestSignature.replaceFirst("head", "get"));
+			//				if (jsonViews == null || jsonViews.isEmpty())
+			//					return null;
+			//			} else
 			return null;
 		}
 		String requestVersion = ResourceUtil.REQUEST_VERSION.get();

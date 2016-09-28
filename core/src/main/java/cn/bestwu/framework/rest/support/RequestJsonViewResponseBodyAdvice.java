@@ -9,10 +9,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
-import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.servlet.mvc.method.annotation.AbstractMappingJacksonResponseBodyAdvice;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 请求JSON视图时响应结果处理
@@ -36,17 +33,16 @@ public class RequestJsonViewResponseBodyAdvice extends AbstractMappingJacksonRes
 	@Override
 	protected void beforeBodyWriteInternal(MappingJacksonValue bodyContainer, MediaType contentType,
 			MethodParameter returnType, ServerHttpRequest request, ServerHttpResponse response) {
-		beforeBodyWrite(bodyContainer, ((ServletServerHttpRequest) request).getServletRequest());
+		beforeBodyWrite(bodyContainer);
 	}
 
 	/**
 	 * 写入响应BODY前加入序列化视图
 	 *
 	 * @param bodyContainer bodyContainer
-	 * @param request       request
 	 */
-	public void beforeBodyWrite(MappingJacksonValue bodyContainer, HttpServletRequest request) {
-		Class<?> serializationView = serializationViewMappings.getSerializationView(request);
+	public void beforeBodyWrite(MappingJacksonValue bodyContainer) {
+		Class<?> serializationView = serializationViewMappings.getSerializationView();
 		if (log.isDebugEnabled()) {
 			log.debug("serializationView:" + (serializationView == null ? null : serializationView.getSimpleName()));
 		}

@@ -129,7 +129,7 @@ public class LogAspect {
 						Object body = responseEntity.getBody();
 						if (requestJsonViewResponseBodyAdvice != null) {
 							MappingJacksonValue mappingJacksonValue = new MappingJacksonValue(body);
-							requestJsonViewResponseBodyAdvice.beforeBodyWrite(mappingJacksonValue, request);
+							requestJsonViewResponseBodyAdvice.beforeBodyWrite(mappingJacksonValue);
 							body = mappingJacksonValue;
 						}
 						resultStr = StringUtil.valueOf(body, true);

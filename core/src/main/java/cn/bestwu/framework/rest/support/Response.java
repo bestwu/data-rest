@@ -22,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.*;
 
@@ -43,6 +44,8 @@ public class Response {
 	private Repositories repositories;
 	@Autowired
 	protected ApplicationEventPublisher publisher;
+	@Autowired(required = false)
+	protected HttpServletRequest request;
 
 	protected PersistentEntity<?, ?> getPersistentEntity(Class<?> modelType) {
 		return repositories.getPersistentEntity(modelType);
@@ -180,6 +183,11 @@ public class Response {
 	 * @return 200 ResponseEntity
 	 */
 	private ResponseEntity ok(Object resource, boolean supportClientCache) {
+		if ("HEAD".equals(ResourceUtil.REQUEST_METHOD.get())) {
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Link", request.getRequestURL().toString());
+			return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);
+		}
 		if (resource instanceof PersistentEntityResource) {
 			PersistentEntityResource<?> persistentEntityResource = (PersistentEntityResource<?>) resource;
 			PersistentEntity<?, ?> persistentEntity = persistentEntityResource.getEntity();

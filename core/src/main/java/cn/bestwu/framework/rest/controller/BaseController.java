@@ -16,7 +16,6 @@ import org.springframework.data.repository.support.RepositoryInvokerFactory;
 import org.springframework.util.ClassUtils;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -49,9 +48,6 @@ public abstract class BaseController extends Response {
 	private ServletContext servletContext;
 	@Autowired
 	private MessageSource messageSource;
-
-	@Autowired(required = false)
-	protected HttpServletRequest request;
 
 	@Autowired
 	private RepositoryInvokerFactory invokerFactory;
