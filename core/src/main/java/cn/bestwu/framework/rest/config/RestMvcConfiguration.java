@@ -4,6 +4,8 @@ import cn.bestwu.framework.rest.aspect.LogAspect;
 import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.converter.DefaultElementMixIn;
 import cn.bestwu.framework.rest.converter.PageMixIn;
+import cn.bestwu.framework.rest.filter.AbstractAuthenticationFailureListener;
+import cn.bestwu.framework.rest.filter.AuthorizationFailureListener;
 import cn.bestwu.framework.rest.filter.OrderedHttpPutFormContentFilter;
 import cn.bestwu.framework.rest.filter.ThreadLocalCleanFilter;
 import cn.bestwu.framework.rest.mapping.RepositoryResourceMappings;
@@ -112,6 +114,7 @@ public class RestMvcConfiguration {
 	 * 日志
 	 */
 	@Configuration
+	@ConditionalOnProperty(value = "logging.logAspect.enabled")
 	@ConditionalOnWebApplication
 	@ConditionalOnClass(SpringProxy.class)
 	protected static class LoggerConfiguration {
@@ -119,10 +122,19 @@ public class RestMvcConfiguration {
 		private ApplicationEventPublisher publisher;
 
 		@Bean
-		@ConditionalOnProperty(value = "logging.logAspect.enabled")
 		@Order(Ordered.HIGHEST_PRECEDENCE + 10)
 		public LogAspect logAspect() {
 			return new LogAspect(publisher);
+		}
+
+		@Bean
+		public AbstractAuthenticationFailureListener abstractAuthenticationFailureListener() {
+			return new AbstractAuthenticationFailureListener();
+		}
+
+		@Bean
+		public AuthorizationFailureListener authorizationFailureListener() {
+			return new AuthorizationFailureListener();
 		}
 	}
 
