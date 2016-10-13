@@ -106,7 +106,7 @@ public class JpaSearchRepository implements SearchRepository {
 				luceneQuery = queryBuilder.keyword().onFields(getSearchFields(modelType)).matching(keyword).createQuery();
 			}
 			{//生成query
-				QueryCarrier queryCarrier = new QueryCarrier(queryBuilder, luceneQuery);
+				QueryCarrier queryCarrier = new QueryCarrier(queryBuilder, luceneQuery, keyword);
 				publisher.publishEvent(new QueryBuilderEvent(queryCarrier, modelType));
 				Query query = queryCarrier.getQuery();
 				if (query != null) {

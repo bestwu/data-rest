@@ -16,10 +16,13 @@ public class QueryCarrier {
 	private Query query;
 	private Query defaultQuery;
 
+	private String keyword;
+
 	//--------------------------------------------
 
-	public QueryCarrier(QueryBuilder queryBuilder, Query defaultQuery) {
+	public QueryCarrier(QueryBuilder queryBuilder, Query defaultQuery, String keyword) {
 		this.queryBuilder = queryBuilder;
 		this.defaultQuery = defaultQuery;
+		this.keyword = keyword;
 	}
 }
