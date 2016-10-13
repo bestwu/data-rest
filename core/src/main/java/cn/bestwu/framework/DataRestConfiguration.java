@@ -5,6 +5,8 @@ import cn.bestwu.framework.data.query.SearchRepository;
 import cn.bestwu.framework.data.query.jpa.JpaSearchRepository;
 import cn.bestwu.framework.event.AnnotatedEventHandlerInvoker;
 import cn.bestwu.framework.rest.config.RestMvcConfiguration;
+import cn.bestwu.framework.rest.resolver.LucenePageableHandlerMethodArgumentResolver;
+import cn.bestwu.framework.rest.resolver.LuceneSortHandlerMethodArgumentResolver;
 import cn.bestwu.framework.util.AutowireHelper;
 import org.hibernate.search.jpa.Search;
 import org.springframework.beans.factory.BeanFactoryUtils;
@@ -24,6 +26,10 @@ import org.springframework.data.mapping.context.MappingContext;
 import org.springframework.data.mapping.context.PersistentEntities;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.data.repository.support.Repositories;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.data.web.SortHandlerMethodArgumentResolver;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -99,6 +105,32 @@ public class DataRestConfiguration {
 		public SearchRepository searchRepository() {
 			return new JpaSearchRepository(entityManager, publisher);
 		}
+
+		@Configuration
+		protected static class SpringDataWebConfiguration extends WebMvcConfigurerAdapter {
+
+			@Bean
+			public PageableHandlerMethodArgumentResolver pageableResolver() {
+				return new LucenePageableHandlerMethodArgumentResolver(lucenceSortResolver());
+			}
+
+			@Bean
+			public LuceneSortHandlerMethodArgumentResolver lucenceSortResolver() {
+				return new LuceneSortHandlerMethodArgumentResolver();
+			}
+
+			@Bean
+			public SortHandlerMethodArgumentResolver sortResolver() {
+				return new SortHandlerMethodArgumentResolver();
+			}
+
+			@Override
+			public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+				argumentResolvers.add(sortResolver());
+				argumentResolvers.add(pageableResolver());
+			}
+		}
+
 	}
 
 	/**

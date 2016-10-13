@@ -1,13 +1,12 @@
 package cn.bestwu.framework.data.query.jpa;
 
 import cn.bestwu.framework.data.annotation.HighLight;
+import cn.bestwu.framework.data.query.LuceneSort;
 import cn.bestwu.framework.data.query.QueryCarrier;
 import cn.bestwu.framework.data.query.ResultHandler;
 import cn.bestwu.framework.data.query.SearchRepository;
 import cn.bestwu.framework.event.QueryBuilderEvent;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.exception.EmptyQueryException;
@@ -21,7 +20,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Jpa全文搜索的hibernate Search实现
@@ -119,11 +121,8 @@ public class JpaSearchRepository implements SearchRepository {
 
 			if (totalSize > 0) {
 				org.springframework.data.domain.Sort sort = pageable.getSort();
-				if (sort != null) {
-					List<SortField> sortFields = new ArrayList<>();
-					sort.forEach(
-							order -> sortFields.add(new SortField(order.getProperty(), SortField.Type.SCORE, org.springframework.data.domain.Sort.Direction.DESC.equals(order.getDirection()))));
-					fullTextQuery.setSort(new Sort(sortFields.toArray(new SortField[sortFields.size()])));
+				if (sort != null && sort instanceof LuceneSort) {
+					fullTextQuery.setSort(((LuceneSort) sort).getSort());
 				}
 
 				fullTextQuery.setFirstResult(pageable.getOffset());
