@@ -159,7 +159,7 @@ bintray {
 }
 //发布到snapshot
 artifactory {
-    contextUrl = 'http://192.168.0.110:8081'
+    contextUrl = 'http://127.0.0.1:8081'
 //    contextUrl = 'http://oss.jfrog.org'
     publish {
 //        repository {
