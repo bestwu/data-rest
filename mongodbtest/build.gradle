@@ -3,6 +3,9 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-data-mongodb'
     compile 'com.querydsl:querydsl-mongodb'
 
+    optional 'com.github.stuxuhai:jpinyin'
+    optional 'org.springframework.security:spring-security-core'
+
     testCompile 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
     testCompile 'com.querydsl:querydsl-apt'
     testCompile 'org.springframework.boot:spring-boot-starter-test'

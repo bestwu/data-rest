@@ -3,6 +3,7 @@ package org.springframework.data.querydsl.binding;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.CollectionPathBase;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.Property;
@@ -32,7 +33,7 @@ public class FixQuerydslPredicateBuilder {
 	private final EntityPathResolver resolver;
 
 	/**
-	 * Creates a new {@link QuerydslPredicateBuilder} for the given {@link ConversionService} and
+	 * Creates a new  for the given {@link ConversionService} and
 	 * {@link EntityPathResolver}.
 	 *
 	 * @param conversionService must not be {@literal null}.
@@ -76,7 +77,7 @@ public class FixQuerydslPredicateBuilder {
 
 			String path = entry.getKey();
 
-			if (!bindings.isPathVisible(path, type.getType())) {
+			if (!bindings.isPathAvailable(path, type)) {
 				continue;
 			}
 
@@ -159,6 +160,10 @@ public class FixQuerydslPredicateBuilder {
 	 * @return Path
 	 */
 	private Path<?> reifyPath(PropertyPath path, Path<?> base) {
+
+		if (base instanceof CollectionPathBase) {
+			return reifyPath(path, (Path<?>) ((CollectionPathBase<?, ?, ?>) base).any());
+		}
 
 		Path<?> entityPath = base != null ? base : resolver.createPath(path.getOwningType().getType());
 
