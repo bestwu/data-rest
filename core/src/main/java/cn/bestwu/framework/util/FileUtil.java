@@ -1,5 +1,8 @@
 package cn.bestwu.framework.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -12,6 +15,7 @@ import java.util.List;
  * @author Peter Wu
  */
 public class FileUtil {
+	private static Logger log = LoggerFactory.getLogger(FileUtil.class);
 
 	//-----------------------------------------------------------------------
 	public static Charset toCharset(Charset charset) {
@@ -198,4 +202,25 @@ public class FileUtil {
 
 	//-----------------------------------------------------------------------
 
+	/**
+	 * 删除文件
+	 *
+	 * @param file 文件
+	 * @return 是否成功
+	 */
+	public static boolean delete(File file) {
+		if (!file.exists()) {
+			return false;
+		}
+
+		if (file.isDirectory()) {
+			log.error("无权删除文件夹:{}", file);
+			return false;
+		}
+
+		boolean delete = file.delete();
+		if (log.isDebugEnabled() && delete)
+			log.debug("删除文件：{}", file);
+		return delete;
+	}
 }

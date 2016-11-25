@@ -45,6 +45,18 @@ public class ImageBuilder {
 	 * @return ImageBuilder
 	 */
 	public ImageBuilder scaleTrim(Integer width, Integer height) {
+		return scaleTrim(width, height, Origin.CENTER);
+	}
+
+	/**
+	 * 按宽高缩放
+	 *
+	 * @param width  宽度
+	 * @param height 高度
+	 * @param origin 从哪裁剪
+	 * @return ImageBuilder
+	 */
+	public ImageBuilder scaleTrim(Integer width, Integer height, Origin origin) {
 		double scale = 1.0;
 		if (width == null) {
 			width = this.width;
@@ -57,10 +69,10 @@ public class ImageBuilder {
 		if (height > newheight) {
 			scale = height * scale / newheight;
 		}
-		if (scale != 1) {
+		if (scale < 1) {
 			scale(scale);
 		}
-		sourceRegion(width, height);
+		sourceRegion(width, height, origin);
 		return this;
 	}
 
@@ -131,6 +143,9 @@ public class ImageBuilder {
 		}
 		if (height > this.height) {
 			height = this.height;
+		}
+		if (height == this.height && width == this.width) {
+			return this;
 		}
 		int x = 0;
 		int y = 0;
