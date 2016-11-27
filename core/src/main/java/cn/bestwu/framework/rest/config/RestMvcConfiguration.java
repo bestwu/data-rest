@@ -4,10 +4,7 @@ import cn.bestwu.framework.rest.aspect.LogAspect;
 import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.converter.DefaultElementMixIn;
 import cn.bestwu.framework.rest.converter.PageMixIn;
-import cn.bestwu.framework.rest.filter.AbstractAuthenticationFailureListener;
-import cn.bestwu.framework.rest.filter.AuthorizationFailureListener;
-import cn.bestwu.framework.rest.filter.OrderedHttpPutFormContentFilter;
-import cn.bestwu.framework.rest.filter.ThreadLocalCleanFilter;
+import cn.bestwu.framework.rest.filter.*;
 import cn.bestwu.framework.rest.mapping.RepositoryResourceMappings;
 import cn.bestwu.framework.rest.mapping.SerializationViewMappings;
 import cn.bestwu.framework.rest.mapping.VersionRepositoryRestRequestMappingHandlerMapping;
@@ -57,6 +54,7 @@ import org.springframework.http.converter.json.AbstractJackson2HttpMessageConver
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
 import org.springframework.validation.DefaultMessageCodesResolver;
 import org.springframework.validation.MessageCodesResolver;
 import org.springframework.validation.Validator;
@@ -127,14 +125,21 @@ public class RestMvcConfiguration {
 			return new LogAspect(publisher);
 		}
 
-		@Bean
-		public AbstractAuthenticationFailureListener abstractAuthenticationFailureListener() {
-			return new AbstractAuthenticationFailureListener();
-		}
+		@Configuration
+		@ConditionalOnProperty(value = "logging.logAspect.enabled")
+		@ConditionalOnWebApplication
+		@ConditionalOnClass(AbstractAuthenticationFailureEvent.class)
+		protected static class failureListener {
 
-		@Bean
-		public AuthorizationFailureListener authorizationFailureListener() {
-			return new AuthorizationFailureListener();
+			@Bean
+			public AuthenticationFailureListener authenticationFailureListener() {
+				return new AuthenticationFailureListener();
+			}
+
+			@Bean
+			public AuthorizationFailureListener authorizationFailureListener() {
+				return new AuthorizationFailureListener();
+			}
 		}
 	}
 

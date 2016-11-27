@@ -9,7 +9,7 @@ import org.springframework.security.access.event.AuthorizationFailureEvent;
  * @author Peter Wu
  */
 @Slf4j
-public class AuthorizationFailureListener extends AuthenticationFailureListener<AuthorizationFailureEvent> {
+public class AuthorizationFailureListener extends AbstractAuthenticationFailureListener<AuthorizationFailureEvent> {
 
 	@Override protected String getPrincipalName(AuthorizationFailureEvent authorizationFailureEvent) {
 		return authorizationFailureEvent.getAuthentication().getName();

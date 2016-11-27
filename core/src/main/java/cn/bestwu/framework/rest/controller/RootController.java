@@ -5,7 +5,6 @@ import cn.bestwu.api.sign.ApiSign;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
 import cn.bestwu.framework.util.CaptchaUtil;
 import cn.bestwu.framework.util.Sha1DigestUtil;
-import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +56,7 @@ public class RootController extends BaseController {
 		Arrays.stream(word).forEach(w -> {
 			try {
 				map.put(w, PinyinHelper.getShortPinyin(w));
-			} catch (PinyinException e) {
+			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
 		});

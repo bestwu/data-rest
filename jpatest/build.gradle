@@ -6,9 +6,6 @@ dependencies {
     compile 'org.apache.lucene:lucene-highlighter'
 //    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
 
-    optional 'com.github.stuxuhai:jpinyin'
-    optional 'org.springframework.security:spring-security-core'
-
     testCompile 'com.querydsl:querydsl-apt'
     testCompile "com.h2database:h2"
     testCompile 'org.springframework.boot:spring-boot-starter-test'
