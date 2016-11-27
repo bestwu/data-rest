@@ -15,9 +15,9 @@ public class DefaultSortEvent extends RepositoryEvent {
 
 	/**
 	 * @param orders    排序
-	 * @param modelType 实体类型
+	 * @param domainType 实体类型
 	 */
-	public DefaultSortEvent(List<Sort.Order> orders, Class<?> modelType) {
-		super(orders, modelType);
+	public DefaultSortEvent(List<Sort.Order> orders, Class<?> domainType) {
+		super(orders, domainType);
 	}
 }

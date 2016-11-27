@@ -43,8 +43,8 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 	 */
 	@Override
 	public void onApplicationEvent(RepositoryEvent event) {
-		Class<?> modelType = event.getModelType();
-		if (!handlerMethods.containsKey(modelType)) {
+		Class<?> domainType = event.getDomainType();
+		if (!handlerMethods.containsKey(domainType)) {
 			return;
 		}
 
@@ -58,7 +58,7 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 
 		Class<? extends RepositoryEvent> eventType = event.getClass();
 
-		for (EventHandlerMethod handlerMethod : handlerMethods.get(modelType)) {
+		for (EventHandlerMethod handlerMethod : handlerMethods.get(domainType)) {
 
 			if (!handlerMethod.eventType.equals(eventType)) {
 				continue;
@@ -142,19 +142,19 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 		if (parameterTypes.length == 0) {
 			throw new IllegalStateException(String.format(PARAMETER_MISSING, method));
 		}
-		Class<?> modelType;
+		Class<?> domainType;
 		if (annotationType.equals(HandleDefaultSort.class)) {
-			modelType = ((HandleDefaultSort) annotation).value();
+			domainType = ((HandleDefaultSort) annotation).value();
 		} else if (annotationType.equals(HandleDefaultPredicate.class)) {
-			modelType = ((HandleDefaultPredicate) annotation).value();
+			domainType = ((HandleDefaultPredicate) annotation).value();
 		} else if (annotationType.equals(HandleQueryBuilder.class)) {
-			modelType = ((HandleQueryBuilder) annotation).value();
+			domainType = ((HandleQueryBuilder) annotation).value();
 		} else {
-			modelType = parameterTypes[0];
+			domainType = parameterTypes[0];
 		}
 
 		EventHandlerMethod handlerMethod = new EventHandlerMethod(eventType, handler, method);
-		handlerMethods.add(modelType, handlerMethod);
+		handlerMethods.add(domainType, handlerMethod);
 	}
 
 	/**

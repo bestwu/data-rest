@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Peter Wu
  */
-public class ResourceMethodArgumentResolver extends ModelMethodArgumentResolver {
+public class ResourceMethodArgumentResolver extends DomainMethodArgumentResolver {
 
 	private final RepositoryResourceMetadataHandlerMethodArgumentResolver resourceMetadataResolver;
 
@@ -55,8 +55,8 @@ public class ResourceMethodArgumentResolver extends ModelMethodArgumentResolver 
 		if (resourceMetadata == null) {
 			return null;
 		}
-		Class<?> modelType = resourceMetadata.getModelType();
-		return new PersistentEntityResource<>(resolveModel(parameter, mavContainer, webRequest, binderFactory, modelType), resourceMetadata.getEntity());
+		Class<?> domainType = resourceMetadata.getModelType();
+		return new PersistentEntityResource<>(resolveModel(parameter, mavContainer, webRequest, binderFactory, domainType), resourceMetadata.getEntity());
 	}
 
 }

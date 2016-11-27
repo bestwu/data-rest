@@ -1,6 +1,6 @@
 package cn.bestwu.framework.mongodb;
 
-import cn.bestwu.framework.mongodb.model.TestUser;
+import cn.bestwu.framework.mongodb.domain.TestUser;
 import cn.bestwu.framework.support.client.CustomRestTemplate;
 import org.junit.Assert;
 import org.junit.Test;

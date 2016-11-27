@@ -15,7 +15,7 @@ def taskGroup = 'app'
 //生成querydsl
 def testquerydslSourcesDir = file('src/testquerydsl/java')
 task generateTestMongodbQueryDSL(type: JavaCompile, group: taskGroup) {
-    source = 'src/test/java/cn/bestwu/framework/mongodb/model'
+    source = 'src/test/java/cn/bestwu/framework/mongodb/domain'
     classpath = configurations.compile + configurations.testCompile + configurations.runtime
     options.compilerArgs = ['-proc:only', '-processor', 'org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor']
     options.encoding = 'UTF-8'

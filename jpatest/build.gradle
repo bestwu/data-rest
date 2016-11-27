@@ -32,7 +32,7 @@ def taskGroup = 'app'
 //生成querydsl
 def testquerydslSourcesDir = file('src/testquerydsl/java')
 task generateTestJPAQueryDSL(type: JavaCompile, group: taskGroup) {
-    source = 'src/test/java/cn/bestwu/framework/jpa/model'
+    source = 'src/test/java/cn/bestwu/framework/jpa/domain'
     classpath = configurations.compile + configurations.testCompile + configurations.runtime
     options.compilerArgs = ['-proc:only', '-processor', 'com.querydsl.apt.jpa.JPAAnnotationProcessor']
     options.encoding = 'UTF-8'

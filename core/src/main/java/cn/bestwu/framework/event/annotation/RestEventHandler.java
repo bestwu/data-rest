@@ -15,7 +15,7 @@ import java.lang.annotation.*;
  * public class MyEventHandler {
  *
  * &#064;HandleBeforeSave
- * public void handleBeforeSave(MyModel model) {
+ * public void handleBeforeSave(MyModel domain) {
  *		 //do something
  * }
  *

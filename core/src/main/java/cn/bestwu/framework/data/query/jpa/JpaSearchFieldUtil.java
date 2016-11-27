@@ -23,25 +23,25 @@ import java.util.Set;
 public class JpaSearchFieldUtil {
 
 	/**
-	 * modelType类上注解了AnnotationType 的字段
+	 * domainType 类上注解了AnnotationType 的字段
 	 *
-	 * @param modelType      modelType
+	 * @param domainType      domainType
 	 * @param AnnotationType AnnotationType
 	 * @param <T>            T
 	 * @return 字段名
 	 */
-	public static <T> String[] getAnnotationedFields(Class<T> modelType, Class<? extends Annotation> AnnotationType) {
+	public static <T> String[] getAnnotationedFields(Class<T> domainType, Class<? extends Annotation> AnnotationType) {
 		Set<String> fields = new HashSet<>();
-		getAnnotationedFields(fields, modelType, AnnotationType, null);
+		getAnnotationedFields(fields, domainType, AnnotationType, null);
 		if (log.isDebugEnabled()) {
 			log.debug("查找到" + AnnotationType + "注解的字段：" + fields);
 		}
 		return fields.toArray(new String[fields.size()]);
 	}
 
-	private static <T> void getAnnotationedFields(Set<String> fields, Class<T> modelType, Class<? extends Annotation> AnnotationType, String parentFieldName) {
-		Arrays.stream(modelType.getDeclaredFields()).forEach(field -> addAnnotationedFields(fields, field, AnnotationType, parentFieldName));
-		Arrays.stream(BeanUtils.getPropertyDescriptors(modelType)).forEach(propertyDescriptor -> addAnnotationedPropertys(fields, propertyDescriptor, AnnotationType, parentFieldName));
+	private static <T> void getAnnotationedFields(Set<String> fields, Class<T> domainType, Class<? extends Annotation> AnnotationType, String parentFieldName) {
+		Arrays.stream(domainType.getDeclaredFields()).forEach(field -> addAnnotationedFields(fields, field, AnnotationType, parentFieldName));
+		Arrays.stream(BeanUtils.getPropertyDescriptors(domainType)).forEach(propertyDescriptor -> addAnnotationedPropertys(fields, propertyDescriptor, AnnotationType, parentFieldName));
 	}
 
 	private static void addAnnotationedPropertys(Set<String> fields, PropertyDescriptor propertyDescriptor, Class<? extends Annotation> annotationType, String parentFieldName) {

@@ -14,21 +14,21 @@ public abstract class RepositoryEvent extends ApplicationEvent {
 	/**
 	 * 实体类型
 	 */
-	private final Class<?> modelType;
+	private final Class<?> domainType;
 
 	/**
-	 * @param source    实体
-	 * @param modelType 实体类型
+	 * @param source     实体
+	 * @param domainType 实体类型
 	 */
-	protected RepositoryEvent(Object source, Class<?> modelType) {
+	protected RepositoryEvent(Object source, Class<?> domainType) {
 		super(source);
-		this.modelType = modelType;
+		this.domainType = domainType;
 	}
 
 	/**
 	 * @return 实体类型
 	 */
-	public Class<?> getModelType() {
-		return modelType;
+	public Class<?> getDomainType() {
+		return domainType;
 	}
 }

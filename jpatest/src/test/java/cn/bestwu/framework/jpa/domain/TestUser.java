@@ -1,4 +1,4 @@
-package cn.bestwu.framework.jpa.model;
+package cn.bestwu.framework.jpa.domain;
 
 import cn.bestwu.framework.data.annotation.DisableSelfRel;
 import org.hibernate.search.annotations.Field;

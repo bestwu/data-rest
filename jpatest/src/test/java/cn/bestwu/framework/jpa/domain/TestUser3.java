@@ -1,4 +1,4 @@
-package cn.bestwu.framework.jpa.model;
+package cn.bestwu.framework.jpa.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,20 +7,19 @@ import java.io.Serializable;
 
 /**
  * 测试用
- *
  * @author Peter Wu
  */
 @Entity
-public class TestUser4 implements Serializable {
+public class TestUser3 implements Serializable {
 
-	private static final long serialVersionUID = 873688637874451303L;
+	private static final long serialVersionUID = 1189386593289454050L;
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	//	@NotBlank
+//	@NotBlank
 	private String firstName;
-	//	@NotBlank
+//	@NotBlank
 	private String lastName;
 
 	public Long getId() {

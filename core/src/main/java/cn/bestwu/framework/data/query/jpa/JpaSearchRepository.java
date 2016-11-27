@@ -45,45 +45,45 @@ public class JpaSearchRepository implements SearchRepository {
 	}
 
 	/**
-	 * @param modelType modelType
+	 * @param domainType domainType
 	 * @param <T>       <T>
 	 * @return 搜索字段
 	 */
-	private <T> String[] getSearchFields(Class<T> modelType) {
+	private <T> String[] getSearchFields(Class<T> domainType) {
 		String[] fields;
-		if (fieldsCache.containsKey(modelType)) {
-			fields = fieldsCache.get(modelType);
+		if (fieldsCache.containsKey(domainType)) {
+			fields = fieldsCache.get(domainType);
 		} else {
-			fields = JpaSearchFieldUtil.getAnnotationedFields(modelType, Field.class);
+			fields = JpaSearchFieldUtil.getAnnotationedFields(domainType, Field.class);
 			if (fields.length == 0) {
-				throw new RuntimeException("搜索的类型" + modelType + "没有标注索引字段,请使用org.hibernate.search.annotations.Field标注");
+				throw new RuntimeException("搜索的类型" + domainType + "没有标注索引字段,请使用org.hibernate.search.annotations.Field标注");
 			}
-			fieldsCache.put(modelType, fields);
+			fieldsCache.put(domainType, fields);
 		}
 		return fields;
 	}
 
 	/**
-	 * @param modelType modelType
+	 * @param domainType domainType
 	 * @param <T>       <T>
 	 * @return 高亮字段
 	 */
-	private <T> String[] getHighLightFields(Class<T> modelType) {
+	private <T> String[] getHighLightFields(Class<T> domainType) {
 		String[] highLightFields;
-		if (highlightFieldsCache.containsKey(modelType)) {
-			highLightFields = highlightFieldsCache.get(modelType);
+		if (highlightFieldsCache.containsKey(domainType)) {
+			highLightFields = highlightFieldsCache.get(domainType);
 		} else {
-			highLightFields = JpaSearchFieldUtil.getAnnotationedFields(modelType, HighLight.class);
+			highLightFields = JpaSearchFieldUtil.getAnnotationedFields(domainType, HighLight.class);
 			if (highLightFields.length == 0) {
-				highLightFields = getSearchFields(modelType);
+				highLightFields = getSearchFields(domainType);
 			}
-			highlightFieldsCache.put(modelType, highLightFields);
+			highlightFieldsCache.put(domainType, highLightFields);
 		}
 		return highLightFields;
 	}
 
 	/**
-	 * @param modelType     要搜索的类
+	 * @param domainType     要搜索的类
 	 * @param keyword       关键字
 	 * @param pageable      分页
 	 * @param resultHandler 结果处理
@@ -91,23 +91,23 @@ public class JpaSearchRepository implements SearchRepository {
 	 * @return 结果
 	 */
 	@SuppressWarnings("unchecked")
-	@Override public <T> Page search(Class<T> modelType, String keyword, Pageable pageable, ResultHandler resultHandler) {
+	@Override public <T> Page search(Class<T> domainType, String keyword, Pageable pageable, ResultHandler resultHandler) {
 		try {
 			FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(entityManager);
 			SearchFactory searchFactory = fullTextEntityManager.getSearchFactory();
-			QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity(modelType).get();
+			QueryBuilder queryBuilder = searchFactory.buildQueryBuilder().forEntity(domainType).get();
 
 			Query luceneQuery;
 			if (keyword.length() == 1) {
-				luceneQuery = queryBuilder.keyword().wildcard().onFields(getSearchFields(modelType)).matching(keyword + "*").createQuery();
+				luceneQuery = queryBuilder.keyword().wildcard().onFields(getSearchFields(domainType)).matching(keyword + "*").createQuery();
 			} else if (keyword.contains("*") || keyword.contains("?")) {
-				luceneQuery = queryBuilder.keyword().wildcard().onFields(getSearchFields(modelType)).matching(keyword).createQuery();
+				luceneQuery = queryBuilder.keyword().wildcard().onFields(getSearchFields(domainType)).matching(keyword).createQuery();
 			} else {
-				luceneQuery = queryBuilder.keyword().onFields(getSearchFields(modelType)).matching(keyword).createQuery();
+				luceneQuery = queryBuilder.keyword().onFields(getSearchFields(domainType)).matching(keyword).createQuery();
 			}
 			{//生成query
 				QueryCarrier queryCarrier = new QueryCarrier(queryBuilder, luceneQuery, keyword);
-				publisher.publishEvent(new QueryBuilderEvent(queryCarrier, modelType));
+				publisher.publishEvent(new QueryBuilderEvent(queryCarrier, domainType));
 				Query query = queryCarrier.getQuery();
 				if (query != null) {
 					luceneQuery = query;
@@ -116,7 +116,7 @@ public class JpaSearchRepository implements SearchRepository {
 
 			List<T> result;
 			long totalSize;
-			org.hibernate.search.jpa.FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery(luceneQuery, modelType);
+			org.hibernate.search.jpa.FullTextQuery fullTextQuery = fullTextEntityManager.createFullTextQuery(luceneQuery, domainType);
 			totalSize = fullTextQuery.getResultSize();
 
 			if (totalSize > 0) {
@@ -137,9 +137,9 @@ public class JpaSearchRepository implements SearchRepository {
 				if (resultHandler instanceof HighlightResultHandler) {
 					HighlightResultHandler highlightResultHandler = (HighlightResultHandler) resultHandler;
 					highlightResultHandler.setQuery(luceneQuery);
-					highlightResultHandler.setAnalyzer(searchFactory.getAnalyzer(modelType));
-					highlightResultHandler.setHighLightFields(getHighLightFields(modelType));
-					highlightResultHandler.setModelType(modelType);
+					highlightResultHandler.setAnalyzer(searchFactory.getAnalyzer(domainType));
+					highlightResultHandler.setHighLightFields(getHighLightFields(domainType));
+					highlightResultHandler.setDomainType(domainType);
 				}
 				resultHandler.accept(result);
 			}

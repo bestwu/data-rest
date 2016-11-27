@@ -110,7 +110,7 @@ public class FixQuerydslPredicateBuilder {
 	private Predicate invokeBinding(PropertyPath dotPath, QuerydslBindings bindings, Collection<Object> values) {
 
 		Path<?> path = getPath(dotPath, bindings);
-		if (path == null) {//path 在model 有getter或setter方法，无对应field时可能为空
+		if (path == null) {//path 在 domain 有getter或setter方法，无对应field时可能为空
 			return null;
 		}
 

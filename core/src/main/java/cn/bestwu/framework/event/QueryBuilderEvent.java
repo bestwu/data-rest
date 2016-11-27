@@ -13,9 +13,9 @@ public class QueryBuilderEvent extends RepositoryEvent {
 
 	/**
 	 * @param queryCarrier 搜索条件
-	 * @param modelType    实体类型
+	 * @param domainType    实体类型
 	 */
-	public QueryBuilderEvent(QueryCarrier queryCarrier, Class<?> modelType) {
-		super(queryCarrier, modelType);
+	public QueryBuilderEvent(QueryCarrier queryCarrier, Class<?> domainType) {
+		super(queryCarrier, domainType);
 	}
 }

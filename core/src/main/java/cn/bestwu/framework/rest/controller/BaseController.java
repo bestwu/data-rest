@@ -1,7 +1,7 @@
 package cn.bestwu.framework.rest.controller;
 
 import cn.bestwu.framework.event.DefaultSortEvent;
-import cn.bestwu.framework.rest.resolver.ModelMethodArgumentResolver;
+import cn.bestwu.framework.rest.resolver.DomainMethodArgumentResolver;
 import cn.bestwu.framework.rest.support.Response;
 import cn.bestwu.framework.util.ParameterUtil;
 import cn.bestwu.framework.util.ResourceUtil;
@@ -122,18 +122,18 @@ public abstract class BaseController extends Response {
 
 	/**
 	 * @param pageable  pageable
-	 * @param modelType 实体类型
+	 * @param domainType 实体类型
 	 * @return 增加默认sort的pageable
 	 */
-	protected Pageable getDefaultPageable(Pageable pageable, Class<?> modelType) {
+	protected Pageable getDefaultPageable(Pageable pageable, Class<?> domainType) {
 		if (pageable == null) {
 			return null;
 		}
 		if (pageable.getSort() == null) {
 			List<Sort.Order> orders = new ArrayList<>();
-			publisher.publishEvent(new DefaultSortEvent(orders, modelType));
+			publisher.publishEvent(new DefaultSortEvent(orders, domainType));
 			if (orders.isEmpty()) {
-				orders.add(new Sort.Order(Sort.Direction.DESC, getPersistentEntity(modelType).getIdProperty().getName()));
+				orders.add(new Sort.Order(Sort.Direction.DESC, getPersistentEntity(domainType).getIdProperty().getName()));
 			}
 			pageable = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), new Sort(orders));
 		}
@@ -161,7 +161,7 @@ public abstract class BaseController extends Response {
 	 * @return 更新前的实体
 	 */
 	protected Object getOldModel() {
-		String oldModel = ModelMethodArgumentResolver.OLD_MODEL;
+		String oldModel = DomainMethodArgumentResolver.OLD_DOMAIN;
 		return request.getAttribute(oldModel);
 	}
 

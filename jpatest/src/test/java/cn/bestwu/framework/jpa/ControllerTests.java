@@ -1,6 +1,6 @@
 package cn.bestwu.framework.jpa;
 
-import cn.bestwu.framework.jpa.model.TestUser;
+import cn.bestwu.framework.jpa.domain.TestUser;
 import cn.bestwu.framework.support.client.CustomRestTemplate;
 import org.junit.Assert;
 import org.junit.Test;

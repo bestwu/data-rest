@@ -13,10 +13,10 @@ public abstract class LinkedEvent extends RepositoryEvent {
 	/**
 	 * @param source    实体
 	 * @param linked    关联实体
-	 * @param modelType 实体类型
+	 * @param domainType 实体类型
 	 */
-	public LinkedEvent(Object source, Object linked, Class<?> modelType) {
-		super(source, modelType);
+	public LinkedEvent(Object source, Object linked, Class<?> domainType) {
+		super(source, domainType);
 		this.linked = linked;
 	}
 

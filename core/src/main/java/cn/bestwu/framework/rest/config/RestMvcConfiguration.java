@@ -457,7 +457,7 @@ public class RestMvcConfiguration {
 			super.addArgumentResolvers(argumentResolvers);
 
 			argumentResolvers.add(repoRequestArgumentResolver());
-			argumentResolvers.add(new ModelMethodArgumentResolver(repositoryInvokerFactory(), messageConverters()));
+			argumentResolvers.add(new DomainMethodArgumentResolver(repositoryInvokerFactory(), messageConverters()));
 			argumentResolvers
 					.add(new ResourceMethodArgumentResolver(repositoryResourceMetadataHandlerMethodArgumentResolver(), repositoryInvokerFactory(), messageConverters()));
 			if (QueryDslUtils.QUERY_DSL_PRESENT)

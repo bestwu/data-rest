@@ -24,7 +24,7 @@ public class HighlightResultHandler implements ResultHandler {
 
 	private Query query;
 	private Analyzer analyzer;
-	private Class<?> modelType;
+	private Class<?> domainType;
 	/**
 	 * 需要高亮的字段
 	 */
@@ -56,8 +56,8 @@ public class HighlightResultHandler implements ResultHandler {
 		this.analyzer = analyzer;
 	}
 
-	public void setModelType(Class<?> modelType) {
-		this.modelType = modelType;
+	public void setDomainType(Class<?> domainType) {
+		this.domainType = domainType;
 	}
 
 	public void setHighLightFields(String[] highLightFields) {
@@ -72,12 +72,12 @@ public class HighlightResultHandler implements ResultHandler {
 			for (String fieldName : highLightFields) {
 				try {
 					if (fieldName.contains(".")) {
-						hightLightField(analyzer, modelType, highlighter, t, fieldName);
+						hightLightField(analyzer, domainType, highlighter, t, fieldName);
 					} else {
-						Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getReadMethod(), t);
+						Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(domainType, fieldName).getReadMethod(), t);
 						String highLightFieldValue = highlighter.getBestFragment(analyzer, fieldName, String.valueOf(fieldValue));
 						if (highLightFieldValue != null) {
-							ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getWriteMethod(), t, highLightFieldValue);
+							ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(domainType, fieldName).getWriteMethod(), t, highLightFieldValue);
 						}
 					}
 				} catch (Exception e) {
@@ -93,31 +93,31 @@ public class HighlightResultHandler implements ResultHandler {
 	 * 高亮某个字段
 	 *
 	 * @param analyzer    analyzer
-	 * @param modelType   modelType
+	 * @param domainType   domainType
 	 * @param highlighter highlighter
 	 * @param t           t
 	 * @param fieldName   fieldName
-	 * @throws NoSuchFieldException
-	 * @throws IOException
-	 * @throws InvalidTokenOffsetsException
+	 * @throws NoSuchFieldException NoSuchFieldException
+	 * @throws IOException IOException
+	 * @throws InvalidTokenOffsetsException InvalidTokenOffsetsException
 	 */
-	private void hightLightField(Analyzer analyzer, Class<?> modelType, Highlighter highlighter, Object t, String fieldName) throws NoSuchFieldException, IOException, InvalidTokenOffsetsException {
+	private void hightLightField(Analyzer analyzer, Class<?> domainType, Highlighter highlighter, Object t, String fieldName) throws NoSuchFieldException, IOException, InvalidTokenOffsetsException {
 		if (fieldName.contains(".")) {
 			String[] split = fieldName.split("\\.");
 			String pfieldName = split[0];
-			Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, pfieldName).getReadMethod(), t);
-			Class<?> fieldType = modelType.getDeclaredField(pfieldName).getType();
+			Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(domainType, pfieldName).getReadMethod(), t);
+			Class<?> fieldType = domainType.getDeclaredField(pfieldName).getType();
 			String propertyName = split[1];
 			if (fieldValue != null) {
 				hightLightField(analyzer, fieldType, highlighter, fieldValue, propertyName);
 			}
 		} else {
-			Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getReadMethod(), t);
+			Object fieldValue = ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(domainType, fieldName).getReadMethod(), t);
 			String text = String.valueOf(fieldValue);
 			if (!text.contains(preTag)) {
 				String highLightFieldValue = highlighter.getBestFragment(analyzer, fieldName, text);
 				if (highLightFieldValue != null) {
-					ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(modelType, fieldName).getWriteMethod(), t, highLightFieldValue);
+					ReflectionUtils.invokeMethod(BeanUtils.getPropertyDescriptor(domainType, fieldName).getWriteMethod(), t, highLightFieldValue);
 				}
 			}
 		}

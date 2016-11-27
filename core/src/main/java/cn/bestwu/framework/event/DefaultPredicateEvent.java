@@ -14,9 +14,9 @@ public class DefaultPredicateEvent extends RepositoryEvent {
 
 	/**
 	 * @param predicateResource 持有Predicate 的资源
-	 * @param modelType         实体类型
+	 * @param domainType         实体类型
 	 */
-	public DefaultPredicateEvent(Resource<Predicate> predicateResource, Class<?> modelType) {
-		super(predicateResource, modelType);
+	public DefaultPredicateEvent(Resource<Predicate> predicateResource, Class<?> domainType) {
+		super(predicateResource, domainType);
 	}
 }

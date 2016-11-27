@@ -1,9 +1,8 @@
-package cn.bestwu.framework.mongodb.model;
+package cn.bestwu.framework.jpa.domain;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.TextIndexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.io.Serializable;
 
 /**
@@ -11,26 +10,24 @@ import java.io.Serializable;
  *
  * @author Peter Wu
  */
-@Document
-public class TestUser implements Serializable {
+@Entity
+public class TestUser4 implements Serializable {
 
-	private static final long serialVersionUID = -4452630632601963240L;
+	private static final long serialVersionUID = 873688637874451303L;
 	@Id
-	//	@GeneratedValue
-	private String id;
+	@GeneratedValue
+	private Long id;
 
 	//	@NotBlank
-	@TextIndexed
 	private String firstName;
 	//	@NotBlank
-	@TextIndexed
 	private String lastName;
 
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -58,4 +55,3 @@ public class TestUser implements Serializable {
 				'}';
 	}
 }
-

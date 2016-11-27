@@ -1,7 +1,7 @@
 package cn.bestwu.framework.jpa;
 
 import cn.bestwu.framework.data.QCrudRepository;
-import cn.bestwu.framework.jpa.model.TestUser2;
+import cn.bestwu.framework.jpa.domain.TestUser2;
 
 /**
  * @author Peter Wu

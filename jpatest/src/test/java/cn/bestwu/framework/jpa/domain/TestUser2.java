@@ -1,4 +1,4 @@
-package cn.bestwu.framework.jpa.model;
+package cn.bestwu.framework.jpa.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

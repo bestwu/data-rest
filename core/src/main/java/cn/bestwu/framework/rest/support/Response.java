@@ -47,8 +47,8 @@ public class Response {
 	@Autowired(required = false)
 	protected HttpServletRequest request;
 
-	protected PersistentEntity<?, ?> getPersistentEntity(Class<?> modelType) {
-		return repositories.getPersistentEntity(modelType);
+	protected PersistentEntity<?, ?> getPersistentEntity(Class<?> domainType) {
+		return repositories.getPersistentEntity(domainType);
 	}
 
 	/**
@@ -385,7 +385,7 @@ public class Response {
 					headers.setETag(eTagValue);
 				}
 				if (hasLastModified) {
-					Collections.sort(LastModifieds, (x, y) -> (x < y) ? 1 : ((Objects.equals(x, y)) ? 0 : -1));
+					LastModifieds.sort((x, y) -> (x < y) ? 1 : ((Objects.equals(x, y)) ? 0 : -1));
 					headers.setLastModified(LastModifieds.get(0));
 				}
 

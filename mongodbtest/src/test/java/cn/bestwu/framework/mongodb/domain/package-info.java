@@ -3,4 +3,4 @@
  *
  * @author Peter Wu
  */
-package cn.bestwu.framework.mongodb.model;
+package cn.bestwu.framework.mongodb.domain;

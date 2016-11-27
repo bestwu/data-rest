@@ -27,19 +27,19 @@ public class MongodbSearchRepository implements SearchRepository {
 	}
 
 	/**
-	 * @param modelType     要搜索的类
+	 * @param domainType     要搜索的类
 	 * @param keyword       关键字
 	 * @param pageable      分页
 	 * @param resultHandler 结果处理
 	 * @param <T>           T
 	 * @return 结果
 	 */
-	@Override public <T> Page search(Class<T> modelType, String keyword, Pageable pageable, ResultHandler resultHandler) {
-		Class<?> repositoryInterface = repositories.getRepositoryInformationFor(modelType).getRepositoryInterface();
+	@Override public <T> Page search(Class<T> domainType, String keyword, Pageable pageable, ResultHandler resultHandler) {
+		Class<?> repositoryInterface = repositories.getRepositoryInformationFor(domainType).getRepositoryInterface();
 		try {
 			Method method = repositoryInterface.getMethod("findAllBy", TextCriteria.class, Pageable.class);
 			TextCriteria criteria = TextCriteria.forDefaultLanguage().matchingPhrase(keyword);
-			Page page = (Page) method.invoke(repositories.getRepositoryFor(modelType), criteria, pageable);
+			Page page = (Page) method.invoke(repositories.getRepositoryFor(domainType), criteria, pageable);
 			if (resultHandler != null) {
 				resultHandler.accept(page.getContent());
 			}
