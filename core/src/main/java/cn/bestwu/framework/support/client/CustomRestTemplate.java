@@ -145,6 +145,7 @@ public class CustomRestTemplate extends RestTemplate {
 		return doExecute(url, method, requestCallback, responseExtractor, null);
 	}
 
+	@SuppressWarnings("unchecked")
 	protected <T> T doExecute(URI url, HttpMethod method, RequestCallback requestCallback,
 			ResponseExtractor<T> responseExtractor, MediaType mediaType) throws RestClientException {
 
@@ -189,7 +190,12 @@ public class CustomRestTemplate extends RestTemplate {
 					logger.debug("responseBody: \n" + ((PushbackBodyClientHttpResponseWrapper) response).readBody());
 					logger.debug("------------------------------");
 				}
-				return responseExtractor.extractData(response);
+				try {
+					return responseExtractor.extractData(response);
+				} catch (Exception e) {
+					logger.warn("解析response body失败");
+					return (T) new ResponseEntity<>(null, response.getHeaders(), response.getStatusCode());
+				}
 			} else {
 				return null;
 			}
