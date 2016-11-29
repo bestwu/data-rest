@@ -24,7 +24,10 @@ import org.springframework.util.ClassUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * 响应客户端
@@ -224,7 +227,7 @@ public class Response {
 		}
 
 		if (supportClientCache)
-			return ResponseEntity.ok().headers(cacheControl(null)).body(resource);
+			return ResponseEntity.ok().headers(prepareHeaders(null, resource)).body(resource);
 		else
 			return ResponseEntity.ok().headers(noCache()).body(resource);
 	}

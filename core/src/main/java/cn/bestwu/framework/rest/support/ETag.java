@@ -40,10 +40,9 @@ public final class ETag {
 	}
 
 	public static String getETagValue(PersistentEntity<?, ?> entity, Object bean, boolean exact) {
-		Assert.notNull(entity, "PersistentEntity must not be null!");
 		Assert.notNull(bean, "Target bean must not be null!");
 
-		if (exact) {
+		if (exact || entity == null) {
 			ByteArrayOutputStream byteStream = new ByteArrayOutputStream(1024);
 			try {
 				serializer.serialize(bean, byteStream);
