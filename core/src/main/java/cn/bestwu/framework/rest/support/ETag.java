@@ -2,9 +2,9 @@ package cn.bestwu.framework.rest.support;
 
 import cn.bestwu.framework.rest.exception.ETagDoesntMatchException;
 import cn.bestwu.framework.util.Sha1DigestUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.serializer.DefaultSerializer;
 import org.springframework.core.serializer.Serializer;
-import org.springframework.core.serializer.support.SerializationFailedException;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.PersistentPropertyAccessor;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +19,7 @@ import static org.springframework.util.StringUtils.trimTrailingCharacter;
 /**
  * A value object to represent ETags.
  */
+@Slf4j
 public final class ETag {
 
 	public static final ETag NO_ETAG = new ETag(null);
@@ -48,7 +49,8 @@ public final class ETag {
 				serializer.serialize(bean, byteStream);
 				return Sha1DigestUtil.shaHex(new String(byteStream.toByteArray()));
 			} catch (Throwable ex) {
-				throw new SerializationFailedException("Failed to serialize object using " + serializer.getClass().getSimpleName(), ex);
+				log.error("Failed to serialize object using " + serializer.getClass().getSimpleName(), ex);
+				return null;
 			}
 		} else {
 			if (!entity.hasVersionProperty()) {

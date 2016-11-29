@@ -16,7 +16,7 @@ public class PersistentEntityResource<T> extends SimpleResource<T> {
 
 	private static final long serialVersionUID = 1009307069857374549L;
 	@JsonIgnore
-	private final PersistentEntity<?, ?> entity;
+	private transient final PersistentEntity<?, ?> entity;
 
 	public PersistentEntityResource(T content, PersistentEntity<?, ?> entity, Link... links) {
 		super(content, links);
