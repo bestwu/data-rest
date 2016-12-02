@@ -139,7 +139,7 @@ bintray {
     publications = ['mavenJava']
 
     publish = true
-    override = true
+//    override = true
     pkg {
         repo = 'maven'
         name = 'com.bestwu:data-rest'
