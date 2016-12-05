@@ -18,6 +18,9 @@ public class ChinaCellValidator implements ConstraintValidator<ChinaCell, String
 	}
 
 	public boolean isValid(String charSequence, ConstraintValidatorContext constraintValidatorContext) {
+		if (charSequence == null || charSequence.length() == 0) {
+			return true;
+		}
 		return CellUtil.isChinaCell(charSequence);
 	}
 }
