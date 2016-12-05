@@ -15,6 +15,7 @@ import cn.bestwu.framework.rest.resolver.*;
 import cn.bestwu.framework.rest.support.*;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import org.hibernate.validator.HibernateValidator;
 import org.springframework.aop.SpringProxy;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.boot.autoconfigure.web.ErrorAttributes;
 import org.springframework.boot.autoconfigure.web.WebMvcRegistrationsAdapter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.*;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -37,12 +39,13 @@ import org.springframework.data.repository.support.Repositories;
 import org.springframework.data.repository.support.RepositoryInvokerFactory;
 import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.filter.HttpPutFormContentFilter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.multipart.MultipartResolver;
@@ -196,13 +199,23 @@ public class RestMvcConfiguration {
 	protected static class CustomWebMvcConfiguration extends WebMvcConfigurerAdapter {
 
 		@Autowired
-		private StringHttpMessageConverter stringHttpMessageConverter;
+		private MessageSource messageSource;
 		@Autowired
 		private Repositories repositories;
 		@Autowired
 		private RepositoryResourceMappings repositoryResourceMappings;
 		@Autowired
 		private FormattingConversionService conversionService;
+
+		/*
+		 * 验证器
+		 */
+		@Override public Validator getValidator() {
+			final LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
+			localValidatorFactoryBean.setProviderClass(HibernateValidator.class);
+			localValidatorFactoryBean.setValidationMessageSource(messageSource);
+			return localValidatorFactoryBean;
+		}
 
 		@Bean
 		public RepositoryInvokerFactory repositoryInvokerFactory() {
