@@ -1,6 +1,6 @@
-package cn.bestwu.framework.rest.support;
+package cn.bestwu.framework.data.validator;
 
-import cn.bestwu.framework.rest.annotation.ReversePattern;
+import cn.bestwu.framework.data.validator.ReversePattern;
 import org.hibernate.validator.internal.util.logging.Log;
 import org.hibernate.validator.internal.util.logging.LoggerFactory;
 

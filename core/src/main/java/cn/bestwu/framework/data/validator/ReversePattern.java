@@ -1,6 +1,4 @@
-package cn.bestwu.framework.rest.annotation;
-
-import cn.bestwu.framework.rest.support.ReversePatternValidator;
+package cn.bestwu.framework.data.validator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

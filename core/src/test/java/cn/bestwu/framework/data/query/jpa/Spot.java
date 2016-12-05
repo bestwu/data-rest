@@ -1,6 +1,5 @@
 package cn.bestwu.framework.data.query.jpa;
 
-import cn.bestwu.framework.rest.annotation.TrimNotBlank;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.github.stuxuhai.jpinyin.PinyinException;
 import com.github.stuxuhai.jpinyin.PinyinFormat;
@@ -11,6 +10,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * 目的地/景点
@@ -25,7 +25,7 @@ public class Spot {
 	 * 名称
 	 */
 	@Field
-	@TrimNotBlank
+	@NotBlank
 	@JsonView(Object.class)
 	private String name;
 
