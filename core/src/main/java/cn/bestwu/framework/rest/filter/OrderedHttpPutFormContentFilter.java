@@ -9,7 +9,7 @@ import org.springframework.http.converter.support.AllEncompassingFormHttpMessage
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.filter.HttpPutFormContentFilter;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -26,7 +26,7 @@ import java.util.*;
  *
  * @author Peter Wu
  */
-public class OrderedHttpPutFormContentFilter extends OncePerRequestFilter implements Ordered {
+public class OrderedHttpPutFormContentFilter extends HttpPutFormContentFilter implements Ordered {
 	/**
 	 * Higher order to ensure the filter is applied before Spring Security.
 	 */
