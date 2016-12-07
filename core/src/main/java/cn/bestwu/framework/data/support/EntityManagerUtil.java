@@ -1,4 +1,4 @@
-package cn.bestwu.framework.data.util;
+package cn.bestwu.framework.data.support;
 
 import org.hibernate.Session;
 import org.hibernate.search.exception.SearchException;
