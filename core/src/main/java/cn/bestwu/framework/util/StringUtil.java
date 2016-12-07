@@ -12,12 +12,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StreamUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Array;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 /**
  * 字符串工具类
@@ -278,4 +285,40 @@ public class StringUtil {
 		}
 		return list.toArray(new String[list.size()]);
 	}
+
+	/**
+	 * 压缩字符
+	 *
+	 * @param str 待压缩字符
+	 * @return 压缩后字符
+	 */
+	public static String compress(String str) {
+		if (str == null || str.length() == 0) {
+			return str;
+		}
+		try {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			DeflaterOutputStream gzip = new DeflaterOutputStream(out);
+			gzip.write(str.getBytes());
+			gzip.close();
+			return new String(out.toByteArray(), "ISO-8859-1");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+
+	public static String decompress(String str) {
+		if (str == null || str.length() == 0) {
+			return str;
+		}
+		try {
+			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(str.getBytes("ISO-8859-1"));
+			InflaterInputStream zipInputStream = new InflaterInputStream(byteArrayInputStream);
+			return StreamUtils.copyToString(zipInputStream, Charset.forName("ISO-8859-1"));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 }
