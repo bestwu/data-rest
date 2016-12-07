@@ -120,6 +120,9 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 
 					if ("${server.error.path:${error.path:/error}}".equals(apiSignature)) {
 						apiSignature = (String) request.getAttribute(RequestDispatcher.FORWARD_SERVLET_PATH);
+						if (apiSignature == null) {
+							apiSignature = ((String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI)).replace(request.getContextPath(), "");
+						}
 					} else {
 						String repositoryBasePathName = (String) request.getAttribute(VersionRepositoryRestRequestMappingHandlerMapping.REQUEST_REPOSITORY_BASE_PATH_NAME);
 						if (repositoryBasePathName != null) {
