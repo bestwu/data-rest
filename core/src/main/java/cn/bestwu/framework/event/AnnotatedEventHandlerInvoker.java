@@ -113,7 +113,6 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 			inspect(bean, method, HandleBeforeDelete.class, BeforeDeleteEvent.class);
 			inspect(bean, method, HandleAfterDelete.class, AfterDeleteEvent.class);
 			inspect(bean, method, HandleItemResource.class, ItemResourceEvent.class);
-			inspect(bean, method, HandleDefaultSort.class, DefaultSortEvent.class);
 			inspect(bean, method, HandleDefaultPredicate.class, DefaultPredicateEvent.class);
 			inspect(bean, method, HandleQueryBuilder.class, QueryBuilderEvent.class);
 		}, USER_METHODS);
@@ -143,9 +142,7 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 			throw new IllegalStateException(String.format(PARAMETER_MISSING, method));
 		}
 		Class<?> domainType;
-		if (annotationType.equals(HandleDefaultSort.class)) {
-			domainType = ((HandleDefaultSort) annotation).value();
-		} else if (annotationType.equals(HandleDefaultPredicate.class)) {
+		if (annotationType.equals(HandleDefaultPredicate.class)) {
 			domainType = ((HandleDefaultPredicate) annotation).value();
 		} else if (annotationType.equals(HandleQueryBuilder.class)) {
 			domainType = ((HandleQueryBuilder) annotation).value();

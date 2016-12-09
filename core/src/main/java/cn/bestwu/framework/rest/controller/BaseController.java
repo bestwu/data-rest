@@ -1,6 +1,6 @@
 package cn.bestwu.framework.rest.controller;
 
-import cn.bestwu.framework.event.DefaultSortEvent;
+import cn.bestwu.framework.rest.annotation.DefaultSort;
 import cn.bestwu.framework.rest.resolver.DomainMethodArgumentResolver;
 import cn.bestwu.framework.rest.support.Response;
 import cn.bestwu.framework.util.ParameterUtil;
@@ -14,13 +14,11 @@ import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.repository.support.RepositoryInvoker;
 import org.springframework.data.repository.support.RepositoryInvokerFactory;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletContext;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -121,7 +119,7 @@ public abstract class BaseController extends Response {
 	}
 
 	/**
-	 * @param pageable  pageable
+	 * @param pageable   pageable
 	 * @param domainType 实体类型
 	 * @return 增加默认sort的pageable
 	 */
@@ -130,14 +128,52 @@ public abstract class BaseController extends Response {
 			return null;
 		}
 		if (pageable.getSort() == null) {
-			List<Sort.Order> orders = new ArrayList<>();
-			publisher.publishEvent(new DefaultSortEvent(orders, domainType));
-			if (orders.isEmpty()) {
-				orders.add(new Sort.Order(Sort.Direction.DESC, getPersistentEntity(domainType).getIdProperty().getName()));
+			Sort sort = null;
+			DefaultSort defaultSort = domainType.getAnnotation(DefaultSort.class);
+			if (defaultSort != null) {
+				String[] value = defaultSort.value();
+				if (value.length > 0) {
+					sort = parseParameterIntoSort(value, ",");
+				}
 			}
-			pageable = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), new Sort(orders));
+			if (sort == null) {
+				sort = new Sort(Collections.singletonList(new Sort.Order(Sort.Direction.DESC, getPersistentEntity(domainType).getIdProperty().getName())));
+			}
+			pageable = new PageRequest(pageable.getPageNumber(), pageable.getPageSize(), sort);
 		}
 		return pageable;
+	}
+
+	private Sort parseParameterIntoSort(String[] source, String delimiter) {
+
+		List<Sort.Order> allOrders = new ArrayList<>();
+
+		for (String part : source) {
+
+			if (part == null) {
+				continue;
+			}
+
+			String[] elements = part.split(delimiter);
+			Sort.Direction direction = elements.length == 0 ? null : Sort.Direction.fromStringOrNull(elements[elements.length - 1]);
+
+			for (int i = 0; i < elements.length; i++) {
+
+				if (i == elements.length - 1 && direction != null) {
+					continue;
+				}
+
+				String property = elements[i];
+
+				if (!StringUtils.hasText(property)) {
+					continue;
+				}
+
+				allOrders.add(new Sort.Order(direction, property));
+			}
+		}
+
+		return allOrders.isEmpty() ? null : new Sort(allOrders);
 	}
 
 	/**
