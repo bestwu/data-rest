@@ -1,8 +1,8 @@
 package cn.bestwu.framework.data.support;
 
 import cn.bestwu.framework.data.annotation.Device;
-import cn.bestwu.framework.util.AutowireHelper;
-import cn.bestwu.framework.util.StringUtil;
+import cn.bestwu.lang.util.AutowireHelper;
+import cn.bestwu.lang.util.StringUtil;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.PersistentProperty;
 import org.springframework.data.mapping.PersistentPropertyAccessor;

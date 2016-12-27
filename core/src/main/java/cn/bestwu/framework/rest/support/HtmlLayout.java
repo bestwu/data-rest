@@ -1,6 +1,6 @@
 package cn.bestwu.framework.rest.support;
 
-import cn.bestwu.framework.util.StringUtil;
+import cn.bestwu.lang.util.StringUtil;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
@@ -15,11 +15,9 @@ import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * 自定义Log4j2 日志HtmlLayout
@@ -49,6 +47,7 @@ public final class HtmlLayout extends AbstractStringLayout {
 	private final String font;
 	private final String fontSize;
 	private final String headerSize;
+	private final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	/**
 	 * Possible font sizes
@@ -112,7 +111,7 @@ public final class HtmlLayout extends AbstractStringLayout {
 		sbuf.append(Constants.LINE_SEPARATOR).append("<tr>").append(Constants.LINE_SEPARATOR);
 
 		sbuf.append("<td>");
-		sbuf.append(LocalDateTime.ofInstant(Instant.ofEpochMilli(event.getTimeMillis()), ZoneId.systemDefault()).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+		sbuf.append(simpleDateFormat.format(new Date(event.getTimeMillis())));
 		sbuf.append("</td>").append(Constants.LINE_SEPARATOR);
 
 		final String escapedThread = Transform.escapeHtmlTags(event.getThreadName());

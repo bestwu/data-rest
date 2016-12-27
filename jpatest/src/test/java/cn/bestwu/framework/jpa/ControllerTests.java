@@ -1,7 +1,7 @@
 package cn.bestwu.framework.jpa;
 
 import cn.bestwu.framework.jpa.domain.TestUser;
-import cn.bestwu.framework.support.client.CustomRestTemplate;
+import cn.bestwu.test.client.CustomRestTemplate;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +13,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,8 +50,8 @@ public class ControllerTests {
 		Assert.assertEquals("wu1", testUser1Result.getLastName());
 
 		MultiValueMap<String, Object> testUser2 = new LinkedMultiValueMap<>();
-		testUser2.put("firstName", Collections.singletonList("peter2"));
-		testUser2.put("lastName", Collections.singletonList("wu2"));
+		testUser2.add("firstName", "peter2");
+		testUser2.add("lastName", "wu2");
 		Map testUser2Result = restTemplate.postForObject(getBaseUrl() + "/testUsers", testUser2, HashMap.class);
 		Assert.assertEquals("peter2", testUser2Result.get("firstName"));
 		Assert.assertEquals("wu2", testUser2Result.get("lastName"));
@@ -67,7 +66,7 @@ public class ControllerTests {
 		Assert.assertEquals("Peter_modify", testUser1UpdateResult.get("firstName"));
 
 		MultiValueMap<String, Object> testUser2ForUpdate = new LinkedMultiValueMap<>();
-		testUser2ForUpdate.put("lastName", Collections.singletonList("wu2_modify"));
+		testUser2ForUpdate.add("lastName", "wu2_modify");
 		Map testUser2UpdateResult = restTemplate.putForObject(getBaseUrl() + "/testUsers/" + testUser2Result.get("id"), testUser2ForUpdate, HashMap.class);
 		Assert.assertEquals("wu2_modify", testUser2UpdateResult.get("lastName"));
 

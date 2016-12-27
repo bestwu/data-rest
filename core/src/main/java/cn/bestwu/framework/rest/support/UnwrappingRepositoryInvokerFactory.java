@@ -46,15 +46,23 @@ public class UnwrappingRepositoryInvokerFactory implements RepositoryInvokerFact
 		// Add unwrapper for Java 8 Optional
 
 		if (ClassUtils.isPresent("java.util.Optional", classLoader)) {
-			converters.add(source -> source instanceof Optional ? ((Optional<?>) source).orElse(null) : source);
+			converters.add(new Converter<Object, Object>() {
+				@Override public Object convert(Object source) {
+					return source instanceof Optional ? ((Optional<?>) source).orElse(null) : source;
+				}
+			});
 		}
 
 		// Add unwrapper for Guava Optional
 
 		if (ClassUtils.isPresent("com.google.common.base.Optional", classLoader)) {
 
-			converters.add(source -> source instanceof com.google.common.base.Optional ? ((com.google.common.base.Optional<?>) source)
-					.orNull() : source);
+			converters.add(new Converter<Object, Object>() {
+				@Override public Object convert(Object source) {
+					return source instanceof com.google.common.base.Optional ? ((com.google.common.base.Optional<?>) source)
+							.orNull() : source;
+				}
+			});
 		}
 
 		CONVERTERS = Collections.unmodifiableList(converters);

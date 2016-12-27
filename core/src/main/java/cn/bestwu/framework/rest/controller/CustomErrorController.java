@@ -79,7 +79,7 @@ public class CustomErrorController extends AbstractErrorController {
 	 */
 	@RequestMapping(produces = { "text/plain", "text/html" })
 	@ResponseBody
-	public ResponseEntity<Object> errorPlain(HttpServletRequest request) throws JsonProcessingException {
+	public ResponseEntity<String> errorPlain(HttpServletRequest request) throws JsonProcessingException {
 		Map<String, Object> body = getErrorAttributes(request, isIncludeStackTrace(request, MediaType.TEXT_HTML, MediaType.TEXT_PLAIN));
 		HttpStatus status = getStatus(request);
 		return ResponseEntity.status(status).headers(noCache()).body(getString(body));
@@ -94,7 +94,7 @@ public class CustomErrorController extends AbstractErrorController {
 	 */
 	@RequestMapping
 	@ResponseBody
-	public ResponseEntity<Object> error(HttpServletRequest request) throws JsonProcessingException {
+	public ResponseEntity<?> error(HttpServletRequest request) throws JsonProcessingException {
 		Map<String, Object> body = getErrorAttributes(request, isIncludeStackTrace(request, MediaType.ALL));
 		HttpStatus status = getStatus(request);
 		if (status.equals(HttpStatus.NOT_ACCEPTABLE)) {

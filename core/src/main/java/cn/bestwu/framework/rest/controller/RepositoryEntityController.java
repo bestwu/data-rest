@@ -27,7 +27,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Entity 模型 基本控制类
@@ -298,7 +301,7 @@ import java.util.*;
 		if (id == null) {
 			throw new IllegalArgumentException(getText("param.notnull", "id"));
 		}
-		Arrays.stream(id).forEach(i -> {
+		for (String i : id) {
 			try {
 				Object one = invoker.invokeFindOne(i);
 
@@ -310,7 +313,7 @@ import java.util.*;
 				publisher.publishEvent(new AfterDeleteEvent(one));
 			} catch (EmptyResultDataAccessException | ResourceNotFoundException ignored) {
 			}
-		});
+		}
 
 		return noContent();
 	}

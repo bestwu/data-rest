@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 
 /**
  * 支持PUT上传
@@ -44,15 +45,11 @@ public class StandardServletMultipartResolver implements MultipartResolver {
 		// To be on the safe side: explicitly delete the parts,
 		// but only actual file parts (for Resin compatibility)
 		try {
-			request.getParts().stream().filter(part -> request.getFile(part.getName()) != null).forEach(part -> {
-				try {
+			for (Part part : request.getParts()) {
+				if (request.getFile(part.getName()) != null) {
 					part.delete();
-				} catch (Exception ex) {
-					if (log.isWarnEnabled()) {
-						log.warn("Failed to perform cleanup of multipart items", ex);
-					}
 				}
-			});
+			}
 		} catch (Exception ex) {
 			if (log.isWarnEnabled()) {
 				log.warn("Failed to perform cleanup of multipart items", ex);

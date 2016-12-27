@@ -99,7 +99,7 @@ public class OrderedHttpPutFormContentFilter extends HttpPutFormContentFilter im
 
 		public HttpPutFormContentRequestWrapper(HttpServletRequest request, MultiValueMap<String, String> parameters) {
 			super(request);
-			this.formParameters = (parameters != null) ? parameters : new LinkedMultiValueMap<>();
+			this.formParameters = (parameters != null) ? parameters : new LinkedMultiValueMap<String, String>();
 		}
 
 		@Override

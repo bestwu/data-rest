@@ -103,18 +103,20 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 		if (typeAnno == null) {
 			return bean;
 		}
-		ReflectionUtils.doWithMethods(beanType, method -> {
+		ReflectionUtils.doWithMethods(beanType, new ReflectionUtils.MethodCallback() {
 
-			inspect(bean, method, HandleBeforeCreate.class, BeforeCreateEvent.class);
-			inspect(bean, method, HandleAfterCreate.class, AfterCreateEvent.class);
-			inspect(bean, method, HandleBeforeSave.class, BeforeSaveEvent.class);
-			inspect(bean, method, HandleBeforeShow.class, BeforeShowEvent.class);
-			inspect(bean, method, HandleAfterSave.class, AfterSaveEvent.class);
-			inspect(bean, method, HandleBeforeDelete.class, BeforeDeleteEvent.class);
-			inspect(bean, method, HandleAfterDelete.class, AfterDeleteEvent.class);
-			inspect(bean, method, HandleItemResource.class, ItemResourceEvent.class);
-			inspect(bean, method, HandleDefaultPredicate.class, DefaultPredicateEvent.class);
-			inspect(bean, method, HandleQueryBuilder.class, QueryBuilderEvent.class);
+			@Override public void doWith(Method method) throws IllegalArgumentException {
+				inspect(bean, method, HandleBeforeCreate.class, BeforeCreateEvent.class);
+				inspect(bean, method, HandleAfterCreate.class, AfterCreateEvent.class);
+				inspect(bean, method, HandleBeforeSave.class, BeforeSaveEvent.class);
+				inspect(bean, method, HandleBeforeShow.class, BeforeShowEvent.class);
+				inspect(bean, method, HandleAfterSave.class, AfterSaveEvent.class);
+				inspect(bean, method, HandleBeforeDelete.class, BeforeDeleteEvent.class);
+				inspect(bean, method, HandleAfterDelete.class, AfterDeleteEvent.class);
+				inspect(bean, method, HandleItemResource.class, ItemResourceEvent.class);
+				inspect(bean, method, HandleDefaultPredicate.class, DefaultPredicateEvent.class);
+				inspect(bean, method, HandleQueryBuilder.class, QueryBuilderEvent.class);
+			}
 		}, USER_METHODS);
 
 		return bean;
@@ -181,9 +183,13 @@ public class AnnotatedEventHandlerInvoker implements ApplicationListener<Reposit
 	/**
 	 * 用户定义的方法，排除反射代理生成的方法
 	 */
-	public static final ReflectionUtils.MethodFilter USER_METHODS = method -> !method.isSynthetic() && //
-			!method.isBridge() && //
-			!ReflectionUtils.isObjectMethod(method) && //
-			!ClassUtils.isCglibProxyClass(method.getDeclaringClass()) && //
-			!ReflectionUtils.isCglibRenamedMethod(method);
+	public static final ReflectionUtils.MethodFilter USER_METHODS = new ReflectionUtils.MethodFilter() {
+		@Override public boolean matches(Method method) {
+			return !method.isSynthetic() && //
+					!method.isBridge() && //
+					!ReflectionUtils.isObjectMethod(method) && //
+					!ClassUtils.isCglibProxyClass(method.getDeclaringClass()) && //
+					!ReflectionUtils.isCglibRenamedMethod(method);
+		}
+	};
 }

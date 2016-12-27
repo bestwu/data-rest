@@ -5,8 +5,8 @@ import cn.bestwu.framework.data.annotation.EnableAllDataInOnePage;
 import cn.bestwu.framework.data.annotation.RepositoryRestResource;
 import cn.bestwu.framework.data.annotation.SearchResource;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
-import cn.bestwu.framework.util.ArrayUtil;
 import cn.bestwu.framework.util.ResourceUtil;
+import cn.bestwu.lang.util.ArrayUtil;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.repository.core.CrudMethods;
 import org.springframework.http.HttpMethod;
@@ -16,7 +16,6 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 资源元数据
@@ -53,7 +52,7 @@ public class RepositoryResourceMetadata {
 		this.enableAllDataInOnePage = repositoryInterface.isAnnotationPresent(EnableAllDataInOnePage.class);
 		//SearchResource
 		Method[] methods = repositoryInterface.getMethods();
-		Arrays.stream(methods).forEach(method -> {
+		for (Method method : methods) {
 			SearchResource searchResource = method.getAnnotation(SearchResource.class);
 			if (searchResource != null) {
 				String searchResourceName = searchResource.value();
@@ -65,7 +64,7 @@ public class RepositoryResourceMetadata {
 				}
 				searchMethods.put(searchResourceName, method);
 			}
-		});
+		}
 
 		//RepositoryRestResource
 		RepositoryRestResource annotation = repositoryInterface.getAnnotation(RepositoryRestResource.class);
@@ -193,7 +192,11 @@ public class RepositoryResourceMetadata {
 			throw new ResourceNotFoundException();
 		}
 		if (!supportedHttpMethods.contains(requestHttpMethod)) {
-			throw new HttpRequestMethodNotSupportedException(requestHttpMethod.name(), supportedHttpMethods.stream().map(Enum::name).collect(Collectors.toSet()));
+			Set<String> methods = new HashSet<>();
+			for (HttpMethod method : supportedHttpMethods) {
+				methods.add(method.name());
+			}
+			throw new HttpRequestMethodNotSupportedException(requestHttpMethod.name(), methods);
 		}
 	}
 

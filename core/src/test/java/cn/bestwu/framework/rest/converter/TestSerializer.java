@@ -1,6 +1,6 @@
 package cn.bestwu.framework.rest.converter;
 
-import cn.bestwu.framework.util.Sha1DigestUtil;
+import cn.bestwu.lang.util.Sha1DigestUtil;
 import org.junit.Test;
 import org.springframework.core.serializer.DefaultSerializer;
 import org.springframework.core.serializer.Serializer;

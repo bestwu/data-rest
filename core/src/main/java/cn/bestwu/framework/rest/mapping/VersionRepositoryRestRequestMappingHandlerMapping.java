@@ -8,8 +8,8 @@ import cn.bestwu.framework.rest.support.ProxyPathMapper;
 import cn.bestwu.framework.rest.support.RepositoryResourceMetadata;
 import cn.bestwu.framework.rest.support.ResourceType;
 import cn.bestwu.framework.rest.support.Version;
-import cn.bestwu.framework.util.ArrayUtil;
 import cn.bestwu.framework.util.ResourceUtil;
+import cn.bestwu.lang.util.ArrayUtil;
 import org.springframework.hateoas.core.AnnotationMappingDiscoverer;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -23,11 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 import static cn.bestwu.framework.util.ResourceUtil.*;
 
@@ -242,13 +238,15 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 	 * @param request request
 	 * @return Comparator
 	 */
-	@Override protected Comparator<RequestMappingInfo> getMappingComparator(HttpServletRequest request) {
-		return (info1, info2) -> {
-			int result = versionCompareTo(getVersions(info1.getProducesCondition().getProducibleMediaTypes()), getVersions(info2.getProducesCondition().getProducibleMediaTypes()), request);//版本比较
-			if (result != 0) {
-				return result;
+	@Override protected Comparator<RequestMappingInfo> getMappingComparator(final HttpServletRequest request) {
+		return new Comparator<RequestMappingInfo>() {
+			@Override public int compare(RequestMappingInfo info1, RequestMappingInfo info2) {
+				int result = versionCompareTo(getVersions(info1.getProducesCondition().getProducibleMediaTypes()), getVersions(info2.getProducesCondition().getProducibleMediaTypes()), request);//版本比较
+				if (result != 0) {
+					return result;
+				}
+				return info1.compareTo(info2, request);
 			}
-			return info1.compareTo(info2, request);
 		};
 	}
 
@@ -257,7 +255,15 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 	 * @return 版本号
 	 */
 	private List<String> getVersions(Set<MediaType> mediaTypes) {
-		return mediaTypes.stream().map(mediaType -> mediaType.getParameter(Version.VERSION_PARAM_NAME)).filter(StringUtils::hasText).collect(Collectors.toList());
+		List<String> versions = new ArrayList<>();
+		for (MediaType mediaType : mediaTypes) {
+			String version = mediaType.getParameter(Version.VERSION_PARAM_NAME);
+			if (StringUtils.hasText(version)) {
+				versions.add(version);
+			}
+
+		}
+		return versions;
 	}
 
 	/**
@@ -275,9 +281,13 @@ public class VersionRepositoryRestRequestMappingHandlerMapping extends RequestMa
 		if (other.isEmpty()) {
 			other.add(Version.DEFAULT_VERSION);
 		}
-		Comparator<String> comparator = Version::compareVersion;
-		me.sort(comparator);
-		other.sort(comparator);
+		Comparator<String> comparator = new Comparator<String>() {
+			@Override public int compare(String o1, String o2) {
+				return Version.compareVersion(o1, o2);
+			}
+		};
+		Collections.sort(me, comparator);
+		Collections.sort(other, comparator);
 
 		String acceptedVersion = ResourceUtil.REQUEST_VERSION.get();
 		int thisIndex, otherIndex, result;

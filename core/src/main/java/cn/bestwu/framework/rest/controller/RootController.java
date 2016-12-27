@@ -3,8 +3,8 @@ package cn.bestwu.framework.rest.controller;
 
 import cn.bestwu.api.sign.ApiSign;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
-import cn.bestwu.framework.util.CaptchaUtil;
-import cn.bestwu.framework.util.Sha1DigestUtil;
+import cn.bestwu.lang.util.CaptchaUtil;
+import cn.bestwu.lang.util.Sha1DigestUtil;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,13 +52,13 @@ public class RootController extends BaseController {
 		Assert.notEmpty(word, getText("param.notnull", "word"));
 
 		Map<String, String> map = new HashMap<>();
-		Arrays.stream(word).forEach(w -> {
+		for (String w : word) {
 			try {
 				map.put(w, PinyinHelper.getShortPinyin(w));
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 			}
-		});
+		}
 		return ok(map);
 	}
 

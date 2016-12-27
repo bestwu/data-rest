@@ -5,6 +5,7 @@ dependencies {
 
     //utils
     compile 'org.atteo:evo-inflector'
+    compile 'cn.bestwu:common-lang'
 
     provided "org.projectlombok:lombok"
 

@@ -1,6 +1,6 @@
 package cn.bestwu.framework.data.query.jpa;
 
-import cn.bestwu.framework.util.StringUtil;
+import cn.bestwu.lang.util.StringUtil;
 import org.hibernate.search.annotations.Field;
 import org.junit.Test;
 

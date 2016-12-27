@@ -29,7 +29,7 @@ public class RepositoryResourceMappings {
 	 * @param repositories repositories
 	 */
 	private void populateCache(Repositories repositories) {
-		repositories.forEach(entityClass -> {
+		for (Class<?> entityClass : repositories) {
 			org.springframework.data.repository.core.RepositoryInformation repositoryInformation = repositories.getRepositoryInformationFor(entityClass);
 			Class<?> repositoryInterface = repositoryInformation.getRepositoryInterface();
 			PersistentEntity<?, ?> entity = repositories.getPersistentEntity(entityClass);
@@ -39,7 +39,7 @@ public class RepositoryResourceMappings {
 			if (!hasMetadataFor(pathName)) {
 				cache.put(pathName, repositoryResourceMetadata);
 			}
-		});
+		}
 	}
 
 	/**

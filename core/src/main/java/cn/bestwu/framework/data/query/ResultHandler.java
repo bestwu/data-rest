@@ -7,7 +7,6 @@ import java.util.List;
  *
  * @author Peter Wu
  */
-@FunctionalInterface
 public interface ResultHandler {
 
 	void accept(List result);

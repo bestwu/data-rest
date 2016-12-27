@@ -1,10 +1,9 @@
 package cn.bestwu.framework.rest.support;
 
-import cn.bestwu.framework.util.ArrayUtil;
+import cn.bestwu.lang.util.ArrayUtil;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.springframework.hateoas.Link;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +22,9 @@ public class SimpleResource<T> extends Resource<T> {
 		super(content);
 		if (ArrayUtil.isNotEmpty(links)) {
 			this.links = new HashMap<>();
-			Arrays.stream(links).forEach(link -> this.links.put(link.getRel(), link.getHref()));
+			for (Link link : links) {
+				this.links.put(link.getRel(), link.getHref());
+			}
 		}
 	}
 
@@ -46,6 +47,8 @@ public class SimpleResource<T> extends Resource<T> {
 		if (this.links == null) {
 			this.links = new HashMap<>();
 		}
-		Arrays.stream(links).forEach(link -> this.links.put(link.getRel(), link.getHref()));
+		for (Link link : links) {
+			this.links.put(link.getRel(), link.getHref());
+		}
 	}
 }

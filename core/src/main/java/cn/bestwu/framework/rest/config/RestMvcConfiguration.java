@@ -53,9 +53,9 @@ import org.springframework.web.servlet.config.annotation.ContentNegotiationConfi
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -303,8 +303,11 @@ public class RestMvcConfiguration {
 		private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
 		@Override public void afterPropertiesSet() throws Exception {
-			if (serializationViewMappings != null)
-				requestMappingHandlerAdapter.setResponseBodyAdvice(Collections.singletonList(requestJsonViewResponseBodyAdvice()));
+			if (serializationViewMappings != null) {
+				List<ResponseBodyAdvice<?>> requestJsonViewResponseBodyAdvices = new ArrayList<>(1);
+				requestJsonViewResponseBodyAdvices.add(requestJsonViewResponseBodyAdvice());
+				requestMappingHandlerAdapter.setResponseBodyAdvice(requestJsonViewResponseBodyAdvices);
+			}
 		}
 	}
 

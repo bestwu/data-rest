@@ -7,12 +7,12 @@ import org.springframework.util.Assert;
  *
  * @author Peter Wu
  */
-public interface Version {
-	String DEFAULT_VERSION = "1.0";
+public abstract class Version {
+	public static String DEFAULT_VERSION = "1.0";
 	/**
 	 * 请求头中Accept中包含的版本参数名
 	 */
-	String VERSION_PARAM_NAME = "version";
+	public static String VERSION_PARAM_NAME = "version";
 
 	/**
 	 * 比较版本信息
@@ -21,7 +21,7 @@ public interface Version {
 	 * @param version2 只包含数字
 	 * @return int
 	 */
-	static int compareVersion(String version1, String version2) {
+	public static int compareVersion(String version1, String version2) {
 		if (version1.equals(version2)) {
 			return 0;
 		}
@@ -62,7 +62,7 @@ public interface Version {
 	 * @param version2 version2
 	 * @return version1 是否包含 version2
 	 */
-	static boolean included(String version1, String version2) {
+	public static boolean included(String version1, String version2) {
 		return version1.contains(version2) || version1.matches(version2);
 	}
 
@@ -71,7 +71,7 @@ public interface Version {
 	 * @param version2 version2
 	 * @return version1 是否等于 version2
 	 */
-	static boolean equals(String version1, String version2) {
+	public static boolean equals(String version1, String version2) {
 		Assert.notNull(version1);
 		return version1.equalsIgnoreCase(version2);
 	}

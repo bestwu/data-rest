@@ -34,7 +34,7 @@ public class SerializationViewMappings {
 		}
 
 		Class<?>[] classes = serializationViewsClass.getClasses();
-		Arrays.stream(classes).forEach(clazz -> {
+		for (Class<?> clazz : classes) {
 			String className = clazz.getSimpleName();//例子：get_users_v_1_0
 			String signature = className.replaceAll("^(.*)_v_.*$", "$1");
 			String version = className.replaceAll("^.*_v_(.*)$", "$1");
@@ -52,9 +52,11 @@ public class SerializationViewMappings {
 			if (firstPut) {
 				cache.put(signature, jsonViews);
 			}
-		});
+		}
 
-		cache.values().forEach(Collections::sort);
+		for (List<VersionedSerializationView> serializationViews : cache.values()) {
+			Collections.sort(serializationViews);
+		}
 	}
 
 	/**

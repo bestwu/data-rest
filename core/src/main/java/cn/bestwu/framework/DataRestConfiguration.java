@@ -7,7 +7,7 @@ import cn.bestwu.framework.event.AnnotatedEventHandlerInvoker;
 import cn.bestwu.framework.rest.config.RestMvcConfiguration;
 import cn.bestwu.framework.rest.resolver.LucenePageableHandlerMethodArgumentResolver;
 import cn.bestwu.framework.rest.resolver.LuceneSortHandlerMethodArgumentResolver;
-import cn.bestwu.framework.util.AutowireHelper;
+import cn.bestwu.lang.util.AutowireHelper;
 import org.hibernate.search.jpa.Search;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,8 +70,9 @@ public class DataRestConfiguration {
 
 		List<MappingContext<?, ?>> arrayList = new ArrayList<>();
 
-		BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, MappingContext.class).values().forEach(arrayList::add);
-
+		for (MappingContext mappingContext : BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext, MappingContext.class).values()) {
+			arrayList.add(mappingContext);
+		}
 		return new PersistentEntities(arrayList);
 	}
 

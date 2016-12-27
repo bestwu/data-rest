@@ -87,12 +87,14 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 				BindException er = (BindException) e;
 				List<FieldError> fieldErrors = er.getFieldErrors();
 				//			String errorMsg = getText("data.valid.failed");
-				fieldErrors.forEach(fieldError -> {
+				for (FieldError fieldError : fieldErrors) {
 					String defaultMessage = fieldError.getDefaultMessage();
 					if (defaultMessage.contains("required type"))
 						defaultMessage = getText(fieldError.getCode());
 					errors.put(fieldError.getField(), getText(fieldError.getField()) + defaultMessage);
-				});
+
+				}
+
 				message = errors.values().iterator().next();
 
 				if (!StringUtils.hasText(message)) {
@@ -121,9 +123,10 @@ public class BaseErrorAttributes extends BaseController implements ErrorAttribut
 					ConstraintViolationException er = (ConstraintViolationException) e;
 					Set<ConstraintViolation<?>> constraintViolations = er.getConstraintViolations();
 					//			String errorMsg = getText("data.valid.failed");
-					constraintViolations
-							.forEach(constraintViolation -> errors
-									.put(constraintViolation.getPropertyPath().toString(), getText(constraintViolation.getPropertyPath()) + constraintViolation.getMessage()));
+					for (ConstraintViolation<?> constraintViolation : constraintViolations) {
+						errors
+								.put(constraintViolation.getPropertyPath().toString(), getText(constraintViolation.getPropertyPath()) + constraintViolation.getMessage());
+					}
 					message = errors.values().iterator().next();
 
 					if (!StringUtils.hasText(message)) {

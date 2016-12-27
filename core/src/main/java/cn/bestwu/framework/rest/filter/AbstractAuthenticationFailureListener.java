@@ -1,6 +1,6 @@
 package cn.bestwu.framework.rest.filter;
 
-import cn.bestwu.framework.util.StringUtil;
+import cn.bestwu.lang.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEvent;

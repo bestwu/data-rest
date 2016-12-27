@@ -1,6 +1,6 @@
 package cn.bestwu.framework.rest.support;
 
-import cn.bestwu.framework.util.StringUtil;
+import cn.bestwu.lang.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.core.io.FileSystemResource;

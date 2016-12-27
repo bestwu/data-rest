@@ -1,6 +1,6 @@
 package cn.bestwu.framework.data.validator;
 
-import cn.bestwu.framework.util.CellUtil;
+import cn.bestwu.lang.util.CellUtil;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

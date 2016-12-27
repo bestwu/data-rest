@@ -1,6 +1,6 @@
 package cn.bestwu.framework.jpa;
 
-import cn.bestwu.framework.support.client.CustomRestTemplate;
+import cn.bestwu.test.client.CustomRestTemplate;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +37,7 @@ public class ExcludeTest {
 	/**
 	 * 全不支持
 	 *
-	 * @throws Exception
+	 * @throws Exception Exception
 	 */
 	@Test
 	public void testExludeAll() throws Exception {
@@ -63,7 +63,7 @@ public class ExcludeTest {
 	/**
 	 * 不支持更新
 	 *
-	 * @throws Exception
+	 * @throws Exception Exception
 	 */
 	@Test
 	public void testExludeUpdate() throws Exception {
@@ -85,7 +85,7 @@ public class ExcludeTest {
 	/**
 	 * 只支持查询列表
 	 *
-	 * @throws Exception
+	 * @throws Exception Exception
 	 */
 	@Test
 	public void testExlude() throws Exception {

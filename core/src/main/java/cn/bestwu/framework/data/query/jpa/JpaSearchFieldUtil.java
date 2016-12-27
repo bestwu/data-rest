@@ -1,6 +1,6 @@
 package cn.bestwu.framework.data.query.jpa;
 
-import cn.bestwu.framework.util.StringUtil;
+import cn.bestwu.lang.util.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
@@ -10,7 +10,6 @@ import org.springframework.beans.BeanUtils;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +24,7 @@ public class JpaSearchFieldUtil {
 	/**
 	 * domainType 类上注解了AnnotationType 的字段
 	 *
-	 * @param domainType      domainType
+	 * @param domainType     domainType
 	 * @param AnnotationType AnnotationType
 	 * @param <T>            T
 	 * @return 字段名
@@ -40,8 +39,12 @@ public class JpaSearchFieldUtil {
 	}
 
 	private static <T> void getAnnotationedFields(Set<String> fields, Class<T> domainType, Class<? extends Annotation> AnnotationType, String parentFieldName) {
-		Arrays.stream(domainType.getDeclaredFields()).forEach(field -> addAnnotationedFields(fields, field, AnnotationType, parentFieldName));
-		Arrays.stream(BeanUtils.getPropertyDescriptors(domainType)).forEach(propertyDescriptor -> addAnnotationedPropertys(fields, propertyDescriptor, AnnotationType, parentFieldName));
+		for (java.lang.reflect.Field field : domainType.getDeclaredFields()) {
+			addAnnotationedFields(fields, field, AnnotationType, parentFieldName);
+		}
+		for (PropertyDescriptor propertyDescriptor : BeanUtils.getPropertyDescriptors(domainType)) {
+			addAnnotationedPropertys(fields, propertyDescriptor, AnnotationType, parentFieldName);
+		}
 	}
 
 	private static void addAnnotationedPropertys(Set<String> fields, PropertyDescriptor propertyDescriptor, Class<? extends Annotation> annotationType, String parentFieldName) {

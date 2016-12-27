@@ -3,7 +3,7 @@ package cn.bestwu.framework.rest.resolver;
 import cn.bestwu.framework.rest.annotation.Domain;
 import cn.bestwu.framework.rest.controller.BaseController;
 import cn.bestwu.framework.rest.exception.ResourceNotFoundException;
-import cn.bestwu.framework.util.StringUtil;
+import cn.bestwu.lang.util.StringUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;

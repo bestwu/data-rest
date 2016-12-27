@@ -1,7 +1,7 @@
 package cn.bestwu.framework.rest.resolver;
 
 import cn.bestwu.framework.data.query.LuceneSort;
-import cn.bestwu.framework.util.BooleanUtil;
+import cn.bestwu.lang.util.BooleanUtil;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.springframework.beans.factory.annotation.Qualifier;

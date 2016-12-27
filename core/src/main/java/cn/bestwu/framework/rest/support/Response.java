@@ -4,7 +4,7 @@ import cn.bestwu.framework.data.annotation.DisableSelfRel;
 import cn.bestwu.framework.event.ItemResourceEvent;
 import cn.bestwu.framework.rest.controller.RepositoryEntityController;
 import cn.bestwu.framework.util.ResourceUtil;
-import cn.bestwu.framework.util.Sha1DigestUtil;
+import cn.bestwu.lang.util.Sha1DigestUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,10 +24,7 @@ import org.springframework.util.ClassUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 响应客户端
@@ -210,11 +207,14 @@ public class Response {
 				}
 			} else if (source instanceof Iterable<?>) {
 				Iterable<?> iterable = (Iterable<?>) source;
-				if (iterable.iterator().hasNext()) {
+				Iterator<?> iterator = iterable.iterator();
+				if (iterator.hasNext()) {
 					ResourceConverter converter = getResourceConverter(persistentEntityResource, supportClientCache);
 
 					List<PersistentEntityResource<?>> newContent = new ArrayList<>();
-					iterable.forEach(object -> newContent.add(converter.convert(object)));
+					while (iterator.hasNext()){
+						newContent.add(converter.convert(iterator.next()));
+					}
 					ResponseEntity.BodyBuilder bodyBuilder = converter.getBodyBuilder();
 					return bodyBuilder.body(persistentEntityResource.map(newContent));
 				}
@@ -319,7 +319,7 @@ public class Response {
 	private class ResourceConverter implements Converter<Object, PersistentEntityResource<?>> {
 
 		private List<String> eTagValues = new ArrayList<>();
-		private List<Long> LastModifieds = new ArrayList<>();
+		private List<Long> lastModifieds = new ArrayList<>();
 
 		private boolean hasEtag = true;
 		private boolean hasLastModified = true;
@@ -355,7 +355,7 @@ public class Response {
 						if (lastModifiedDate == null) {
 							hasLastModified = false;
 						} else {
-							LastModifieds.add(lastModifiedDate.getTimeInMillis());
+							lastModifieds.add(lastModifiedDate.getTimeInMillis());
 						}
 					}
 				}
@@ -388,8 +388,12 @@ public class Response {
 					headers.setETag(eTagValue);
 				}
 				if (hasLastModified) {
-					LastModifieds.sort((x, y) -> (x < y) ? 1 : ((Objects.equals(x, y)) ? 0 : -1));
-					headers.setLastModified(LastModifieds.get(0));
+					Collections.sort(lastModifieds,new Comparator<Long>() {
+						@Override public int compare(Long x, Long y) {
+							return (x < y) ? 1 : ((Objects.equals(x, y)) ? 0 : -1);
+						}
+					});
+					headers.setLastModified(lastModifieds.get(0));
 				}
 
 				return ResponseEntity.ok().headers(cacheControl(headers));

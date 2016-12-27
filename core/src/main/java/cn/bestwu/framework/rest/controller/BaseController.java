@@ -3,23 +3,18 @@ package cn.bestwu.framework.rest.controller;
 import cn.bestwu.framework.rest.annotation.DefaultSort;
 import cn.bestwu.framework.rest.resolver.DomainMethodArgumentResolver;
 import cn.bestwu.framework.rest.support.Response;
-import cn.bestwu.framework.util.ParameterUtil;
 import cn.bestwu.framework.util.ResourceUtil;
+import cn.bestwu.lang.util.ParameterUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mapping.PersistentEntity;
-import org.springframework.data.repository.support.RepositoryInvoker;
 import org.springframework.data.repository.support.RepositoryInvokerFactory;
-import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletContext;
-import java.io.Serializable;
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * 基础控制器
@@ -217,32 +212,32 @@ public abstract class BaseController extends Response {
 		return ParameterUtil.hasParameterKey(request.getParameterMap(), key);
 	}
 
-	/**
-	 * 设置已存在的相关资源
-	 *
-	 * @param source source
-	 * @param action 操作
-	 * @param <S>    S
-	 */
-	protected <S> void setRelatedProperty(S source, Consumer<S> action) {
-		if (source != null) {
-			Class<?> sourceClass = source.getClass();
-			if (ClassUtils.isCglibProxy(source)) {
-				sourceClass = sourceClass.getSuperclass();
-			}
-			PersistentEntity<?, ?> sourceEntity = getPersistentEntity(sourceClass);
-			Object id = sourceEntity.getIdentifierAccessor(source).getIdentifier();
-			if (id != null) {
-				RepositoryInvoker repositoryInvoker = invokerFactory.getInvokerFor(sourceClass);
-				source = repositoryInvoker.invokeFindOne((Serializable) id);
-				if (source == null) {
-					throw new IllegalArgumentException(getText("id.notFound"));
-				}
-			} else {
-				source = null;
-			}
-		}
-		action.accept(source);
-	}
+	//	/**
+	//	 * 设置已存在的相关资源
+	//	 *
+	//	 * @param source source
+	//	 * @param action 操作
+	//	 * @param <S>    S
+	//	 */
+	//	protected <S> void setRelatedProperty(S source, Consumer<S> action) {
+	//		if (source != null) {
+	//			Class<?> sourceClass = source.getClass();
+	//			if (ClassUtils.isCglibProxy(source)) {
+	//				sourceClass = sourceClass.getSuperclass();
+	//			}
+	//			PersistentEntity<?, ?> sourceEntity = getPersistentEntity(sourceClass);
+	//			Object id = sourceEntity.getIdentifierAccessor(source).getIdentifier();
+	//			if (id != null) {
+	//				RepositoryInvoker repositoryInvoker = invokerFactory.getInvokerFor(sourceClass);
+	//				source = repositoryInvoker.invokeFindOne((Serializable) id);
+	//				if (source == null) {
+	//					throw new IllegalArgumentException(getText("id.notFound"));
+	//				}
+	//			} else {
+	//				source = null;
+	//			}
+	//		}
+	//		action.accept(source);
+	//	}
 
 }

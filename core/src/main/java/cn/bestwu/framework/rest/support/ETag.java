@@ -1,7 +1,7 @@
 package cn.bestwu.framework.rest.support;
 
 import cn.bestwu.framework.rest.exception.ETagDoesntMatchException;
-import cn.bestwu.framework.util.Sha1DigestUtil;
+import cn.bestwu.lang.util.Sha1DigestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.serializer.DefaultSerializer;
 import org.springframework.core.serializer.Serializer;
