@@ -1,13 +1,6 @@
-buildscript {
-    repositories {
-        jcenter()
-        maven { url 'http://repo.spring.io/plugins-release/' }
-        maven { url 'https://plugins.gradle.org/m2/' }
-    }
-    dependencies {
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.6'
-        classpath 'io.spring.gradle:dependency-management-plugin:0.6.0.RELEASE'
-    }
+plugins {
+    id 'io.spring.dependency-management' version '1.0.0.RELEASE'
+    id 'cn.bestwu.propdeps' version '0.0.10'
 }
 
 subprojects {
@@ -18,7 +11,7 @@ subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
     apply plugin: "io.spring.dependency-management"
-    apply plugin: 'propdeps'
+    apply plugin: 'cn.bestwu.propdeps'
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
@@ -55,17 +48,8 @@ subprojects {
     }
 
     dependencies {
-
         //test
         testCompile 'cn.bestwu:test'
     }
 
-}
-
-apply plugin: 'idea'
-idea {
-    project {
-        jdkName = '1.7'
-        languageLevel = '1.7'
-    }
 }
