@@ -155,7 +155,7 @@ public class LogAspect {
 						servletPath, StringUtil.valueOf(headers, true), StringUtil.valueOf(parameterMap, true), resultStr);
 			else {
 				if (error)
-					log.error(MSG_CODE, ipAddress, StringUtil.subString(getUserAgent(), 220), principalName, requestMethod, requestSignature,
+					log.warn(MSG_CODE, ipAddress, StringUtil.subString(getUserAgent(), 220), principalName, requestMethod, requestSignature,
 							servletPath, StringUtil.valueOf(headers), StringUtil.valueOf(parameterMap), resultStr);
 				else
 					log.info(MSG_CODE, ipAddress, StringUtil.subString(getUserAgent(), 220), principalName, requestMethod, requestSignature,
